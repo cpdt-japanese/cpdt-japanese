@@ -1,0 +1,73 @@
+\documentclass[12pt]{report}
+\usepackage[]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{fullpage}
+\usepackage{coqdoc}
+\usepackage{amsmath,amssymb}
+\usepackage{url}
+\usepackage{makeidx,hyperref}
+
+\newcommand{\naive}[0]{na\"ive}
+
+\title{Certified Programming with Dependent Types}
+\author{Adam Chlipala}
+
+\makeindex
+
+\begin{document}
+
+\maketitle
+
+A print version of this book is available from the MIT Press.  For more information, see the book's home page:
+
+\begin{center} \url{http://adam.chlipala.net/cpdt/} \end{center}
+
+\thispagestyle{empty}
+\mbox{}\vfill
+\begin{center}
+
+Copyright Adam Chlipala 2008-2013, 2015.
+
+
+This work is licensed under a
+Creative Commons Attribution-Noncommercial-No Derivative Works 3.0
+Unported License.
+The license text is available at:
+
+\end{center}
+
+\begin{center} \url{http://creativecommons.org/licenses/by-nc-nd/3.0/} \end{center}
+
+\phantomsection
+\tableofcontents
+
+\include{Intro.v}
+\include{StackMachine.v}
+\include{InductiveTypes.v}
+\include{Predicates.v}
+\include{Coinductive.v}
+\include{Subset.v}
+\include{GeneralRec.v}
+\include{MoreDep.v}
+\include{DataStruct.v}
+\include{Equality.v}
+\include{Generic.v}
+\include{Universes.v}
+\include{LogicProg.v}
+\include{Match.v}
+\include{Reflection.v}
+\include{Large.v}
+\include{ProgLang.v}
+\include{Conclusion.v}
+
+\clearpage
+\addcontentsline{toc}{chapter}{Bibliography}
+\bibliographystyle{plain}
+\bibliography{cpdt}
+
+\clearpage
+\addcontentsline{toc}{chapter}{Index}
+\printindex
+
+\end{document}

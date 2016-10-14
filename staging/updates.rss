@@ -1,0 +1,373 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<rss version="2.0">
+<channel>
+
+<title>Certified Programming with Dependent Types updates</title>
+<link>http://adam.chlipala.net/cpdt/</link>
+<description>Updates to a draft textbook</description>
+
+<language>en-us</language>
+<managingEditor>adam@chlipala.net</managingEditor>
+<webMaster>adam@chlipala.net</webMaster>
+<docs>http://blogs.law.harvard.edu/tech/rss</docs>
+
+<item>
+        <title>Book source updated for Coq 8.5</title>
+        <pubDate>Wed, 5 Aug 2015 18:08:34 EDT</pubDate>
+        <link>http://adam.chlipala.net/cpdt/</link>
+        <author>adamc@csail.mit.edu</author>
+        <description>The online versions of the book have been updated with code that builds not only in Coq version 8.4, current at the time that the print book was released, but now also builds in Coq 8.5, which is in beta release now.</description>
+</item>
+
+<item>
+        <title>CPDT now available in print!</title>
+        <pubDate>Fri, 13 Dec 2013 13:05:17 EST</pubDate>
+        <link>http://adam.chlipala.net/cpdt/</link>
+        <author>adamc@csail.mit.edu</author>
+        <description>I'm happy to report that the print version of the book has been released officially!  My web site for the book now includes links to online purchasing options.</description>
+</item>
+
+<item>
+        <title>Finished last pass before entering MIT Press editorial process</title>
+        <pubDate>Wed, 13 Feb 2013 10:23:25 EST</pubDate>
+        <link>http://adam.chlipala.net/cpdt/</link>
+        <author>adamc@csail.mit.edu</author>
+        <description>This is it: the content is largely frozen now, and next comes copyediting by the publisher.</description>
+</item>
+
+<item>
+        <title>Batch of changes based on proofreader feedback</title>
+        <pubDate>Sun, 6 Jan 2013 16:34:49 EST</pubDate>
+        <link>http://adam.chlipala.net/cpdt/</link>
+        <author>adamc@csail.mit.edu</author>
+        <description>Thanks to everyone who is helping with the final proofreading!</description>
+</item>
+
+<item>
+        <title>Batch of changes based on proofreader feedback</title>
+        <pubDate>Fri, 30 Nov 2012 11:57:14 EST</pubDate>
+        <link>http://adam.chlipala.net/cpdt/</link>
+        <author>adamc@csail.mit.edu</author>
+        <description>Thanks to everyone who is helping with the final proofreading!</description>
+</item>
+
+<item>
+        <title>Batch of changes based on proofreader feedback</title>
+        <pubDate>Sun, 11 Nov 2012 18:16:46 EST</pubDate>
+        <link>http://adam.chlipala.net/cpdt/</link>
+        <author>adamc@csail.mit.edu</author>
+        <description>Thanks to everyone who is helping with the final proofreading!</description>
+</item>
+
+<item>
+        <title>Batch of changes based on proofreader feedback</title>
+        <pubDate>Thu, 25 Oct 2012 08:40:19 EDT</pubDate>
+        <link>http://adam.chlipala.net/cpdt/</link>
+        <author>adamc@csail.mit.edu</author>
+        <description>Thanks to everyone who is helping with the final proofreading!</description>
+</item>
+
+<item>
+        <title>Batch of changes based on proofreader feedback</title>
+        <pubDate>Mon, 22 Oct 2012 14:23:27 EDT</pubDate>
+        <link>http://adam.chlipala.net/cpdt/</link>
+        <author>adamc@csail.mit.edu</author>
+        <description>Thanks to everyone who is helping with the final proofreading!</description>
+</item>
+
+<item>
+        <title>Batch of changes based on proofreader feedback</title>
+        <pubDate>Mon, 8 Oct 2012 16:04:09 EDT</pubDate>
+        <link>http://adam.chlipala.net/cpdt/</link>
+        <author>adamc@csail.mit.edu</author>
+        <description>Thanks to everyone who is helping with the final proofreading!</description>
+</item>
+
+<item>
+        <title>Batch of changes based on proofreader feedback</title>
+        <pubDate>Tue, 2 Oct 2012 11:34:17 EDT</pubDate>
+        <link>http://adam.chlipala.net/cpdt/</link>
+        <author>adamc@csail.mit.edu</author>
+        <description>Thanks to everyone who is helping with the final proofreading!</description>
+</item>
+
+<item>
+        <title>Batch of changes based on proofreader feedback</title>
+        <pubDate>Wed, 26 Sep 2012 16:31:01 EDT</pubDate>
+        <link>http://adam.chlipala.net/cpdt/</link>
+        <author>adamc@csail.mit.edu</author>
+        <description>Thanks to everyone who is helping with the final proofreading!</description>
+</item>
+
+<item>
+        <title>Ready for final proofreading</title>
+        <pubDate>Thu, 30 Aug 2012 08:31:25 EDT</pubDate>
+        <link>http://adam.chlipala.net/cpdt/</link>
+        <author>adamc@csail.mit.edu</author>
+        <description>I've finished a full proofreading pass; CPDT is now almost ready to turn over to the MIT Press editorial process, the beginning of the home stretch for conventional publication!  I'm looking for folks to proofread the current version in full.  Please let me know if you're interested!</description>
+</item>
+
+<item>
+        <title>Vertical spacing</title>
+        <pubDate>Wed, 1 Aug 2012 17:29:20 EDT</pubDate>
+        <link>http://adam.chlipala.net/cpdt/</link>
+        <author>adamc@csail.mit.edu</author>
+        <description>This is a mundane revision where I've normalized the vertical space separators between text sections.  Like the last release, this one won't build for LaTeX without a coqdoc patch that may not be in Coq's Subversion repos yet.  This is the home stretch; I am going to make a proofreading pass through everything, and then I'll be looking for other proofreaders to help come up with the final version to be published by MIT Press!</description>
+</item>
+
+<item>
+        <title>Taking advantage of coqdoc changes</title>
+        <pubDate>Fri, 27 Jul 2012 16:48:35 EDT</pubDate>
+        <link>http://adam.chlipala.net/cpdt/</link>
+        <author>adamc@csail.mit.edu</author>
+        <description>Starting with some help from Matthieu Sozeau, a number of improvements have been made to the coqdoc program, which is used to generate CPDT renderings.  The changes aren't in any Coq release yet (not even an 8.4 beta release), but I hope they will make it into the final 8.4, and I've used a working Coq version to generate pretty outputs.  Now the only concrete change I have planned before the final CPDT version for publication is tweaking of empty vertical space between some page elements.</description>
+</item>
+
+<item>
+        <title>Preparing for final typesetting</title>
+        <pubDate>Fri, 8 Jun 2012 15:55:17 EDT</pubDate>
+        <link>http://adam.chlipala.net/cpdt/</link>
+        <author>adamc@csail.mit.edu</author>
+        <description>I'm getting ready for the final push to get the PDF rendering into shape to use as the final version of the book to deliver to MIT Press.  I plan to get some coqdoc issues fixed, and I've undone some hack-arounds that were meant to avoid a need for coqdoc changes, in addition to some general improvements to the markup.  I've also made some changes to take advantage of Coq 8.4 features.</description>
+</item>
+
+<item>
+        <title>Some content finishing touches</title>
+        <pubDate>Sun, 22 Apr 2012 16:26:07 EDT</pubDate>
+        <link>http://adam.chlipala.net/cpdt/</link>
+        <author>adamc@csail.mit.edu</author>
+        <description>In introduction, clarify meaning of certified programming; add some citations.</description>
+</item>
+
+<item>
+        <title>A number of revisions</title>
+        <pubDate>Thu, 12 Apr 2012 18:42:46 EDT</pubDate>
+        <link>http://adam.chlipala.net/cpdt/</link>
+        <author>adamc@csail.mit.edu</author>
+        <description>Stronger theorem at end of "Infinite Data and Proofs" chapter; in "Reasoning About Equality Proofs" chapter, more discussion of axiom avoidance and tactic pitfalls for JMeq; general passes through "Proof Search in Ltac" and "Proving in the Large" chapters; in "Universes and Axioms" chapter, a class of baffling error messages explained; comments added to CpdtTactics.v.</description>
+</item>
+
+<item>
+        <title>New Conclusion page</title>
+        <pubDate>Tue, 3 Apr 2012 15:08:37 EDT</pubDate>
+        <link>http://adam.chlipala.net/cpdt/</link>
+        <author>adamc@csail.mit.edu</author>
+</item>
+
+<item>
+        <title>New chapter: "A Taste of Reasoning About Programming Language Syntax"</title>
+        <pubDate>Sun, 1 Apr 2012 14:58:20 EDT</pubDate>
+        <link>http://adam.chlipala.net/cpdt/</link>
+        <author>adamc@csail.mit.edu</author>
+        <description>This new chapter condenses and recasts some material from the old Part IV of CPDT.  I felt the level of detail I was giving was out of proportion to my certainty that the techniques I was demonstrating would make sense to use in 5 years, so I'm opting instead for a quick tour that is mostly meant to convey the moral that encoding choices matter (but also to introduce PHOAS).</description>
+</item>
+
+<item>
+        <title>Update to work with Coq 8.4 beta (and keep working with 8.3pl2)</title>
+        <pubDate>Thu, 29 Mar 2012 18:10:00 EDT</pubDate>
+        <link>http://adam.chlipala.net/cpdt/</link>
+        <author>adamc@csail.mit.edu</author>
+</item>
+
+<item>
+        <title>Two new tricks useful in proof by reflection</title>
+        <pubDate>Thu, 29 Mar 2012 17:12:01 EDT</pubDate>
+        <link>http://adam.chlipala.net/cpdt/</link>
+        <author>adamc@csail.mit.edu</author>
+        <description>The "Universes and Axioms" chapter has a new ending describing a way to avoid axioms in dealing with reified typing environments, and the "Proof by Reflection" chapter has a new ending explaining how to write a reification function that recurses under binders.</description>
+</item>
+
+<item>
+        <title>Revisions touching many chapters</title>
+        <pubDate>Mon, 26 Mar 2012 16:59:11 EDT</pubDate>
+        <link>http://adam.chlipala.net/cpdt/</link>
+        <author>adamc@csail.mit.edu</author>
+        <description>I've moved the exercises out of the book, because I don't feel that I have the time to produce well-tested exercises yet; changed crush's use of autorewrite so that Hint Rewrite commands may be given without explicit hint databases; added a crucial new section to "More Dependent Types"; and added prose and other improvements to "Proof Search by Logic Programming."</description>
+</item>
+
+<item>
+        <title>A pass through "Proving in the Large"</title>
+        <pubDate>Wed, 9 Nov 2011 15:25:42 EST</pubDate>
+        <link>http://adam.chlipala.net/cpdt/</link>
+        <author>adamc@csail.mit.edu</author>
+</item>
+
+<item>
+        <title>A pass through "Reasoning About Equality Proofs"</title>
+        <pubDate>Sun, 6 Nov 2011 16:50:59 EST</pubDate>
+        <link>http://adam.chlipala.net/cpdt/</link>
+        <author>adamc@csail.mit.edu</author>
+	<description>I've added a new discussion of the reduction behavior of "fix" and "cofix" terms.</description>
+</item>
+
+<item>
+        <title>A pass through "Proof by Reflection"</title>
+        <pubDate>Wed, 2 Nov 2011 16:22:00 EDT</pubDate>
+        <link>http://adam.chlipala.net/cpdt/</link>
+        <author>adamc@csail.mit.edu</author>
+	<description>I've added a new subsection on reification of term syntax with Ltac, in a way that preserves equality between uninterpreted subterms.</description>
+</item>
+
+<item>
+        <title>A pass through "Generic Programming"</title>
+        <pubDate>Mon, 31 Oct 2011 14:23:29 EDT</pubDate>
+        <link>http://adam.chlipala.net/cpdt/</link>
+        <author>adamc@csail.mit.edu</author>
+</item>
+
+<item>
+        <title>New chapter: "General Recursion"</title>
+        <pubDate>Fri, 28 Oct 2011 18:25:46 EDT</pubDate>
+        <link>http://adam.chlipala.net/cpdt/</link>
+        <author>adamc@csail.mit.edu</author>
+</item>
+
+<item>
+        <title>A pass through "Infinite Data and Proofs"</title>
+        <pubDate>Sun, 23 Oct 2011 14:47:55 EDT</pubDate>
+        <link>http://adam.chlipala.net/cpdt/</link>
+        <author>adamc@csail.mit.edu</author>
+	<description>I've added new discussion of co-induction principles and replaced the programming language semantics example.</description>
+</item>
+
+<item>
+        <title>A pass through "Universes and Axioms"</title>
+        <pubDate>Wed, 19 Oct 2011 09:58:57 EDT</pubDate>
+        <link>http://adam.chlipala.net/cpdt/</link>
+        <author>adamc@csail.mit.edu</author>
+	<description>I've added a new section on avoiding axioms.</description>
+</item>
+
+<item>
+        <title>A pass through "Dependent Data Structures"</title>
+        <pubDate>Sun, 16 Oct 2011 10:45:48 EDT</pubDate>
+        <link>http://adam.chlipala.net/cpdt/</link>
+        <author>adamc@csail.mit.edu</author>
+</item>
+
+<item>
+        <title>A pass through "More Dependent Types"</title>
+        <pubDate>Mon, 10 Oct 2011 15:59:55 EDT</pubDate>
+        <link>http://adam.chlipala.net/cpdt/</link>
+        <author>adamc@csail.mit.edu</author>
+</item>
+
+<item>
+        <title>A pass through "Subset Types and Variations"</title>
+        <pubDate>Wed, 5 Oct 2011 11:32:54 EDT</pubDate>
+        <link>http://adam.chlipala.net/cpdt/</link>
+        <author>adamc@csail.mit.edu</author>
+</item>
+
+<item>
+        <title>New Match exercises; remove Part IV</title>
+        <pubDate>Mon, 3 Oct 2011 11:18:27 EDT</pubDate>
+        <link>http://adam.chlipala.net/cpdt/</link>
+        <author>adamc@csail.mit.edu</author>
+        <description>The old Part IV is still present in old versions available through the public Mercurial repository.</description>
+</item>
+
+<item>
+        <title>New chapter on logic programing</title>
+        <pubDate>Thu, 22 Sep 2011 11:08:30 EDT</pubDate>
+        <link>http://adam.chlipala.net/cpdt/</link>
+        <author>adamc@csail.mit.edu</author>
+        <description>Some new content is missing prose.</description>
+</item>
+
+<item>
+        <title>A pass through Chapter 4</title>
+        <pubDate>Mon, 19 Sep 2011 14:03:40 EDT</pubDate>
+        <link>http://adam.chlipala.net/cpdt/</link>
+        <author>adamc@csail.mit.edu</author>
+</item>
+
+<item>
+        <title>Added a public Mercurial repository with the book source</title>
+        <pubDate>Wed, 14 Sep 2011 14:01:23 EDT</pubDate>
+        <link>http://adam.chlipala.net/cpdt/repo</link>
+        <author>adamc@csail.mit.edu</author>
+</item>
+
+<item>
+        <title>A pass through Chapter 3</title>
+        <pubDate>Mon, 12 Sep 2011 16:47:12 EDT</pubDate>
+        <link>http://adam.chlipala.net/cpdt/</link>
+        <author>adamc@csail.mit.edu</author>
+</item>
+
+<item>
+        <title>Renamed "Tactics" module to "CpdtTactics"</title>
+        <pubDate>Wed, 7 Sep 2011 13:45:31 EDT</pubDate>
+        <link>http://adam.chlipala.net/cpdt/</link>
+        <author>adamc@csail.mit.edu</author>
+	<description>This avoids a name clash with a module included with Coq.</description>
+</item>
+
+<item>
+        <title>A pass through Chapter 2</title>
+        <pubDate>Thu, 1 Sep 2011 11:32:42 EDT</pubDate>
+        <link>http://adam.chlipala.net/cpdt/</link>
+        <author>adamc@csail.mit.edu</author>
+	<description>I've removed some material on dependent pattern-matching but not yet compensated by adding it back in somewhere else.</description>
+</item>
+
+<item>
+        <title>A pass through Chapter 1</title>
+        <pubDate>Thu, 25 Aug 2011 14:47:30 EDT</pubDate>
+        <link>http://adam.chlipala.net/cpdt/</link>
+        <author>adamc@csail.mit.edu</author>
+	<description>I've started passes through all chapters, with an eye toward getting ready both for <a href="http://stellar.mit.edu/S/course/6/fa11/6.892/">my fall class</a> and publication by MIT Press.  I'm adding bibliographic references, index entries, and additional exercises, along with the usual tweaks and improvements.  The version I've just put up is the result of a pass through Chapter 1.  Feedback is especially welcome now, as I get the book into final publishable shape!</description>
+</item>
+
+<item>
+        <title>Tweaks to recent update to satisfy coqdoc 8.3</title>
+        <pubDate>Tue, 18 Jan 2011 08:15:00 EST</pubDate>
+        <link>http://adam.chlipala.net/cpdt/</link>
+        <author>adam@chlipala.net</author>
+</item>
+
+<item>
+        <title>Updated to work with both Coq 8.3 and Coq 8.2</title>
+        <pubDate>Fri, 14 Jan 2011 15:39:00 EST</pubDate>
+        <link>http://adam.chlipala.net/cpdt/</link>
+        <author>adam@chlipala.net</author>
+</item>
+
+<item>
+        <title>A significant revision pass, based on extensive feedback kindly provided by Pierre Castéran</title>
+        <pubDate>Wed, 10 Nov 2010 16:33:49 EST</pubDate>
+        <link>http://adam.chlipala.net/cpdt/</link>
+        <author>adam@chlipala.net</author>
+</item>
+
+<item>
+        <title>Mention that recent versions of Coq allow some omitted "match" cases</title>
+        <pubDate>Mon, 28 Jun 2010 07:59:29 EDT</pubDate>
+        <link>http://adam.chlipala.net/cpdt/</link>
+        <author>adam@chlipala.net</author>
+</item>
+
+<item>
+        <title>A few small typo fixes</title>
+        <pubDate>Sat, 15 May 2010 06:42:47 EDT</pubDate>
+        <link>http://adam.chlipala.net/cpdt/</link>
+        <author>adam@chlipala.net</author>
+</item>
+
+<item>
+        <title>Fix table of contents and mention another command needed to enter Chapter 2's code literally</title>
+        <pubDate>Wed, 3 Feb 2010 08:16:16 EST</pubDate>
+        <link>http://adam.chlipala.net/cpdt/</link>
+        <author>adam@chlipala.net</author>
+</item>
+
+<item>
+        <title>RSS feed created</title>
+        <pubDate>Wed, 27 Jan 2010 07:33:34 EST</pubDate>
+        <link>http://adam.chlipala.net/cpdt/</link>
+        <author>adam@chlipala.net</author>
+</item>
+
+</channel>
+</rss>
