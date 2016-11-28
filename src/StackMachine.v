@@ -10,10 +10,12 @@
 
 (** %\chapter{Some Quick Examples}% *)
 
-(**(*
-I will start off by jumping right in to a fully worked set of examples, building certified compilers from increasingly complicated source languages to stack machines.  We will meet a few useful tactics and see how they can be used in manual proofs, and we will also see how easily these proofs can be automated instead.  This chapter is not meant to give full explanations of the features that are employed.  Rather, it is meant more as an advertisement of what is possible.  Later chapters will introduce all of the concepts in bottom-up fashion.  In other words, it is expected that most readers will not understand what exactly is going on here, but I hope this demo will whet your appetite for the remaining chapters!
+(**
+(** I will start off by jumping right in to a fully worked set of examples, building certified compilers from increasingly complicated source languages to stack machines.  We will meet a few useful tactics and see how they can be used in manual proofs, and we will also see how easily these proofs can be automated instead.  This chapter is not meant to give full explanations of the features that are employed.  Rather, it is meant more as an advertisement of what is possible.  Later chapters will introduce all of the concepts in bottom-up fashion.  In other words, it is expected that most readers will not understand what exactly is going on here, but I hope this demo will whet your appetite for the remaining chapters!
 
 As always, you can step through the source file <<StackMachine.v>> for this chapter interactively in Proof General.  Alternatively, to get a feel for the whole lifecycle of creating a Coq development, you can enter the pieces of source code in this chapter in a new <<.v>> file in an Emacs buffer.  If you do the latter, include these three lines at the start of the file. *)
+*)
+(**
 まずは実際に動く例として、ソース言語からスタックマシンへの証明付きコンパイラの構成から始めましょう。最初はシンプルなソース言語から始め、少しずつ複雑なソース言語も扱っていきます。証明に関しては、いくつかの便利なタクティクを紹介し、それらがどのように手動の証明で使われるか、またそれらがどれだけ簡単に自動化できるかを見ていきます。この章では使う機能の完全な説明を与えるつもりはありません。それよりはむしろ、Coq でできることは何なのかを述べるつもりです。後の章ですべての概念をボトムアップに紹介していきます。言い換えれば、ほとんどの読者にとってここで行われることを完璧に理解するのは難しいかもしれませんが、ここでのデモが残りの章への興味に繋がっていただければ十分です！
 
 読者はいつでもこの章のソースファイル <<StackMachine.v>> を Proof General を使って対話的に1ステップずつ見ていくことができます。あるいは、Coq 開発の過程を手で書いて感じたければ、この章のソースコードの一つ一つを Emacs バッファ内で新規の <<.v>> ファイルに書き込んでいっても良いでしょう。後者の方法を取るなら、ファイルの先頭に以下の三行をコピーしてください。
@@ -29,7 +31,10 @@ Definition bleh := app_assoc.
 (* end thide *)
 (* end hide *)
 
-(** (*In general, similar commands will be hidden in the book rendering of each chapter's source code, so you will need to insert them in from-scratch replayings of the code that is presented.  To be more specific, every chapter begins with the above three lines, with the import list tweaked as appropriate, considering which definitions the chapter uses.  The second command above affects the default behavior of definitions regarding type inference, and the third allows for more concise pattern-matching syntax in Coq versions 8.5 and higher (having no effect in earlier versions). *)
+(**
+(** In general, similar commands will be hidden in the book rendering of each chapter's source code, so you will need to insert them in from-scratch replayings of the code that is presented.  To be more specific, every chapter begins with the above three lines, with the import list tweaked as appropriate, considering which definitions the chapter uses.  The second command above affects the default behavior of definitions regarding type inference, and the third allows for more concise pattern-matching syntax in Coq versions 8.5 and higher (having no effect in earlier versions). *)
+*)
+(**
 今後、各章のソースコード内の似たコマンドは文章中では省略するので、省略された部分は以前与えたところからコピー&ペーストする必要があります。具体的には、どの章の始めにも上の三行が挿入されます。ただし、章ごとに [Require Import] の後を必要に合わせて書き換えなければいけません。二行目のコマンドは型推論に関して定義の標準的なふるまいに影響し、三行目はより簡潔なパターンマッチングの機能を与えます(三行目は Coq のバージョン 8.5 以降のコマンドで、バージョン 8.5 未満には機能しません)。*)
 
 
@@ -40,25 +45,34 @@ Definition bleh := app_assoc.
 
 (** ** ソース言語 *)
 
-(** (* We begin with the syntax of the source language.%\index{Vernacular commands!Inductive}% *)
+(**
+(** We begin with the syntax of the source language.%\index{Vernacular commands!Inductive}% *)
+*)
+(**
 ソース言語のシンタックスから始めます。%\index{Vernacular commands!Inductive}% *)
 
 Inductive binop : Set := Plus | Times.
 
-(** (* Our first line of Coq code should be unsurprising to ML and Haskell programmers.  We define an %\index{algebraic datatypes}%algebraic datatype [binop] to stand for the binary operators of our source language.  There are just two wrinkles compared to ML and Haskell.  First, we use the keyword [Inductive], in place of <<data>>, <<datatype>>, or <<type>>.  This is not just a trivial surface syntax difference; inductive types in Coq are much more expressive than garden variety algebraic datatypes, essentially enabling us to encode all of mathematics, though we begin humbly in this chapter.  Second, there is the %\index{Gallina terms!Set}%[: Set] fragment, which declares that we are defining a datatype that should be thought of as a constituent of programs.  Later, we will see other options for defining datatypes in the universe of proofs or in an infinite hierarchy of universes, encompassing both programs and proofs, that is useful in higher-order constructions. *)
+(**
+(** Our first line of Coq code should be unsurprising to ML and Haskell programmers.  We define an %\index{algebraic datatypes}%algebraic datatype [binop] to stand for the binary operators of our source language.  There are just two wrinkles compared to ML and Haskell.  First, we use the keyword [Inductive], in place of <<data>>, <<datatype>>, or <<type>>.  This is not just a trivial surface syntax difference; inductive types in Coq are much more expressive than garden variety algebraic datatypes, essentially enabling us to encode all of mathematics, though we begin humbly in this chapter.  Second, there is the %\index{Gallina terms!Set}%[: Set] fragment, which declares that we are defining a datatype that should be thought of as a constituent of programs.  Later, we will see other options for defining datatypes in the universe of proofs or in an infinite hierarchy of universes, encompassing both programs and proofs, that is useful in higher-order constructions. *)
+*)
+(**
 私たちの初めての Coq コードとなるこの一行は、ML や Haskell のプログラマには意外なものではないでしょう。ソース言語の二項演算子を表すため、%\index{代数的データ型}%代数的データ型(algebraic datatype) [binop] を定義しました。ここで、ML や Haskell と比較されるべき二つのポイントがあります。一つは、Coq は <<data>>、<<datatype>>、<<type>> の代わりに [Inductive] を使うことです。これは単なる表面上のシンタックスの違いではありません。この章ではごく簡潔にしか触れませんが、Coq の帰納的データ型(inductive data types)はありふれた代数的データ型よりもずっと豊かな表現力を持っていて、とくに数学のすべてを表現することができます。二つ目は、%\index{Gallina terms!Set}%[: Set] です。これは、プログラムの構成要素として考えられるべきデータ型を定義していることを宣言します。プログラムの構成要素ではなく、証明の世界のデータ型、さらにプログラムと証明の両方を包含する、無限の階層を持つ世界のデータ型を定義するときのキーワードも後に与えます。後者は、高階の構成をするときに役立ちます。*)
 
 Inductive exp : Set :=
 | Const : nat -> exp
 | Binop : binop -> exp -> exp -> exp.
 
-(** (* Now we define the type of arithmetic expressions.  We write that a constant may be built from one argument, a natural number; and a binary operation may be built from a choice of operator and two operand expressions.
+(**
+(** Now we define the type of arithmetic expressions.  We write that a constant may be built from one argument, a natural number; and a binary operation may be built from a choice of operator and two operand expressions.
 
 A note for readers following along in the PDF version: %\index{coqdoc}%coqdoc supports pretty-printing of tokens in %\LaTeX{}%#LaTeX# or HTML.  Where you see a right arrow character, the source contains the ASCII text <<->>>.  Other examples of this substitution appearing in this chapter are a double right arrow for <<=>>>, the inverted %`%#'#A' symbol for <<forall>>, and the Cartesian product %`%#'#X' for <<*>>.  When in doubt about the ASCII version of a symbol, you can consult the chapter source code.
 
 %\medskip%
 
 Now we are ready to say what programs in our expression language mean.  We will do this by writing an %\index{interpreters}%interpreter that can be thought of as a trivial operational or denotational semantics.  (If you are not familiar with these semantic techniques, no need to worry: we will stick to "common sense" constructions.)%\index{Vernacular commands!Definition}% *)
+*)
+(**
 算術式を定義しました。定数 [Const] は一つの自然数値の引数から成り、二項演算子 [Binop] は一つの演算子と二つのオペランド式から成るものとして与えます。
 
 本書をPDF版で読んでいる読者への注意：%\index{coqdoc}%coqdoc は Coq のソースコードを %\LaTeX{}%#LaTeX# や HTML 形式に変換します。この PDF 上の右矢印→はソース上では ASCII テキストの <<->>> です。この章では他に、二重の右矢印⇒を <<=>>>、記号∀を <<forall>>、デカルト積×を <<*>> にする置き換えがあります。ASCII テキストでどう書くのかが分からなくなったら、ソースコードを参照してください。
@@ -73,7 +87,8 @@ Definition binopDenote (b : binop) : nat -> nat -> nat :=
     | Times => mult
   end.
 
-(** (* The meaning of a binary operator is a binary function over naturals, defined with pattern-matching notation analogous to the <<case>> and <<match>> of ML and Haskell, and referring to the functions [plus] and [mult] from the Coq standard library.  The keyword [Definition] is Coq's all-purpose notation for binding a term of the programming language to a name, with some associated syntactic sugar, like the notation we see here for defining a function.  That sugar could be expanded to yield this definition:
+(**
+(** The meaning of a binary operator is a binary function over naturals, defined with pattern-matching notation analogous to the <<case>> and <<match>> of ML and Haskell, and referring to the functions [plus] and [mult] from the Coq standard library.  The keyword [Definition] is Coq's all-purpose notation for binding a term of the programming language to a name, with some associated syntactic sugar, like the notation we see here for defining a function.  That sugar could be expanded to yield this definition:
 [[
 Definition binopDenote : binop -> nat -> nat -> nat := fun (b : binop) =>
   match b with
@@ -104,6 +119,8 @@ Finally, commands like [Inductive] and [Definition] are part of %\index{Vernacul
 %\medskip%
 
 We can give a simple definition of the meaning of an expression:%\index{Vernacular commands!Fixpoint}% *)
+*)
+(**
 二項演算子の意味は自然数の二引数関数です。ML や Haskell における <<match>> や <<case>> のようなパターンマッチングを使って定義し、Coq の標準ライブラリ内の関数 [plus] と [mult] を参照しています。[Definition] キーワードは、Coq の項を名前に束縛するための Coq で頻繁に使われる記法で、場合に応じて構文糖衣を持ちます。上の例でも関数を定義するための構文糖衣が用いられており、展開すると以下のようになります：
 [[
 Definition binopDenote : binop -> nat -> nat -> nat := fun (b : binop) =>
@@ -142,12 +159,18 @@ Fixpoint expDenote (e : exp) : nat :=
     | Binop b e1 e2 => (binopDenote b) (expDenote e1) (expDenote e2)
   end.
 
-(** (* We declare explicitly that this is a recursive definition, using the keyword [Fixpoint].  The rest should be old hat for functional programmers. *)
+(**
+(** We declare explicitly that this is a recursive definition, using the keyword [Fixpoint].  The rest should be old hat for functional programmers. *)
+*)
+(**
 [Fixpoint] キーワードを使って、これは再帰的定義をしていることを明示的に宣言しています。残りの部分は関数型プログラマにとっては目新しいものではないでしょう。 *)
 
-(** (* It is convenient to be able to test definitions before starting to prove things about them.  We can verify that our semantics is sensible by evaluating some sample uses, using the command %\index{Vernacular commands!Eval}%[Eval].  This command takes an argument expressing a%\index{reduction strategy}% _reduction strategy_, or an "order of evaluation."  Unlike with ML, which hardcodes an _eager_ reduction strategy, or Haskell, which hardcodes a _lazy_ strategy, in Coq we are free to choose between these and many other orders of evaluation, because all Coq programs terminate.  In fact, Coq silently checked %\index{termination checking}%termination of our [Fixpoint] definition above, using a simple heuristic based on monotonically decreasing size of arguments across recursive calls.  Specifically, recursive calls must be made on arguments that were pulled out of the original recursive argument with [match] expressions.  (In Chapter 7, we will see some ways of getting around this restriction, though simply removing the restriction would leave Coq useless as a theorem proving tool, for reasons we will start to learn about in the next chapter.)
+(**
+(** It is convenient to be able to test definitions before starting to prove things about them.  We can verify that our semantics is sensible by evaluating some sample uses, using the command %\index{Vernacular commands!Eval}%[Eval].  This command takes an argument expressing a%\index{reduction strategy}% _reduction strategy_, or an "order of evaluation."  Unlike with ML, which hardcodes an _eager_ reduction strategy, or Haskell, which hardcodes a _lazy_ strategy, in Coq we are free to choose between these and many other orders of evaluation, because all Coq programs terminate.  In fact, Coq silently checked %\index{termination checking}%termination of our [Fixpoint] definition above, using a simple heuristic based on monotonically decreasing size of arguments across recursive calls.  Specifically, recursive calls must be made on arguments that were pulled out of the original recursive argument with [match] expressions.  (In Chapter 7, we will see some ways of getting around this restriction, though simply removing the restriction would leave Coq useless as a theorem proving tool, for reasons we will start to learn about in the next chapter.)
 
 To return to our test evaluations, we run the [Eval] command using the [simpl] evaluation strategy, whose definition is best postponed until we have learned more about Coq's foundations, but which usually gets the job done. *)
+*)
+(**
 これらの定義の性質の証明をする前に、テストができれば好都合です。コマンド %\index{Vernacular commands!Eval}%[Eval] を使っていくつかの例を評価し、私たちのセマンティクスがもっともらしいことを確かめてみましょう。このコマンドは%\index{簡約戦略}%「簡約戦略」(reduction strategy)、別の言葉で「評価順序」(order of evaluation)を表す引数を取ります。ML の先行評価や、Haskell の遅延評価とは違い、Coq ではこれらや他の様々な評価順序を選べます。これが可能なのはすべての Coq プログラムが停止するからです。実は、Coq は内部で上の [Fixpoint] で定義した関数の%\index{termination checking}%停止性をチェックしています。Coq は再帰呼び出しごとに引数のサイズが単調減少していることを見て、停止性を判断しています。さらに言うと、再帰呼び出しは [match] 式によって分割された元々の引数によって作られていないといけません。(In Chapter 7, we will see some ways of getting around this restriction, though simply removing the restriction would leave Coq useless as a theorem proving tool, for reasons we will start to learn about in the next chapter.)
 
 評価のテストをするために、評価戦略 [simpl] を使って [Eval] コマンドを実行しましょう。[simpl] の定義は Coq の基礎をもっと学むまで後回しにしますが、[simpl] は通常テストを終わらせてくれます。 *)
@@ -161,13 +184,19 @@ Eval simpl in expDenote (Binop Plus (Const 2) (Const 2)).
 Eval simpl in expDenote (Binop Times (Binop Plus (Const 2) (Const 2)) (Const 7)).
 (** [= 28 : nat] *)
 
-(** (* %\smallskip{}%Nothing too surprising goes on here, so we are ready to move on to the target language of our compiler. *)
+(**
+(** %\smallskip{}%Nothing too surprising goes on here, so we are ready to move on to the target language of our compiler. *)
+*)
+(**
 %\smallskip{}%どれも自然な結果でしょう。これで、私たちのコンパイラのターゲット言語の定義に移る準備ができました。 *)
 
 
 (** ** ターゲット言語 *)
 
-(** (* We will compile our source programs onto a simple stack machine, whose syntax is: *)
+(**
+(** We will compile our source programs onto a simple stack machine, whose syntax is: *)
+*)
+(**
 今まで定義してきたソースプログラムを簡単なスタックマシン上へコンパイルします。ターゲット言語のシンタックスは以下で与えます： *)
 
 Inductive instr : Set :=
@@ -177,9 +206,12 @@ Inductive instr : Set :=
 Definition prog := list instr.
 Definition stack := list nat.
 
-(** (* An instruction either pushes a constant onto the stack or pops two arguments, applies a binary operator to them, and pushes the result onto the stack.  A program is a list of instructions, and a stack is a list of natural numbers.
+(**
+(** An instruction either pushes a constant onto the stack or pops two arguments, applies a binary operator to them, and pushes the result onto the stack.  A program is a list of instructions, and a stack is a list of natural numbers.
 
 We can give instructions meanings as functions from stacks to optional stacks, where running an instruction results in [None] in case of a stack underflow and results in [Some s'] when the result of execution is the new stack [s'].  %\index{Gallina operators!::}%The infix operator [::] is "list cons" from the Coq standard library.%\index{Gallina terms!option}% *)
+*)
+(**
 命令 [instr] はスタックの先頭に定数をプッシュする [iConst] か、引数二つをポップし二項演算子に適用した後スタックに結果をプッシュする [iBinon] から成ります。ここでのプログラム [prog] は命令 [instr] のリストで、スタック [stack] は自然数のリストです。
 
 命令の意味をスタックからスタックのオプション型への関数として与えましょう。命令を実行してスタックアンダーフローに陥った場合は [None]、結果として新たなスタック [s'] を得た場合は [Some s'] を返します。%\index{Gallina operators!::}%中置演算子 [::] はリストの cons で、Coq の標準ライブラリで定義されています。%\index{Gallina terms!option}% *)
@@ -194,7 +226,10 @@ Definition instrDenote (i : instr) (s : stack) : option stack :=
       end
   end.
 
-(** (* With [instrDenote] defined, it is easy to define a function [progDenote], which iterates application of [instrDenote] through a whole program. *)
+(**
+(** With [instrDenote] defined, it is easy to define a function [progDenote], which iterates application of [instrDenote] through a whole program. *)
+*)
+(**
 [instrDenote] が定義されれば、関数 [progDenote] も簡単に定義できます。プログラム全体に対して [instrDenote] を繰り返し適用させます： *)
 
 Fixpoint progDenote (p : prog) (s : stack) : option stack :=
@@ -207,12 +242,18 @@ Fixpoint progDenote (p : prog) (s : stack) : option stack :=
       end
   end.
 
-(** (* With the two programming languages defined, we can turn to the compiler definition. *)
+(**
+(** With the two programming languages defined, we can turn to the compiler definition. *)
+*)
+(**
 こうして二つのプログラミング言語が定義されたので、コンパイラの定義に移りましょう。 *)
 
 (** ** 変換 *)
 
-(** (* Our compiler itself is now unsurprising.  The list concatenation operator %\index{Gallina operators!++}\coqdocnotation{%#<tt>#++#</tt>#%}% comes from the Coq standard library. *)
+(**
+(** Our compiler itself is now unsurprising.  The list concatenation operator %\index{Gallina operators!++}\coqdocnotation{%#<tt>#++#</tt>#%}% comes from the Coq standard library. *)
+*)
+(**
 私たちのコンパイラは自然に定義されます。リストの結合 %\index{Gallina operators!++}\coqdocnotation{%#<tt>#++#</tt>#%}% は Coq の標準ライブラリにあります。 *)
 
 Fixpoint compile (e : exp) : prog :=
@@ -252,13 +293,19 @@ Eval simpl in progDenote (compile (Binop Times (Binop Plus (Const 2) (Const 2))
 
 (** ** 変換の正しさ *)
 
-(** (* We are ready to prove that our compiler is implemented correctly.  We can use a new vernacular command [Theorem] to start a correctness proof, in terms of the semantics we defined earlier:%\index{Vernacular commands!Theorem}% *)
+(**
+(** We are ready to prove that our compiler is implemented correctly.  We can use a new vernacular command [Theorem] to start a correctness proof, in terms of the semantics we defined earlier:%\index{Vernacular commands!Theorem}% *)
+*)
+(**
 コンパイラが正しく実装されたことを証明しましょう。証明を始めるためには新たな Vernacula コマンド [Theorem] を使います。先ほど定義したセマンティクスを用いて変換の正しさを証明しましょう。%\index{Vernacular commands!Theorem}% *)
 
 Theorem compile_correct : forall e, progDenote (compile e) nil = Some (expDenote e :: nil).
 (* begin thide *)
 
-(** (* Though a pencil-and-paper proof might clock out at this point, writing "by a routine induction on [e]," it turns out not to make sense to attack this proof directly.  We need to use the standard trick of%\index{strengthening the induction hypothesis}% _strengthening the induction hypothesis_.  We do that by proving an auxiliary lemma, using the command [Lemma] that is a synonym for [Theorem], conventionally used for less important theorems that appear in the proofs of primary theorems.%\index{Vernacular commands!Lemma}% *)
+(**
+(** Though a pencil-and-paper proof might clock out at this point, writing "by a routine induction on [e]," it turns out not to make sense to attack this proof directly.  We need to use the standard trick of%\index{strengthening the induction hypothesis}% _strengthening the induction hypothesis_.  We do that by proving an auxiliary lemma, using the command [Lemma] that is a synonym for [Theorem], conventionally used for less important theorems that appear in the proofs of primary theorems.%\index{Vernacular commands!Lemma}% *)
+*)
+(**
 紙と鉛筆の証明なら「[e] に関する帰納法より」と書いて終わらせるかもしれませんが、この証明は直接取り組むのは懸命ではありません。ここでは基本的な手法である%\index{帰納法の仮定の強化}%[帰納法の仮定の強化]をする必要があります。そのために、[Lemma] コマンドを使って補題を示しましょう。[Lemma] コマンドは [Theorem] のシノニムで、慣習的に主定理の証明に必要となる補助的な定理に対して使います。%\index{Vernacular commands!Lemma}% *)
 
 Abort.
@@ -266,7 +313,8 @@ Abort.
 Lemma compile_correct' : forall e p s,
   progDenote (compile e ++ p) s = progDenote p (expDenote e :: s).
 
-(** (* After the period in the [Lemma] command, we are in%\index{interactive proof-editing mode}% _the interactive proof-editing mode_.  We find ourselves staring at this ominous screen of text:
+(**
+(** After the period in the [Lemma] command, we are in%\index{interactive proof-editing mode}% _the interactive proof-editing mode_.  We find ourselves staring at this ominous screen of text:
 
 [[
 1 subgoal
@@ -283,6 +331,8 @@ Next in the output, we see our single subgoal described in full detail.  There i
 
 We manipulate the proof state by running commands called%\index{tactics}% _tactics_.  Let us start out by running one of the most important tactics:%\index{tactics!induction}%
 *)
+*)
+(**
 [Lemma] コマンドを読み込むと、%\index{対話的証明モード}%[対話的証明モード](interactive proof-editing mode)に入ります。スクリーンに何やら新しいテキストが表示されるのが見えるでしょう：
 
 [[
@@ -303,7 +353,8 @@ Coq は補題の証明を始めようとしています。ここに見えてい�
 
   induction e.
 
-(** (* We declare that this proof will proceed by induction on the structure of the expression [e].  This swaps out our initial subgoal for two new subgoals, one for each case of the inductive proof:
+(**
+(** We declare that this proof will proceed by induction on the structure of the expression [e].  This swaps out our initial subgoal for two new subgoals, one for each case of the inductive proof:
 
 [[
 2 subgoals
@@ -326,6 +377,8 @@ The first and current subgoal is displayed with the double-dashed line below fre
 
 We begin the first case with another very common tactic.%\index{tactics!intros}%
 *)
+*)
+(**
 今、式 [e] の構造の帰納法によってこの証明を始めることが宣言されました。始めのサブゴールは、帰納法による証明のための二つの新しいサブゴールに変わりました：
 
 [[
@@ -351,7 +404,8 @@ subgoal 2 is
 
   intros.
 
-(** (* The current subgoal changes to:
+(**
+(** The current subgoal changes to:
 [[
 
  n : nat
@@ -367,6 +421,8 @@ We see that [intros] changes [forall]-bound variables at the beginning of a goal
 
 To progress further, we need to use the definitions of some of the functions appearing in the goal.  The [unfold] tactic replaces an identifier with its definition.%\index{tactics!unfold}%
 *)
+*)
+(**
 サブゴールは次のように変わります：
 [[
 
@@ -397,7 +453,8 @@ To progress further, we need to use the definitions of some of the functions app
 *)
 
   unfold expDenote.
-(** (* [[
+(**
+(** [[
  n : nat
  s : stack
  p : list instr
@@ -407,6 +464,8 @@ To progress further, we need to use the definitions of some of the functions app
 ]]
 
 We only need to unfold the first occurrence of [progDenote] to prove the goal.  An [at] clause used with [unfold] specifies a particular occurrence of an identifier to unfold, where we count occurrences from left to right.%\index{tactics!unfold}% *)
+*)
+(**
 [[
  n : nat
  s : stack
@@ -419,7 +478,8 @@ We only need to unfold the first occurrence of [progDenote] to prove the goal.  
 ゴールを証明するには一つ目の [progDenote] を展開(unfold)する必要があります。[at] 節は [unfold] と共に使われ、識別子を特定の箇所のみを展開したい場合にその場所を指定します。場所は左から右に数えます。%\index{tactics!unfold}% *)
 
   unfold progDenote at 1.
-(** (* [[
+(**
+(** [[
  n : nat
  s : stack
  p : list instr
@@ -442,6 +502,8 @@ This last [unfold] has left us with an anonymous recursive definition of [progDe
 
 Fortunately, in this case, we can eliminate the complications of anonymous recursion right away, since the structure of the argument ([iConst n :: nil) ++ p] is known, allowing us to simplify the internal pattern match with the [simpl] tactic, which applies the same reduction strategy that we used earlier with [Eval] (and whose details we still postpone).%\index{tactics!simpl}%
 *)
+*)
+(**
 [[
  n : nat
  s : stack
@@ -467,7 +529,8 @@ Fortunately, in this case, we can eliminate the complications of anonymous recur
 *)
 
   simpl.
-(** (* [[
+(**
+(** [[
  n : nat
  s : stack
  p : list instr
@@ -487,6 +550,8 @@ Fortunately, in this case, we can eliminate the complications of anonymous recur
 
 Now we can unexpand the definition of [progDenote]:%\index{tactics!fold}%
 *)
+*)
+(**
 [[
  n : nat
  s : stack
@@ -509,7 +574,8 @@ Now we can unexpand the definition of [progDenote]:%\index{tactics!fold}%
 *)
 
   fold progDenote.
-(** (* [[
+(**
+(** [[
  n : nat
  s : stack
  p : list instr
@@ -520,6 +586,8 @@ Now we can unexpand the definition of [progDenote]:%\index{tactics!fold}%
 
 It looks like we are at the end of this case, since we have a trivial equality.  Indeed, a single tactic finishes us off:%\index{tactics!reflexivity}%
 *)
+*)
+(**
 [[
 n : nat
 s : stack
@@ -534,7 +602,8 @@ progDenote p (n :: s) = progDenote p (n :: s)
 
   reflexivity.
 
-(** (* On to the second inductive case:
+(**
+(** On to the second inductive case:
 
 [[
   b : binop
@@ -554,6 +623,8 @@ progDenote p (n :: s) = progDenote p (n :: s)
 We see our first example of %\index{hypotheses}%hypotheses above the double-dashed line.  They are the inductive hypotheses [IHe1] and [IHe2] corresponding to the subterms [e1] and [e2], respectively.
 
 We start out the same way as before, introducing new free variables and unfolding and folding the appropriate definitions.  The seemingly frivolous [unfold]/[fold] pairs are actually accomplishing useful work, because [unfold] will sometimes perform easy simplifications. %\index{tactics!intros}\index{tactics!unfold}\index{tactics!fold}% *)
+*)
+(**
 二つ目のサブゴールに入ります：
 
 [[
@@ -581,7 +652,8 @@ We start out the same way as before, introducing new free variables and unfoldin
   unfold expDenote.
   fold expDenote.
 
-(** (* Now we arrive at a point where the tactics we have seen so far are insufficient.  No further definition unfoldings get us anywhere, so we will need to try something different.
+(**
+(** Now we arrive at a point where the tactics we have seen so far are insufficient.  No further definition unfoldings get us anywhere, so we will need to try something different.
 
 [[
   b : binop
@@ -600,6 +672,8 @@ We start out the same way as before, introducing new free variables and unfoldin
 ]]
 
 What we need is the associative law of list concatenation, which is available as a theorem [app_assoc_reverse] in the standard library.%\index{Vernacular commands!Check}%  (Here and elsewhere, it is possible to tell the difference between inputs and outputs to Coq by periods at the ends of the inputs.) *)
+*)
+(**
 今、私たちはこれまで見てきたタクティクでは不十分な地点に着きました。もう定義の展開は不要なので、他のことを試す必要があります。
 
 [[
@@ -621,13 +695,16 @@ What we need is the associative law of list concatenation, which is available as
 今必要なのは、リストの結合に関する結合律(associative law)です。これは標準ライブラリで定理 [app_assoc_reverse] として利用できます。%\index{Vernacular commands!Check}% (Here and elsewhere, it is possible to tell the difference between inputs and outputs to Coq by periods at the ends of the inputs.) *)
 
 Check app_assoc_reverse.
-(** (* %\vspace{-.15in}%[[
+(**
+(** %\vspace{-.15in}%[[
 app_assoc_reverse
      : forall (A : Type) (l m n : list A), (l ++ m) ++ n = l ++ m ++ n
 
 ]]
 
 If we did not already know the name of the theorem, we could use the %\index{Vernacular commands!SearchRewrite}%[SearchRewrite] command to find it, based on a pattern that we would like to rewrite: *)
+*)
+(**
 %\vspace{-.15in}%[[
 app_assoc_reverse
      : forall (A : Type) (l m n : list A), (l ++ m) ++ n = l ++ m ++ n
@@ -637,7 +714,8 @@ app_assoc_reverse
 もし使いたい定理の名前を知らなければ、%\index{Vernacular commands!SearchRewrite}%[SearchRewrite] コマンドを使って検索できます。[SearchRewrite] は以下のように書き換えたいパターンを入力して使います： *)
 
 SearchRewrite ((_ ++ _) ++ _).
-(**(* %\vspace{-.15in}%[[
+(**
+(**%\vspace{-.15in}%[[
 app_assoc_reverse:
   forall (A : Type) (l m n : list A), (l ++ m) ++ n = l ++ m ++ n
 ]]
@@ -648,6 +726,8 @@ app_assoc: forall (A : Type) (l m n : list A), l ++ m ++ n = (l ++ m) ++ n
 ]]
 
 We use [app_assoc_reverse] to perform a rewrite: %\index{tactics!rewrite}% *)
+*)
+(**
 %\vspace{-.15in}%[[
 app_assoc_reverse:
   forall (A : Type) (l m n : list A), (l ++ m) ++ n = l ++ m ++ n
@@ -682,13 +762,16 @@ Now we can notice that the lefthand side of the equality matches the lefthand si
 今、等式の左辺は二つ目の帰納法の仮定内の等式の左辺に一致していることが分かります。よってその仮定も書き換えに使えます。%\index{tactics!rewrite}% *)
 
   rewrite IHe2.
-(**(* [[
+(**
+(** [[
    progDenote ((compile e1 ++ iBinop b :: nil) ++ p) (expDenote e2 :: s) =
    progDenote p (binopDenote b (expDenote e1) (expDenote e2) :: s)
 
 ]]
 
 The same process lets us apply the remaining hypothesis.%\index{tactics!rewrite}% *)
+*)
+(**
 [[
    progDenote ((compile e1 ++ iBinop b :: nil) ++ p) (expDenote e2 :: s) =
    progDenote p (binopDenote b (expDenote e1) (expDenote e2) :: s)
@@ -700,7 +783,8 @@ The same process lets us apply the remaining hypothesis.%\index{tactics!rewrite}
 
   rewrite app_assoc_reverse.
   rewrite IHe1.
-(** (* [[
+(**
+(** [[
    progDenote ((iBinop b :: nil) ++ p) (expDenote e1 :: expDenote e2 :: s) =
    progDenote p (binopDenote b (expDenote e1) (expDenote e2) :: s)
 
@@ -708,6 +792,8 @@ The same process lets us apply the remaining hypothesis.%\index{tactics!rewrite}
 
 Now we can apply a similar sequence of tactics to the one that ended the proof of the first case.%\index{tactics!unfold}\index{tactics!simpl}\index{tactics!fold}\index{tactics!reflexivity}%
 *)
+*)
+(**
 [[
    progDenote ((iBinop b :: nil) ++ p) (expDenote e1 :: expDenote e2 :: s) =
    progDenote p (binopDenote b (expDenote e1) (expDenote e2) :: s)
@@ -731,8 +817,11 @@ Now we can apply a similar sequence of tactics to the one that ended the proof o
 >>
 *)
 
-(** (* And there lies our first proof.  Already, even for simple theorems like this, the final proof script is unstructured and not very enlightening to readers.  If we extend this approach to more serious theorems, we arrive at the unreadable proof scripts that are the favorite complaints of opponents of tactic-based proving.  Fortunately, Coq has rich support for scripted automation, and we can take advantage of such a scripted tactic (defined elsewhere) to make short work of this lemma.  We abort the old proof attempt and start again.%\index{Vernacular commands!Abort}%
+(**
+(** And there lies our first proof.  Already, even for simple theorems like this, the final proof script is unstructured and not very enlightening to readers.  If we extend this approach to more serious theorems, we arrive at the unreadable proof scripts that are the favorite complaints of opponents of tactic-based proving.  Fortunately, Coq has rich support for scripted automation, and we can take advantage of such a scripted tactic (defined elsewhere) to make short work of this lemma.  We abort the old proof attempt and start again.%\index{Vernacular commands!Abort}%
 *)
+*)
+(**
 私たちの最初の証明ができました。既に、このような単純な定理に対しても、証明のスクリプトは構造化されておらず、あまり読者に教育的ではありません。もしこのアプローチをもっと本格的な定理に拡張しようとすれば、証明のスクリプトは可読性が低く、タクティク・ベースの証明に反対する人々には都合のいい批判の的となるでしょう。幸いなことに、Coq はスクリプトによる高機能な自動化をサポートしており、この補題に対して短い証明を与えることができます(自動化のタクティクは別の場所で定義しています)。これまで書いてきた証明の試みを中止し、新しく初めましょう。%\index{Vernacular commands!Abort}%
 *)
 
@@ -745,13 +834,16 @@ Lemma compile_correct' : forall e s p, progDenote (compile e ++ p) s =
   induction e; crush.
 Qed.
 
-(** (* We need only to state the basic inductive proof scheme and call a tactic that automates the tedious reasoning in between.  In contrast to the period tactic terminator from our last proof, the %\index{tactics!semicolon}%semicolon tactic separator supports structured, compositional proofs.  The tactic [t1; t2] has the effect of running [t1] and then running [t2] on each remaining subgoal.  The semicolon is one of the most fundamental building blocks of effective proof automation.  The period terminator is very useful for exploratory proving, where you need to see intermediate proof states, but final proofs of any serious complexity should have just one period, terminating a single compound tactic that probably uses semicolons.
+(**
+(** We need only to state the basic inductive proof scheme and call a tactic that automates the tedious reasoning in between.  In contrast to the period tactic terminator from our last proof, the %\index{tactics!semicolon}%semicolon tactic separator supports structured, compositional proofs.  The tactic [t1; t2] has the effect of running [t1] and then running [t2] on each remaining subgoal.  The semicolon is one of the most fundamental building blocks of effective proof automation.  The period terminator is very useful for exploratory proving, where you need to see intermediate proof states, but final proofs of any serious complexity should have just one period, terminating a single compound tactic that probably uses semicolons.
 
 The [crush] tactic comes from the library associated with this book and is not part of the Coq standard library.  The book's library contains a number of other tactics that are especially helpful in highly automated proofs.
 
 The %\index{Vernacular commands!Qed}%[Qed] command checks that the proof is finished and, if so, saves it.  The tactic commands we have written above are an example of a _proof script_, or a series of Ltac programs; while [Qed] uses the result of the script to generate a _proof term_, a well-typed term of Gallina.  To believe that a theorem is true, we only need to trust that the (relatively simple) checker for proof terms is correct; the use of proof scripts is immaterial.  Part I of this book will introduce the principles behind encoding all proofs as terms of Gallina.
 
 The proof of our main theorem is now easy.  We prove it with four period-terminated tactics, though separating them with semicolons would work as well; the version here is easier to step through.%\index{tactics!intros}% *)
+*)
+(**
 必要なのは帰納法による証明の決まり文句を書いて、残りの長々しい推論を自動化するタクティクを呼ぶことだけです。今回の証明ではタクティクの終わりでピリオドの変わりに%\index{tactics!semicolon}%セミコロンが使われています。セミコロンは二つのタクティクの間に使い、証明を構造化し合成します。タクティク [t1; t2] は [t1] を適用し、その後残される各サブゴールに [t2] を適用します。セミコロンは効果的な証明の自動化のための基本的な構成要素の一つです。ピリオドは証明途中の確認すべき状態がどこにあるのかを予め調べるには便利です。しかし複雑な証明は最終的には、セミコロンなどを使って一つのタクティクに合成し、ピリオドが一つだけになるようにすべきです。
 
 [crush] タクティクは本書に付随したライブラリにあり、Coq の標準ライブラリ内のものではありません。本書のライブラリは証明の高度な自動化にとても役立つタクティクを他にもいくつか含んでいます。
@@ -762,7 +854,8 @@ The proof of our main theorem is now easy.  We prove it with four period-termina
 
 Theorem compile_correct : forall e, progDenote (compile e) nil = Some (expDenote e :: nil).
   intros.
-(**(* [[
+(**
+(** [[
   e : exp
   ============================
    progDenote (compile e) nil = Some (expDenote e :: nil)
@@ -770,6 +863,8 @@ Theorem compile_correct : forall e, progDenote (compile e) nil = Some (expDenote
 ]]
 
 At this point, we want to massage the lefthand side to match the statement of [compile_correct'].  A theorem from the standard library is useful: *)
+*)
+(**
 [[
   e : exp
   ============================
@@ -788,7 +883,8 @@ app_nil_end
 
   rewrite (app_nil_end (compile e)).
 
-(**(* This time, we explicitly specify the value of the variable [l] from the theorem statement, since multiple expressions of list type appear in the conclusion.  The [rewrite] tactic might choose the wrong place to rewrite if we did not specify which we want.
+(**
+(** This time, we explicitly specify the value of the variable [l] from the theorem statement, since multiple expressions of list type appear in the conclusion.  The [rewrite] tactic might choose the wrong place to rewrite if we did not specify which we want.
 
 [[
   e : exp
@@ -798,6 +894,8 @@ app_nil_end
 ]]
 
 Now we can apply the lemma.%\index{tactics!rewrite}% *)
+*)
+(**
 結論にはリストが複数個現れているので、定理内の変数 [l] の値を明示しました。どれを書き換えたいかを明示しなければ、[rewrite] タクティクは別の場所を選んで書き換えてしまうことがあります。
 
 [[
@@ -810,7 +908,8 @@ Now we can apply the lemma.%\index{tactics!rewrite}% *)
 これで補題が適用できます。%\index{tactics!rewrite}% *)
 
   rewrite compile_correct'.
-(** (* [[
+(**
+(** [[
   e : exp
   ============================
    progDenote nil (expDenote e :: nil) = Some (expDenote e :: nil)
@@ -818,6 +917,8 @@ Now we can apply the lemma.%\index{tactics!rewrite}% *)
 ]]
 
 We are almost done.  The lefthand and righthand sides can be seen to match by simple symbolic evaluation.  That means we are in luck, because Coq identifies any pair of terms as equal whenever they normalize to the same result by symbolic evaluation.  By the definition of [progDenote], that is the case here, but we do not need to worry about such details.  A simple invocation of %\index{tactics!reflexivity}%[reflexivity] does the normalization and checks that the two results are syntactically equal.%\index{tactics!reflexivity}% *)
+*)
+(**
 [[
   e : exp
   ============================
@@ -831,25 +932,37 @@ We are almost done.  The lefthand and righthand sides can be seen to match by si
 Qed.
 (* end thide *)
 
-(** (* This proof can be shortened and automated, but we leave that task as an exercise for the reader. *)
+(**
+(** This proof can be shortened and automated, but we leave that task as an exercise for the reader. *)
+*)
+(**
 この証明はより短くでき自動化されますが、これは読者への演習問題としましょう。 *)
 
 
 (** * 型付き式 *)
 
-(** (* In this section, we will build on the initial example by adding additional expression forms that depend on static typing of terms for safety. *)
+(**
+(** In this section, we will build on the initial example by adding additional expression forms that depend on static typing of terms for safety. *)
+*)
+(**
 この節では、安全のため項の静的片付けを持つような式の構造を追加した最初の例を作ります。 *)
 
 (** ** ソース言語 *)
 
-(**(* We define a trivial language of types to classify our expressions: *)
+(**
+(** We define a trivial language of types to classify our expressions: *)
+*)
+(**
 式を区別するための型の自明な言語を定義します： *)
 
 Inductive type : Set := Nat | Bool.
 
-(** (* Like most programming languages, Coq uses case-sensitive variable names, so that our user-defined type [type] is distinct from the [Type] keyword that we have already seen appear in the statement of a polymorphic theorem (and that we will meet in more detail later), and our constructor names [Nat] and [Bool] are distinct from the types [nat] and [bool] in the standard library.
+(**
+(** Like most programming languages, Coq uses case-sensitive variable names, so that our user-defined type [type] is distinct from the [Type] keyword that we have already seen appear in the statement of a polymorphic theorem (and that we will meet in more detail later), and our constructor names [Nat] and [Bool] are distinct from the types [nat] and [bool] in the standard library.
 
    Now we define an expanded set of binary operators. *)
+*)
+(**
 ほとんどのプログラミング言語と同様に、Coq は変数名の大文字と小文字を区別します。よって今定義された型 [type] は先ほど多相的な定理の主張の中で見た [Type] キーワード(詳細は後で述べます)とは異なります。 また、コンストラクタの [Nat], [Bool] も標準ライブラリ内の型 [nat], [bool] とは異なります。
 
   拡張された二項演算子のセットを定義しましょう。 *)
@@ -860,7 +973,8 @@ Inductive tbinop : type -> type -> type -> Set :=
 | TEq : forall t, tbinop t t Bool
 | TLt : tbinop Nat Nat Bool.
 
-(** (* The definition of [tbinop] is different from [binop] in an important way.  Where we declared that [binop] has type [Set], here we declare that [tbinop] has type [type -> type -> type -> Set].  We define [tbinop] as an _indexed type family_.  Indexed inductive types are at the heart of Coq's expressive power; almost everything else of interest is defined in terms of them.
+(**
+(** The definition of [tbinop] is different from [binop] in an important way.  Where we declared that [binop] has type [Set], here we declare that [tbinop] has type [type -> type -> type -> Set].  We define [tbinop] as an _indexed type family_.  Indexed inductive types are at the heart of Coq's expressive power; almost everything else of interest is defined in terms of them.
 
 The intuitive explanation of [tbinop] is that a [tbinop t1 t2 t] is a binary operator whose operands should have types [t1] and [t2], and whose result has type [t].  For instance, constructor [TLt] (for less-than comparison of numbers) is assigned type [tbinop Nat Nat Bool], meaning the operator's arguments are naturals and its result is Boolean.  The type of [TEq] introduces a small bit of additional complication via polymorphism: we want to allow equality comparison of any two values of any type, as long as they have the _same_ type.
 
@@ -870,6 +984,8 @@ First, the indices of the range of each data constructor must be type variables 
 
 The second restriction is not lifted by GADTs.  In ML and Haskell, indices of types must be types and may not be _expressions_.  In Coq, types may be indexed by arbitrary Gallina terms.  Type indices can live in the same universe as programs, and we can compute with them just like regular programs.  Haskell supports a hobbled form of computation in type indices based on %\index{Haskell}%multi-parameter type classes, and recent extensions like type functions bring Haskell programming even closer to "real" functional programming with types, but, without dependent typing, there must always be a gap between how one programs with types and how one programs normally.
 *)
+*)
+(**
 [tbinop] の定義は [binop] と重要な意味で異なります。[binop] は [Set] 型を持つと宣言されましたが、[tbinop] は [type -> type -> type -> Set] 型と宣言しました。[tbinop] は _indexed type family_ として定義します。Indexed inductive types は Coq の表現力の核で、私たちの興味のあるほとんどのものはこれで定義されます。
 
 [tbinop] の直感的な説明は、[tbinop t1 t2 t] は型 [t1], [t2] のオペランドを取り、型 [t] の結果を返す二項演算子です。たとえば、コンストラクタ [TLt] (自然数の順序 ≦)は型 [tbinop Nat Nat Bool] を持ち、引数が自然数、結果がブール値であることを意味します。[TEq] の型は多相性によって少し複雑になっています。[TEq] は同じ型を持つ値を任意に取れるようにしているのです。
@@ -881,7 +997,10 @@ First, the indices of the range of each data constructor must be type variables 
 二つ目の制限は GADTs でも制限されたままです。ML や Haskell では、型の添字は必ず型であって、[式]であってはいけません。Coq では、型は任意の Gallina 項により添字付けできます。型添字はプログラムと同じ領域に住むことができ、それらは通常のプログラムと同様に計算できます。Haskell supports a hobbled form of computation in type indices based on %\index{Haskell}%multi-parameter type classes, and recent extensions like type functions bring Haskell programming even closer to "real" functional programming with types, but, without dependent typing, there must always be a gap between how one programs with types and how one programs normally.
 *)
 
-(** (* We can define a similar type family for typed expressions, where a term of type [texp t] can be assigned object language type [t].  (It is conventional in the world of interactive theorem proving to call the language of the proof assistant the%\index{meta language}% _meta language_ and a language being formalized the%\index{object language}% _object language_.) *)
+(**
+(** We can define a similar type family for typed expressions, where a term of type [texp t] can be assigned object language type [t].  (It is conventional in the world of interactive theorem proving to call the language of the proof assistant the%\index{meta language}% _meta language_ and a language being formalized the%\index{object language}% _object language_.) *)
+*)
+(**
 同様にして、片付き式に対して型族を定義できます。型 [texp t] を持つ項は対象言語の型 [t] を割り当てられます。(対話的定理証明の世界では慣習的に、証明支援器の言語を%\index{メタ言語}%[メタ言語]と呼び、形式化されている言語を%\index{対象言語}%[対象言語]と呼びます。)*)
 
 Inductive texp : type -> Set :=
@@ -898,7 +1017,10 @@ Definition typeDenote (t : type) : Set :=
     | Bool => bool
   end.
 
-(** (* It can take a few moments to come to terms with the fact that [Set], the type of types of programs, is itself a first-class type, and that we can write functions that return [Set]s.  Past that wrinkle, the definition of [typeDenote] is trivial, relying on the [nat] and [bool] types from the Coq standard library.  We can interpret binary operators by relying on standard-library equality test functions [eqb] and [beq_nat] for Booleans and naturals, respectively, along with a less-than test [leb]: *)
+(**
+(** It can take a few moments to come to terms with the fact that [Set], the type of types of programs, is itself a first-class type, and that we can write functions that return [Set]s.  Past that wrinkle, the definition of [typeDenote] is trivial, relying on the [nat] and [bool] types from the Coq standard library.  We can interpret binary operators by relying on standard-library equality test functions [eqb] and [beq_nat] for Booleans and naturals, respectively, along with a less-than test [leb]: *)
+*)
+(**
 ここで、いくつかの事実について触れておきましょう。「プログラムの型」の型である [Set] はそれ自身がファーストクラスの型で、私たちは [Set] を返す関数を書くことができます。[typeDenote] の定義は明白で、Coq 標準ライブラリの型 [nat], [bool] を使っています。私たちの二項演算子は、標準ライブラリ内の比較関数 [eqb], [beq_nat] や [leb] を使って定義できます。それぞれ、ブール値間、自然数値間のイコール、自然数の≦を表します。*)
 
 Definition tbinopDenote arg1 arg2 res (b : tbinop arg1 arg2 res)
@@ -911,9 +1033,12 @@ Definition tbinopDenote arg1 arg2 res (b : tbinop arg1 arg2 res)
     | TLt => leb
   end.
 
-(** (* This function has just a few differences from the denotation functions we saw earlier.  First, [tbinop] is an indexed type, so its indices become additional arguments to [tbinopDenote].  Second, we need to perform a genuine%\index{dependent pattern matching}% _dependent pattern match_, where the necessary _type_ of each case body depends on the _value_ that has been matched.  At this early stage, we will not go into detail on the many subtle aspects of Gallina that support dependent pattern-matching, but the subject is central to Part II of the book.
+(**
+(** This function has just a few differences from the denotation functions we saw earlier.  First, [tbinop] is an indexed type, so its indices become additional arguments to [tbinopDenote].  Second, we need to perform a genuine%\index{dependent pattern matching}% _dependent pattern match_, where the necessary _type_ of each case body depends on the _value_ that has been matched.  At this early stage, we will not go into detail on the many subtle aspects of Gallina that support dependent pattern-matching, but the subject is central to Part II of the book.
 
 The same tricks suffice to define an expression denotation function in an unsurprising way.  Note that the [type] arguments to the [TBinop] constructor must be included explicitly in pattern-matching, but here we write underscores because we do not need to refer to those arguments directly. *)
+*)
+(**
 この関数は先ほど定義した表示関数と比べていくつか違いがあります。まず、[tbinop] は添字付けされた型なので、その添字は [tbinopDenote] の追加の引数になります。次に、*)
 (** This function has just a few differences from the denotation functions we saw earlier.  First, [tbinop] is an indexed type, so its indices become additional arguments to [tbinopDenote].  Second, we need to perform a genuine%\index{dependent pattern matching}% _dependent pattern match_, where the necessary _type_ of each case body depends on the _value_ that has been matched.  At this early stage, we will not go into detail on the many subtle aspects of Gallina that support dependent pattern-matching, but the subject is central to Part II of the book.
 
@@ -926,7 +1051,10 @@ Fixpoint texpDenote t (e : texp t) : typeDenote t :=
     | TBinop _ _ _ b e1 e2 => (tbinopDenote b) (texpDenote e1) (texpDenote e2)
   end.
 
-(** (* We can evaluate a few example programs to convince ourselves that this semantics is correct. *)
+(**
+(** We can evaluate a few example programs to convince ourselves that this semantics is correct. *)
+*)
+(**
 このセマンティクスが正しいことを確かめるためにいくつかのプログラムの例を評価します。*)
 
 Eval simpl in texpDenote (TNConst 42).
@@ -950,7 +1078,10 @@ Eval simpl in texpDenote (TBinop TLt (TBinop TPlus (TNConst 2) (TNConst 2))
   (TNConst 7)).
 (** [= true : typeDenote Bool] *)
 
-(** (* %\smallskip{}%Now we are ready to define a suitable stack machine target for compilation. *)
+(**
+(** %\smallskip{}%Now we are ready to define a suitable stack machine target for compilation. *)
+*)
+(**
 %\smallskip{}%今、コンパイルのための適切なスタックマシンを定義する準備ができました。*)
 (** %\smallskip{}%Now we are ready to define a suitable stack machine target for compilation. *)
 
