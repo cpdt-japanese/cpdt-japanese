@@ -70,7 +70,7 @@ Xavier LeroyがCompCertプロジェクトを主導し,
 従ってこれ以降, 機械的に検査された証明を追求すべきであることと, 
 それを作り出すことがどうやら可能であるということについて,
 読者は納得したという仮定をすることにしたいと思います. 
-(まだ納得していない読者には, "machine-chedked proof"でWebを検索することをお勧めします.)
+(まだ納得していない読者には, "machine-checked proof"でWebを検索することをお勧めします.)
 
 (*The idea of %\index{certified program}% _certified program_ features prominently in this book's title.  Here the word "certified" does _not_ refer to governmental rules for how the reliability of engineered systems may be demonstrated to sufficiently high standards.  Rather, this concept of certification, a standard one in the programming languages and formal methods communities, has to do with the idea of a _certificate_, or formal mathematical artifact proving that a program meets its specification.  Government certification procedures rarely provide strong mathematical guarantees, while certified programming provides guarantees about as strong as anything we could hope for.  We trust the definition of a foundational mathematical logic, we trust an implementation of that logic, and we trust that we have encoded our informal intent properly in formal specifications, but few other opportunities remain to certify incorrect software.  For compilers and other programs that run in batch mode, the notion of a %\index{certifying program}% _certifying_ program is also common, where each run of the program outputs both an answer and a proof that the answer is correct.  Any certifying program can be composed with a proof checker to produce a certified program, and this book focuses on the certified case, while also introducing principles and techniques of general interest for stating and proving theorems in Coq.*)
 本書のタイトルでは%\index{認証されたプログラム(certified program)}% _認証されたプログラム_ という考えがはっきりと打ち出されています.
