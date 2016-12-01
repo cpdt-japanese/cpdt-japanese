@@ -20,7 +20,7 @@
 実践者であるか学者かにかかわらず, 
 形式的プログラム検証のコストが利益を
 上まわってしまう(*outweigh*)ときめつけて(*assume*)います.
-計算機科学の歴史においてかつて語られそして失敗した,
+計算機科学の歴史においてかつて語られ, そして失敗した,
 いくつかの強気な展望(*bold promises*)が, このきめつけの少なからぬ原因となっています. 
 本書の目的は, 
 プログラム検証の技術が十分成熟したものであり,
@@ -38,9 +38,9 @@
 
 (*Research into mechanized theorem proving began in the second half of the 20th century, and some of the earliest practical work involved Nqthm%~\cite{Nqthm}\index{Nqthm}%, the "Boyer-Moore Theorem Prover," which was used to prove such theorems as correctness of a complete hardware and software stack%~\cite{Piton}%.  ACL2%~\cite{CAR}\index{ACL2}%, Nqthm's successor, has seen significant industry adoption, for instance, by AMD to verify correctness of floating-point division units%~\cite{AMD}%.*)
 機械化された(*mechanized*)定理証明の研究は20世紀後半に始まりました. 
-最初期の実用的な成果（*work*）の一つに, Nqthm%~\cite{Nqthm}\index{Nqthm}%, the "Boyer-Moore Theorem Prover" があります. 
+最初期の実用的な成果(*work*)の一つに, 「Boyer-Moore定理証明器」Nqthm%~\cite{Nqthm}\index{Nqthm}%があります. 
 これはハードウェアとソフトウェア両方の層(*stack*)にわたる正しさを定理として証明するなどのために用いられました%~\cite{Piton}%. 
-Nqthmの後継であるACL2%~\cite{CAR}\index{ACL2}%は産業界での受容が顕著であり,  
+Nqthmの後継であるACL2%~\cite{CAR}\index{ACL2}%は産業界で顕著に受けいれられ,  
 例えばAMDによって浮動小数除算の正しさを保証するために用いられました%~\cite{AMD}%. 
 
 (*Around the beginning of the 21st century, the pace of progress in practical applications of interactive theorem proving accelerated significantly.  Several well-known formal developments have been carried out in Coq, the system that this book deals with.  In the realm of pure mathematics, Georges Gonthier built a machine-checked proof of the four-color theorem%~\cite{4C}%, a mathematical problem first posed more than a hundred years before, where the only previous proofs had required trusting ad-hoc software to do brute-force checking of key facts.  In the realm of program verification, Xavier Leroy led the CompCert project to produce a verified C compiler back-end%~\cite{CompCert}% robust enough to use with real embedded software.*)
@@ -73,8 +73,8 @@ Xavier LeroyがCompCertプロジェクトを主導し,
 (まだ納得していない読者には, "mechine-chedked proof"でWebを検索することをお勧めします.)
 
 (*The idea of %\index{certified program}% _certified program_ features prominently in this book's title.  Here the word "certified" does _not_ refer to governmental rules for how the reliability of engineered systems may be demonstrated to sufficiently high standards.  Rather, this concept of certification, a standard one in the programming languages and formal methods communities, has to do with the idea of a _certificate_, or formal mathematical artifact proving that a program meets its specification.  Government certification procedures rarely provide strong mathematical guarantees, while certified programming provides guarantees about as strong as anything we could hope for.  We trust the definition of a foundational mathematical logic, we trust an implementation of that logic, and we trust that we have encoded our informal intent properly in formal specifications, but few other opportunities remain to certify incorrect software.  For compilers and other programs that run in batch mode, the notion of a %\index{certifying program}% _certifying_ program is also common, where each run of the program outputs both an answer and a proof that the answer is correct.  Any certifying program can be composed with a proof checker to produce a certified program, and this book focuses on the certified case, while also introducing principles and techniques of general interest for stating and proving theorems in Coq.*)
-本書のタイトルでは%\index{認証されたプログラム(certified program)}%_認証されたプログラム_という考えがはっきりと打ち出されています.
-「認証された」という語が意味するものは政府の規則_ではありません_. 
+本書のタイトルでは%\index{認証されたプログラム(certified program)}% _認証されたプログラム_ という考えがはっきりと打ち出されています.
+「認証された」という語が意味するものは政府の規則 _ではありません_ . 
 つまり作り上げられた(*engineered*)システムの信頼性が十分厳しい規格に従うことを, 
 どのように実証する(*demonstrate*)か定めた規則のことを言うのではありません. 
 そうではなく, この認証(*certification*)という概念は,
@@ -92,11 +92,11 @@ _認証書_ (*certificate*)(*_なんとか_という強調の直後に開きカ�
 そしてわれわれが非形式的な意図を正しく形式的仕様にエンコードできたことを信頼するならば, 
 正しくないソフトウェアを認証してしまう可能性は他にほとんど残りません. 
 コンパイラや他のバッチ処理として走るプログラムについては,
-%\index{認証を伴うプログラム(certifying program)}%_認証を伴う_プログラムという
+%\index{認証を伴うプログラム(certifying program)}% _認証を伴う_ プログラムという
 概念
 (* ノート(才川): concept, notionを訳しわけるかどうか. とりあえずどちらも概念にした *)
 もよく知られており, これは実行すると, 回答と共に回答が正しいことの証明を出力します. 
-認証を伴うプログラムは証明検査器と組み合わせることで認証されたプログラムが得られますが, 
+認証を伴うプログラムを証明検査器と組み合わせることで認証されたプログラムが得られますが, 
 本書では認証されたプログラムの方に焦点をあてることにします. 
 同時に, Coqで定理を述べて証明するための, 一般的興味を惹くような原理や技術も紹介します. 
 
