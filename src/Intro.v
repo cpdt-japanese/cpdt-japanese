@@ -73,13 +73,13 @@ Xavier LeroyがCompCertプロジェクトを主導し,
 (まだ納得していない読者には, "machine-checked proof"でWebを検索することをお勧めします.)
 
 (*The idea of %\index{certified program}% _certified program_ features prominently in this book's title.  Here the word "certified" does _not_ refer to governmental rules for how the reliability of engineered systems may be demonstrated to sufficiently high standards.  Rather, this concept of certification, a standard one in the programming languages and formal methods communities, has to do with the idea of a _certificate_, or formal mathematical artifact proving that a program meets its specification.  Government certification procedures rarely provide strong mathematical guarantees, while certified programming provides guarantees about as strong as anything we could hope for.  We trust the definition of a foundational mathematical logic, we trust an implementation of that logic, and we trust that we have encoded our informal intent properly in formal specifications, but few other opportunities remain to certify incorrect software.  For compilers and other programs that run in batch mode, the notion of a %\index{certifying program}% _certifying_ program is also common, where each run of the program outputs both an answer and a proof that the answer is correct.  Any certifying program can be composed with a proof checker to produce a certified program, and this book focuses on the certified case, while also introducing principles and techniques of general interest for stating and proving theorems in Coq.*)
-本書のタイトルでは%\index{認証されたプログラム(certified program)}% _認証されたプログラム_ という考えがはっきりと打ち出されています.
-「認証された」という語が意味するものは政府の規則 _ではありません_ . 
+本書のタイトルでは%\index{認証されたプログラム(certified program)}%＿認証されたプログラム＿という考えがはっきりと打ち出されています.
+「認証された」という語が意味するものは政府の規則＿ではありません＿. 
 つまり作り上げられた(*engineered*)システムの信頼性が十分厳しい規格に従うことを, 
 どのように実証する(*demonstrate*)か定めた規則のことを言うのではありません. 
 そうではなく, この認証(*certification*)という概念は,
 プログラミング言語や形式手法のコミュニティでは標準的に, 
-_認証書_ (*certificate*)(*_なんとか_という強調の直後に開きカッコを書くと, Fatal error: exception Failure("lexing: empty token")が出た*)の考えと関連づけられます.
+＿認証書＿(*certificate*)の考えと関連づけられます.
 認証書とは, 言いかえると形式的で数学的な産物であり,
 プログラムが仕様に合っていることを証明するものです. 
 (* ノート(才川): certified, certification, certificate, proveなどの
@@ -92,7 +92,7 @@ _認証書_ (*certificate*)(*_なんとか_という強調の直後に開きカ�
 そしてわれわれが非形式的な意図を正しく形式的仕様にエンコードできたことを信頼するならば, 
 正しくないソフトウェアを認証してしまう可能性は他にほとんど残りません. 
 コンパイラや他のバッチ処理として走るプログラムについては,
-%\index{認証を伴うプログラム(certifying program)}% _認証を伴う_ プログラムという
+%\index{認証を伴うプログラム(certifying program)}%＿認証を伴う＿プログラムという
 概念
 (* ノート(才川): concept, notionを訳しわけるかどうか. とりあえずどちらも概念にした *)
 もよく知られており, これは実行すると, 回答と共に回答が正しいことの証明を出力します. 
