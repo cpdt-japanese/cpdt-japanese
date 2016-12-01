@@ -79,7 +79,7 @@ Xavier LeroyがCompCertプロジェクトを主導し,
 どのように実証する(*demonstrate*)か定めた規則のことを言うのではありません. 
 そうではなく, この認証(*certification*)という概念は,
 プログラミング言語や形式手法のコミュニティでは標準的に, 
-_認証書_(*certificate*)の考えと関連づけられます. 
+_認証書_ (*certificate*)(*_なんとか_という強調の直後に開きカッコを書くと, Fatal error: exception Failure("lexing: empty token")が出た*)の考えと関連づけられます.
 認証書とは, 言いかえると形式的で数学的な産物であり,
 プログラムが仕様に合っていることを証明するものです. 
 (* ノート(才川): certified, certification, certificate, proveなどの
