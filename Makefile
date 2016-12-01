@@ -35,10 +35,10 @@ latex/%.v.tex: Makefile src/%.v src/%.glob
 		$*.v -o ../latex/$*.v.tex
 
 latex/cpdt.pdf: latex/cpdt.tex $(TEX) latex/cpdt.bib
-	cd latex ; pdflatex cpdt ; pdflatex cpdt ; bibtex cpdt ; makeindex cpdt ; pdflatex cpdt ; pdflatex cpdt
+	cd latex ; platex cpdt ; platex cpdt ; bibtex cpdt ; makeindex cpdt ; platex cpdt ; platex cpdt ; dvipdfmx cpdt.dvi
 
 latex/%.pdf: latex/%.tex latex/cpdt.bib
-	cd latex ; pdflatex $* ; pdflatex $* ; bibtex $* ; makeindex $* ; pdflatex $* ; pdflatex $*
+	cd latex ; platex $* ; platex $* ; bibtex $* ; makeindex $* ; platex $* ; platex $* ; dvipdfmx $*.dvi
 
 html: Makefile $(VS) src/toc.html
 	mkdir -p html
@@ -76,4 +76,4 @@ pdf:
 latex/exercises.pdf: Makefile src/Exercises.v
 	coqc -R src Cpdt src/Exercises
 	$(COQDOC) --latex -s src/Exercises.v -o latex/exercises.tex
-	cd latex ; pdflatex exercises
+	cd latex ; platex exercises ; dvipdfmx exercises.dvi
