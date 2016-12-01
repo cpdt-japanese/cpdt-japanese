@@ -39,7 +39,7 @@
 (*Research into mechanized theorem proving began in the second half of the 20th century, and some of the earliest practical work involved Nqthm%~\cite{Nqthm}\index{Nqthm}%, the "Boyer-Moore Theorem Prover," which was used to prove such theorems as correctness of a complete hardware and software stack%~\cite{Piton}%.  ACL2%~\cite{CAR}\index{ACL2}%, Nqthm's successor, has seen significant industry adoption, for instance, by AMD to verify correctness of floating-point division units%~\cite{AMD}%.*)
 機械化された(*mechanized*)定理証明の研究は20世紀後半に始まりました. 
 最初期の実用的な成果(*work*)の一つに, 「Boyer-Moore定理証明器」Nqthm%~\cite{Nqthm}\index{Nqthm}%があります. 
-これはハードウェアとソフトウェア両方の層(*stack*)にわたる正しさを定理として証明するなどのために用いられました%~\cite{Piton}%. 
+これはハードウェアとソフトウェア両方の層(*stack*)にわたる正しさを定理として証明する目的などに用いられました%~\cite{Piton}%. 
 Nqthmの後継であるACL2%~\cite{CAR}\index{ACL2}%は産業界で顕著に受けいれられ,  
 例えばAMDによって浮動小数除算の正しさを保証するために用いられました%~\cite{AMD}%. 
 
