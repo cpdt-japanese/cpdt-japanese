@@ -28,7 +28,7 @@ clean:: Makefile.coq
 
 doc: latex/cpdt.pdf html
 
-COQDOC = coqdoc -R . Cpdt
+COQDOC = coqdoc -R . Cpdt --utf8
 
 latex/%.v.tex: Makefile src/%.v src/%.glob
 	cd src ; $(COQDOC) --interpolate --latex --body-only -s \
