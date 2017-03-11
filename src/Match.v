@@ -47,15 +47,12 @@ Ltac の %\index{tactics!match}%[match] 構成要素(construct)に焦点をあ�
 
 %\index{tactics!intuition}%[intuition] タクティクは、
 ゴールの命題論理的構造を簡略化(simplifies)します。
-
 %\index{tactics!congruence}%[congruence] タクティクは、
 等式と合同閉包(congruence closure)のルールに加え、帰納型のコンストラクタの属性を適用します。
-
 %\index{tactics!omega}%[omega] タクティクは、あなたの求めに応じて(depending on whom you ask)、
 %\index{linear arithmetic}%quantifier-free linear arithmetic 量化子のない線形算術、または、
 %\index{Presburger arithmetic}%Presburger arithmetic プレスバーガー算術と呼ばれる
 理論に対する完全な決定手続きを提供します。
-
 すなわち [omega] は、
 その原始式(atomic formulas)が、自然数または整数を基本的な比較演算の対象とし、
 そのオペランドが定数、変数、加算および減算から構成された、
@@ -88,7 +85,6 @@ The%\index{setoids}% _setoid_ の手法(facility)は、
 [rewrite] のようなタクティクによって理解される
 新しい等価関係(equivalence relations)を
 登録することを可能にします。
-
 たとえば [Prop] は、"if and only if" の等価関係を setoid として登録されています。
 新しい setoid を登録する能力は、
 すべての推論(reasoning)が、
@@ -100,7 +96,6 @@ The%\index{setoids}% _setoid_ の手法(facility)は、
 
 Coq マニュアルを熟読することで学ぶことのできる、
 組み込みの「ブラックボックス」な自動化タクティクがあります。
-
 Coqの本当の約束事は、Ltacを使って、
 問題に特化したタクティクのコーディングのなかにあります。
  *)
@@ -219,7 +214,7 @@ Qed.
 (**
 (* Many decision procedures can be coded in Ltac via "[repeat match] loops."  For instance, we can implement a subset of the functionality of [tauto]. *)
 
-多くの決定性の手続きは 「[repeat match] ループ」によって Ltac で記述されます。
+多くの決定性の手続きは 「[repeat match] ループ」によって Ltac で記述することができます。
 たとえば、[tauto] のサブセットの機能を実装することができます。
  *)
 
@@ -252,13 +247,15 @@ Ltac my_tauto :=
 %\index{tactics!exact}%[exact] タクティクは、適切な型の証明項が与えられているとき、
 ゴールを完全に解きます。
 
-（\index{natural deduction}%natural deduction%~\cite{TAPLNatDed}% 自然演繹の意味において）
-いくつかの結合子(* suhara: ∧と∨ *)についての導入のルールを実装することは自明です。
+（自然演繹 %\index{natural deduction}%natural deduction%~\cite{TAPLNatDed}% の意味において）
+いくつかの結合子についての導入(introduction)のルールを実装することもまた自明です。
+(* suhara: connectives 結合子 ∧と∨ *) 
+除去(elimination)のルールを実装することはもう少しの作業です。
+[destruct]に仮説の名前を付ける必要があるからです。
 
 最後のルールは、
 仮説を与えられた引数の集合（量化された変数、または、含意による局所的仮説のため）
-に特化したバージョンに置き換える
-%\index{tactics!specialize}%[specialize] タクティクを使って
+に特化したバージョンに置き換える %\index{tactics!specialize}%[specialize] タクティクを使って
 三段論法(modus ponens)を実装します。
 慣例によって、
 [specialize] への引数が一連の引数に対する仮説 [H] の適用である場合、そ
@@ -290,8 +287,8 @@ End propositional.
 It is tempting to assume that [match] works like it does in ML.  In fact, there are a few critical differences in its behavior.  One is that we may include arbitrary expressions in patterns, instead of being restricted to variables and constructors.  Another is that the same variable may appear multiple times, inducing an implicit equality constraint.
 *)
 
-マッチはMLのように動作すると想定するのは魅力的です。 
-実際、その動作にはいくつかの重要な違いがあります。
+[match] はMLのように動作すると想定するのは魅力的です。 
+実際に、その動作にはいくつかの重要な違いがあります。
 ひとつは、変数やコンストラクタに制限されることなく、パターンに任意の式を含めることです。 
 もうひとつは、同じ変数が複数回現れることがあり、暗黙に等値の制約を含むことです。
 
@@ -300,7 +297,7 @@ There is a related pair of two other differences that are much more important th
 *)
 
 他のふたつの違いは、他のものよりはるかに重要です。
-[match] 構文は、＿失敗によるバックトラッキングの意味＿ を持っています。 
+[match] 構文は、 ＿失敗によるバックトラッキングの意味＿ を持っています。 
 MLでは、パターンマッチングは、一致させる最初のパターンを見つけてから、
 その本体を実行することによって動作します。 
 本体が例外を発生させた場合、全体の一致は同じ例外を発生させます。
@@ -333,8 +330,7 @@ Coqでは、次のパターンを取り戻して試してみます。これも�
 その本体のタクティクは成功するので、全体のタクティクも成功します。
 
 この例では、失敗が [match] 内の別のパターンにどのように移動するかを示しています。
-失敗はまた、単一のパターンにマッチする異なる方法を見つける試みを引き起こします。
-
+失敗はまた、＿単一のパターンにマッチする異なる方法を見つける試み＿を引き起こします。
 別の例を考えてみましょう。
  *)
 
@@ -396,7 +392,6 @@ Ltac notHyp P :=
 パターン・マッチングにに組み込まれている等価性検査(equality checking)を使用して、
 命題に正確に一致する仮説があるかどうかを調べます。もしそうなら、
 %\index{tactics!fail}%[fail] タクティクを使用します。 
-
 引数がなければ、期待通りに、[fail] は通常のタクティクの失敗を通知します。
 [fail] に引数 [n] が渡されると、
 [n] は、バックトラック探索の囲む条件(case)を通して外側に向かってカウントするように使用されます。
@@ -410,13 +405,11 @@ This second case, used when [P] matches no hypothesis, checks if [P] is a conjun
 
 第2の条件(case)は、[P] が仮説と一致しないときに使用され、
 [P] が連言(conjunction)であるかどうかをチェックします。
-
 他の簡略化(simplification)では連言(conjunction)をその成分の式(component formula)
 に分割することがあるため、
 これらの成分の少なくともひとつも表現されていない
 (* suhara: 成分の式がどれも「仮説を使って」表現されてない *)
 ことを確認する必要があります。
-
 これを達成するために、 %\index{tactics!first}%[first] タクティカルを適用します。
 これはタクティクのリストを取り、
 それらのひとつが失敗しないまで (* suhara: 最初のひとつが成功するまで *)
@@ -429,9 +422,8 @@ The body of the [?P1 /\ ?P2] case guarantees that, if it is reached, we either s
 
 [?P1 /\ ?P2] の場合のボディ(* suhara: [=>] の右辺 *) は、
 到達すれば完全に成功するか完全に失敗するかを保証します。
-
 ワイルドカードの場合、[P] は連言ではありませんから、
-%\index {tactics!idtac}％[idtac] を使用します。
+%\index {tactics!idtac}%[idtac] を使用します。
 これは、何もしないことで成功する効果があるため、単独で適用することは愚かなタクティクです。
 それにもかかわらず、[idtac] は、ここで見ているような場合に便利な代用品(placeholder)です。
 
@@ -538,7 +530,6 @@ End firstorder.
 
 かろうじて [completer] の定義における微妙な落とし穴を避けていました。
 慣れていない目には、オリジナルよりも魅力的に見える別の定義を試してみましょう。
-
 （2番目の [match] の場合を少し変更して、
 これまでに行使されていなかったLtacの動作の微妙な部分を処理するのに
 十分スマートなタクティクにしました）。
@@ -548,13 +539,12 @@ End firstorder.
 Ltac completer' :=
   repeat match goal with
            | [ |- _ /\ _ ] => constructor
-	   | [ H : ?P /\ ?Q |- _ ] => destruct H
-(* suhara: この部分は影響しない。
-             ;
+	   | [ H : ?P /\ ?Q |- _ ] => destruct H;
+(* suhara: ここからの部分は影響しない。 *)
              repeat match goal with
                       | [ H' : P /\ Q |- _ ] => clear H'
                     end
-*)
+(* suhara: ここまで。 *)
            | [ H : ?P -> _, H' : ?P |- _ ] => specialize (H H') (* ！！！ *)
            (* suhara: ↑は、H2 : forall x, R x -> S x. や H1 .. にもマッチしてしまう。 *)
            (* specialize (H1 y) や specialize (H2 y) が実行されてしまう。  *)
@@ -565,8 +555,8 @@ Ltac completer' :=
          end.
 (* end thide *)
 
-(*
-(** The only other difference is in the modus ponens rule, where we have replaced an unused uni
+(**
+(* The only other difference is in the modus ponens rule, where we have replaced an unused uni
 fication variable [?Q] with a wildcard.  Let us try our example again with this version: *)
 
 他の唯一の違いは、未使用のユニフィケーション変数 [?Q] をワイルドカードに置き換えた三段論法
@@ -603,11 +593,11 @@ Section firstorder'.
 
 証明できていたゴールを証明できないものに変形(reducing)することで、
 量化された定理は、[x]ではなく[y]で具体化されてしまいます。
-
 [completer'] のための最後の [match] の条件は、
 適切な仮説とともに量化子を具体化するだけに注意深くしています。
 なぜ間違った選択が行われたのですか？
      *)
+
   Abort.
 (* end thide *)
 End firstorder'.
@@ -616,7 +606,7 @@ End firstorder'.
 (* A few examples should illustrate the issue.  Here we see a [match]-based proof that works fine: *)
 
 いくつかの例が問題を説明しているはずです。ここでは、
-[match]ベースの証明がうまくいくのを見ています：
+[match]にもとづく証明がうまくいくのを見ています：
  *)
 
 Theorem t1 : forall x : nat, x = x.
@@ -650,10 +640,8 @@ Abort.                                      (* suhara: Coq 8.5では解けてし
 *)
 
 問題は、ユニフィケーション変数にローカルに束縛された変数が含まれないことです。
-
 (* suhara: forall x, Q や fun x => F の x のこと。P は、
 xが含まれている Q や F とマッチしないが、ワイルドカードならマッチする。 *)
-
 この場合、[?P] はローカルな量化変数 [x] を含む [x = x] に束縛される必要があります。
 以前のバージョンでワイルドカードを使用することで、この制限は回避されました。
 なぜこの制限が [completer] タクティクの振る舞いに影響を与えるのかを理解するために、
@@ -678,7 +666,6 @@ Coq 8.1以前では、このような回避策はありません。
 
 どのCoqバージョンを使用していても、この制限に注意することが重要です。
 すでに示唆したように、その制限は [completer'] の驚くべき振る舞いの背後にある原因です。
-
 (* suhara: match の
 「| [ H : ?P -> _, H' : ?P |- _ ] => specialize (H H') 」
 の H が、
@@ -687,7 +674,6 @@ Coq 8.1以前では、このような回避策はありません。
 そのため、specialize (H1 y) が実行されてしまう。
 y のほうが x より前にあるのもミソである。
 *)
-
 私たちは間違って量化された事実を三段論法と突き合わせ、
 適切に一致する仮説が利用可能であり、
 誤った量化子の具体化が選択された異なる行動につながるというチェックを回避します。
@@ -741,6 +727,7 @@ Error: The reference ls' was not found in the current environment
 (*
    At this point, we hopefully remember that pattern variable names must be prefixed by question marks in Ltac.
 *)
+
 この時点で、Ltacでは、
 パターン変数の名前の先頭に疑問符を付ける必要があることを覚えておいてください。
 
@@ -798,7 +785,6 @@ Goal False.
 
 特定の項に、等号でセットされた(set equal to)、新しい変数でもって、証明のコンテキストを拡張する
 %\index{tactics!pose}%[pose] タクティクを使用します。
-
 [pose n] の代わりに [idtac n] を使用することもできました。
 これは、コンテキストを変更せずに結果を出力します。
 
@@ -978,15 +964,12 @@ Abort.
 (**
 (* What is going wrong here?  The answer has to do with the dual status of Ltac as both a purely functional and an imperative programming language.  The basic programming language is purely functional, but tactic scripts are one "datatype" that can be returned by such programs, and Coq will run such a script using an imperative semantics that mutates proof states.  Readers familiar with %\index{monad}\index{Haskell}%monadic programming in Haskell%~\cite{Monads,IO}% may recognize a similarity.  Haskell programs with side effects can be thought of as pure programs that return _the code of programs in an imperative language_, where some out-of-band mechanism takes responsibility for running these derived programs.  In this way, Haskell remains pure, while supporting usual input-output side effects and more.  Ltac uses the same basic mechanism, but in a dynamically typed setting.  Here the embedded imperative language includes all the tactics we have been applying so far.
 *)
-
 ここで何がうまくいかないのでしょうか？
 答えは、Ltacの、純粋に関数プログラミング言語と命令的プログラミング言語の両方としての
-二重状態( dual status)と関係しています。
-
+二重状態 (dual status) と関係しています。
 基本的なプログラミング言語は純粋に関数的ですが、
 タクティクスクリプトはそのようなプログラムによって返される「データ型」のひとつで、
 Coqは証明状態を変更する命令的なセマンティクスを使ってそのようなスクリプトを実行します。
-
 %~\cite{Monads,IO}% Haskell の
 %\index{monad}\index{Haskell}% モナド・プログラミング(monadic programming)に
 精通している読者は、類似点を認識しているかもしれません。
@@ -994,7 +977,6 @@ Coqは証明状態を変更する命令的なセマンティクスを使って�
 ＿命令型言語におけるプログラムのコード＿
 (the code of programs in an imperative language) を
 返す純粋なプログラムと考えることができます。
-
 一部の帯域外(out-of-band)なメカニズムは、
 これらの派生プログラムを実行する責任を負います。
 このようにして、Haskellは純粋なままで、通常の入出力の副作用などをサポートします。
@@ -1302,13 +1284,10 @@ Qed.
 木を走査するとき、[search_prem] は上記の補題のいくつかを適用して、
 異なる部分式(subformula)をゴールの頭部にもっていくことで、
 ゴールを書き換えます。
-
 すなわち、
 その前提が、いくつかの[Q]に対して、[P /\ Q]のかたちに再配置されるところで、
 含意の前提のそれぞれの部分式 [P] に対して、[P] を 「have a turn」しようとします。
-
 (* suhara: 最後のmatchのひとつめのcaseのこと。Qは「_」。 *)
-
 タクティク [tac] はこのかたちでゴールを見ることを期待し、
 前提の最初の連言に注意を集中するでしょう。
  *)
@@ -1337,13 +1316,10 @@ Ltac search_prem tac :=
 前提が連言で始まる場合は、各連言で[search]手続きを呼び出します。 
 [search P] の呼び出しは、ある [Q] のための前提が [P /\ Q] の形式であるという
 不変性を期待し維持します。
-
 [tac]が常に失敗したときに永久にループするのを避けるために、
 一種の再帰の尺度として減少する、[P]を明示的に渡します。
-
 2番目の[match]の場合は、制御を[search]に渡す前に、
 この不変量を実現するために可換性(commutativity)の補題を呼び出します。
-
 最終的な[match] の場合では [tac] を直接適用しようとしますが、
 それが失敗すると、余分な[True]結合を追加してゴールの形を変え、
 [tac]をもう一度呼び出します。
@@ -1438,19 +1414,16 @@ Qed.
 (* Our final [matcher] tactic is now straightforward.  First, we [intros] all variables into scope.  Then we attempt simple premise simplifications, finishing the proof upon finding [False] and eliminating any existential quantifiers that we find.  After that, we search through the conclusion.  We remove [True] conjuncts, remove existential quantifiers by introducing unification variables for their bound variables, and search for matching premises to cancel.  Finally, when no more progress is made, we see if the goal has become trivial and can be solved by [imp_True].  In each case, we use the tactic %\index{tactics!simple apply}%[simple apply] in place of [apply] to use a simpler, less expensive unification algorithm. *)
 
 今や、最終的な[matcher]タクティクは簡単です。
-
 最初に、すべての変数をスコープに [intro] し、
 単純な前提の単純化を試み、
 [False]を見つけたら証明を完成させ、
 見つかった存在量化子を取り除きます。
-
 その後、結論を検索します。
-
 [True] の連言を取り除き、
 ユニフィケーション変数を導入することによって、束縛変数のための存在量化子を取り除き、
 一致する前提を探して取り除きます。
-
-最後に、それ以上の進展がなければ、ゴールが自明かどうかをみて、[imp_True] によって解くことができます。
+最後に、それ以上の進展がなければ、ゴールが自明かどうかをみて、
+[imp_True] によって解くことができます。
 それぞれの場合において、簡単にするために、[apply] の代わりに、
 より安価なユニフィケーション・アルゴリズムである
 %\index{tactics!simple apply}%[simple apply] タクティクを使います。
@@ -1823,7 +1796,6 @@ Reset red_herring.
 したがって、新しい統一変数を選択するのではなく、
 ユーザーが指定した戦術[tac]を適用します。
 [tac]が[T]を証明するのに失敗した場合、
-
 デフォルトの量化の処理を続けるのではなく、
 具体化を中止します。また、
 %\index{tactics!solve}%
@@ -1871,7 +1843,6 @@ Section t7.
 
 まだ[P]の事実を知らない変数について[Q]仮説を見つけて適用しようとするタクティクで
 [insterKeep]を呼び出すことによってゴールを証明することができます。
-
 Coqの証明エンジンで、
 ファーストクラスのタクティクの引数が、
 [match]で始まらなければならないという奇妙な制限を回避するために、
@@ -1916,7 +1887,6 @@ Qed.
 %\index{tactics!instantiate}%[instantiate] タクティクは
 探索的な証明(exploratory proving)のためには便利かもしれませんが、
 変化する定理には適応しにくい非常に脆い証明スクリプトにつながります。
-
 実在すると判っている項に値を割り当てるために使用できるタクティクを持つことは、しばしば有用です。
 婉曲な(roundabout)実装技術を採用することで、この機能を一般化するタクティクを作ることができます。
 特に、我々の戦術[equate]は、2つの項が等しいことを主張します。
