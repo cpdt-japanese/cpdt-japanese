@@ -129,7 +129,7 @@ four_plus_three = eq_refl
 
 関係の定義では、同じ等式は証明するのにより多くのステップをとりますが、
 そのプロセスは完全に機械的です。
-例えば、simple-minded な手動の証明探索の戦略を考えよう。
+例えば、単純な手動の証明探索の戦略を考えてみましょう。
 後でエラーメッセージの表示された手順は、最終的なスクリプトから省略されます。
 *)
 
@@ -204,7 +204,6 @@ Example five_plus_three : plusR 5 3 8.
 (* This time, [auto] is not enough to make any progress.  Since even a single candidate step may lead to an infinite space of possible proof trees, [auto] is parameterized on the maximum depth of trees to consider.  The default depth is 5, and it turns out that we need depth 6 to prove the goal. *)
 
 この場合は、[auto] は進捗をするのに十分ではありません。
-
 単一の候補のステップは、可能な証明木の無限のスペースに導くかもしれないので、
 [auto] は考慮するべき最大の木の深さをパラメータとして与えられるようになっています。
 ディフォルトの深さは 5 で、ゴールを証明するために深さ 6 が必要ならそのように設定します。
@@ -239,7 +238,6 @@ Qed.
 論理プログラミングのふたつのキーとなるコンポーネントは、
 %\index{backtracking}% _backtracking_ バックトラッキングと
 %\index{unification}% _unification_ ユニフィケーションです。
-
 これらの技法を実際に見るために、さらに単純(silly)な例を考えます。
 ここでは、候補となる証明のステップが反射的で、量化子を具体化します。
 (quantifier instantiation)
@@ -298,8 +296,8 @@ Example seven_minus_three' : exists x, plusR x 3 7.
 
 以前とおなじように、手作業で量化子の具体化を推測しようとしますが、ここではそれは必要ありません。
 [apply] の代わりに、推測を延期したいそれらのパラメータの代わりに
-プレースホルダー %\index{unification variable}% _unification variables_ 
-ユニフィケーション変数をつかう(proceeds with) %\index{tactics!eapply}%[eapply] を使用します。
+プレースホルダー・ユニフィケーション変数 %\index{unification variable}% _unification variables_
+を使って進める %\index{tactics!eapply}%[eapply] を使用します。
  *)
 
   eapply ex_intro.
@@ -355,7 +353,7 @@ Qed.
 この証明は、論理プログラミングが、関数プログラミングと比べて、
 証明探索を単純化する最初の例を与えます。
 一般に、関数型プログラムは、単に一方方向に実行されることを意味し、
-関数は入力と出力の重なりのない集合(disjoint sets)です。
+関数は入力と出力の素集合(disjoint sets、交わりを持たない集合)を持ちます。
 最後の例では、特定の出力を生じさせる入力を推定するために、
 論理型プログラムを後ろ向きに効率的に実行しました。
 他の入力の未知の値を推測するために、同じことが働きます。
@@ -370,12 +368,10 @@ Qed.
 (** 
 (* By proving the right auxiliary facts, we can reason about specific functional programs in the same way as we did above for a logic program.  Let us prove that the constructors of [plusR] have natural interpretations as lemmas about [plus].  We can find the first such lemma already proved in the standard library, using the %\index{Vernacular commands!SearchRewrite}%[SearchRewrite] command to find a library function proving an equality whose lefthand or righthand side matches a pattern with wildcards. *)
 
-正しい補助的な事実を証明するために、(* ?? ただし、ここから等式の証明に話題が移る *)
+正しい補助的な事実を証明するために、(* ここから等式の証明に話題が移る *)
 具体的な関数プログラムについて、上で論理プログラムにしたのと同じ方法で、
 理由づけすることができます。
-
 [plusR] のコンストラクタが、[plus] についての補題を自然に翻訳することを証明しましょう。
-
 最初に、左辺または右辺がワイルドカードとマッチする等式を証明するライブラリ関数を見つけるための
 コマンドである %\index{Vernacular commands!SearchRewrite}%[SearchRewrite] コマンドを使って、
 それらの補題が、既に標準ライブラリで証明されていることを見つけることができます。
@@ -390,7 +386,7 @@ plus_O_n: forall n : nat, 0 + n = n
 (* The command %\index{Vernacular commands!Hint Immediate}%[Hint Immediate] asks [auto] and [eauto] to consider this lemma as a candidate step for any leaf of a proof tree. *)
 
 コマンド %\index{Vernacular commands!Hint Immediate}%[Hint Immediate] は、
-[auto] と [eauto] が、この補題を証明木の任意の葉の候補として考慮するように依頼します。
+[auto] と [eauto] がこの補題を証明木の任意の葉の候補として考慮するように依頼します。
 *)
 
 Hint Immediate plus_O_n.
@@ -398,7 +394,8 @@ Hint Immediate plus_O_n.
 (**
 (* The counterpart to [PlusS] we will prove ourselves. *)
 
-[PlusS] に対応するものを証明します。
+[PlusS] に対応する [plusS] を証明します。
+(* suhara: PlusS のカウンターパートが plusS であることを補足した。 *)
 *)
 
 Lemma plusS : forall n m r,
@@ -420,7 +417,9 @@ Hint Resolve plusS.
 (**
 (* Now that we have registered the proper hints, we can replicate our previous examples with the normal, functional addition [plus]. *)
 
-適切なヒントを登録したので、これまでの例を通常の機能追加[plus]で再現できます。
+適切なヒントを登録したので、これまでの例を通常の関数[plus]の追加で再現できます。
+(* suhara: seven_minus_three' は plusR を使ったが、
+seven_minus_three''は plus (+) を使っているということ。*)
 *)
 
 Example seven_minus_three'' : exists x, x + 3 = 7.
@@ -468,12 +467,11 @@ Hint Resolve plusO.
 (* Note that, if we consider the inputs to [plus] as the inputs of a corresponding logic program, the new rule [plusO] introduces an ambiguity.  For instance, a sum [0 + 0] would match both of [plus_O_n] and [plusO], depending on which operand we focus on.  This ambiguity may increase the number of potential search trees, slowing proof search, but semantically it presents no problems, and in fact it leads to an automated proof of the present example. *)
 
 もし、 [plus] への入力を論理プログラムに関連する入力として考えるなら、
-新しいルール [plus0] は曖昧さを導きいれます。
+新しいルール [plus0] は曖昧さを導き入れます。
 例えば、和 [0 + 0] は、我々の注目するオペランドに依存して、
 [plus_0_n] と [plus0] のどちらにもマッチします。
-
-この曖昧さは潜在的な探索木の数を増やし、証明探索を遅くし、
-意味的には問題を供さないが、実際に自動化した証明につながります。
+この曖昧さは潜在的な探索木の数を増やし、証明探索を遅くしますが、
+意味的には問題はないので、実際に自動化した証明を導きます。
  *)
 
 Example seven_minus_four_zero : exists x, 4 + x + 0 = 7.
@@ -485,7 +483,7 @@ Qed.
 (**
 (* Just how much damage can be done by adding hints that grow the space of possible proof trees?  A classic gotcha comes from unrestricted use of transitivity, as embodied in this library theorem about equality: *)
 
-可能な証明木のスペースを広げるヒントを追加することが、どれだけ損害を被ることになるでしょうか？
+可能な証明木のスペースを広げるヒントを追加することで、どれだけ損害を被ることになるでしょうか？
 古典的なものは、このライブラリの定理で具体的にしたように、
 等式についての推移性(transitivity)の無制限な使用から来ています。
  *)
@@ -501,7 +499,7 @@ eq_trans
 (* Hints are scoped over sections, so let us enter a section to contain the effects of an unfortunate hint choice. *)
 
 ヒントはセクションのスコープ上にあるので、
-不幸なヒントの選択の効果を含むためにセクションに入ります。
+不幸なヒントの選択の効果を含むセクションに入りましょう。
 *)
 
 Section slow.
@@ -621,6 +619,7 @@ Finished transaction in 0. secs (0.004u,0.s)
 この [eauto] は、ゴールを証明するのに失敗しますが、
 しかし、少なくともそれは上記の2秒よりも実質的に短い時間で済みます！
 *)
+
 Abort.
 (* end thide *)
 
@@ -676,7 +675,7 @@ Qed.
 (*
 (** * Searching for Underconstrained Values *)
 *)
-(** * 拘束されていない値を探す *)
+(** * 制約された値を探す *)
 
 (**
 (* Recall the definition of the list length function. *)
@@ -737,7 +736,7 @@ Hint Resolve length_O length_S.
 [length_O] を [Hint Immediate] ではなく [Hint Resolve] で登録しています。
 [Resolve] と [Immediate] は、前提のない定理をヒント
 (* premise-free hint、この場合は length_O *)
-にするなら同じ意味を持ちます。
+にするなら同じ意味を持ちます。）
 *)
 
 Example length_is_2 : exists ls : list nat, length ls = 2.
@@ -757,7 +756,7 @@ Coqは、証明探索の途中で導入された幾つかのユニフィケー�
 決定することなしに、証明を終えたことに文句をいいます。
 型 [nat] の ＿任意＿ の値（たとば 0）をどちらの変数にも差し込むことができますから、
 このエラーメッセージは少し馬鹿げて(silly)います！
-しかし、より複雑な型では、それらの値(inhabitants)を見つけることは、
+しかし、より複雑な型では、それらの具体的な値(inhabitants)を見つけることは、
 一般的に定理証明と同じくらい複雑かもしれません。
 
 %\index{Vernacular commands!Show Proof}%[Show Proof] コマンドは、
@@ -779,7 +778,6 @@ Abort.
 
 (**
 (* We see that the two unification variables stand for the two elements of the list.  Indeed, list length is independent of data values.  Paradoxically, we can make the proof search process easier by constraining the list further, so that proof search naturally locates appropriate data elements by unification.  The library predicate [Forall] will be helpful. *)
-
 そのリストのふたつの要素を表わす、ふたつのユニフィケーション変数があります。
 しかしながら、リストの長さはデータの値と独立です。
 証明探索はユニフィケーションによって適切なデータの要素を自然に見つけ出すので、
@@ -861,7 +859,7 @@ Hint Resolve plusO'.
 (**
 (* Finally, we meet %\index{Vernacular commands!Hint Extern}%[Hint Extern], the command to register a custom hint.  That is, we provide a pattern to match against goals during proof search.  Whenever the pattern matches, a tactic (given to the right of an arrow [=>]) is attempted.  Below, the number [1] gives a priority for this step.  Lower priorities are tried before higher priorities, which can have a significant effect on proof search time. *)
 
-最後に、カスタムヒントを登録するためのコマンド
+最後に、特別仕立てのヒント(custom hint)を登録するためのコマンド
 %\index{Vernacular commands!Hint Extern}%[Hint Extern] を見ます。
 これは、証明探索の間にゴールに対してマッチするパターンを(*我々が*)提供します。
 ひとたび、パターンがマッチしたら、タクティク（矢印 [=>] の右辺で与えられた) が試みられます。
@@ -893,11 +891,9 @@ Print length_and_sum.
 (**
 (* Printing the proof term shows the unsurprising list that is found.  Here is an example where it is less obvious which list will be used.  Can you guess which list [eauto] will choose? *)
 
-証明の項を印刷することは（で）、見つかったなんの不思議もない(unsurprising)リストを示します。
+証明の項を印刷することで、見つかったなんの不思議もない(unsurprising)リストを示します。
 ここに、どのリストが使用されるのかが明白でない例があります。
 [eauto] が選んだリストがどれか判りますか？
-
-(* suhara: 日本語版では 「42」 についての訳注が必要かもしれませんね。半ページくらい。 *)
  *)
 
 Example length_and_sum' : exists ls : list nat, length ls = 5
@@ -906,6 +902,9 @@ Example length_and_sum' : exists ls : list nat, length ls = 5
   eauto 15.
 Qed.
 (* end thide *)
+
+(* suhara: 「42」はもちろん「銀河ヒッチハイクガイド」からの引用ですが、
+日本語版では訳注が必要かもしれません。*)
 
 (* begin hide *)
 Print length_and_sum'.
@@ -1234,7 +1233,6 @@ The basic hints for [auto] and [eauto] are: %\index{Vernacular commands!Hint Imm
 
 All of these [Hint] commands can be expressed with a more primitive hint kind, [Extern].  A few more examples of [Hint Extern] should illustrate more of the possibilities. *)
 
-(* suhara: パラグラフ1 *)
 ここで止めて、[auto] と [eauto] のヒントの可能性を検討しましょう。
 ヒントは、これまでの多くの例で拡張されるのを見た、 ＿ヒントデータベース＿ に格納されます。
 ヒントデータベースが指定されていない場合は、デフォルトのデータベースが使用されます。
@@ -1250,31 +1248,24 @@ Ltac プログラミング言語において、
 この拡張性をどのように達成するかが説明されています。
 他のユーザー定義のタクティクでも、[auto] や [eauto] と同様の利点が得られます。
 
-(* suhara: パラグラフ2 *)
 [auto] と [eauto] についての基本的なヒント
 %\index{Vernacular commands!Hint Immediate}%[Hint Immediate lemma] は、
 補題を適用し、仮説を打ち消して(discharging)、
 ただちに目標をひとつの証明のステップで解くように依頼します。
-
 %\index{Vernacular commands!Hint Resolve}%[Resolve lemma] は、
 同じことをしますが、ネストされた証明検索の対象となる新しい前提を追加するかもしれません。
-
 %\index{Vernacular commands!Hint Constructors}%[Constructors type] は、
 [Resolve] のように動作し、帰納的なすべてのコンストラクタに適用されます。
-
 %\index{Vernacular commands!Hint Unfold}%[Unfold ident] は、
 (* suhara: [ident]が *)
 証明のゴールの先頭に現れるときに [ident] を展開(unfolding)することを試みます。
-
 これらの [Hint] コマンドのそれぞれに接尾辞を付けて、
 指定されたデータベースのみにヒントを追加することができます。たとえば、
 [Hint Resolve lemma : my_db] で、ヒントを特定のデータベースに追加したなら、
 例えば [auto with my_db] のときだけに使われるでしょう。
-
 [auto] の追加引数は、[auto 8] や [auto 8 with my_db] のように、
 深さ優先で検索する証明木の最大の深さを指定します。デフォルトの深さは5です。
 
-(* suhara: パラグラフ3 *)
 これらの [Hint] コマンドはすべて、より原始的なヒントの種類 [Extern] で表現できます。
 [Hint Extern] の例をいくつか挙げると、より多くの可能性が示されます。
  *)
@@ -1474,8 +1465,8 @@ Section autorewrite.
 新しいヒントは、古いヒントがもう適用できないかたち(form)となった、ゴールに適用されます。
 この、新しいヒントが証明探索を遅くするかもしれない、
 [auto] の状況と対比される rewrite ヒントの "非単調性(non-monotonicity)" は、
-古い証明を "壊す(break)" ことは決してありません(* suhara: できていた証明ができなくなること *)。
-
+古い証明を "壊す(break)" こと(* suhara: できていた証明ができなくなること *)
+は決してありません。
 キーとなる違いは、
 [autorewrite] は、ゴールを解くことなしに変形するかもしれないのに対して、
 [auto] は、ゴールと解くか、または、それを変えないかのどちらかです。
