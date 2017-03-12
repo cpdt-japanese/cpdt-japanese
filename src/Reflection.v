@@ -31,7 +31,6 @@ Set Asymmetric Patterns.
 Gallinaによって、決定手続き(decision procedures、決定するための手続き)
 を正しさの証明とともに書いて、
 これらの手続きが非常に短い証明で書けることを示します(appeal)。
-
 項の _reflection_ ＿リフレクション＿ は、
 Gallinaの命題を構文が表す帰納型の値に変換する必要があるために、適用されます。
 それで、Gallinaプログラムがそれらを解析し、
@@ -82,7 +81,6 @@ Even_SS
 最終的な証明項は、入力値に対して長さが超線形(super-linear)です。
 Coqの暗黙的な引数の仕組みは、[Even_SS]のパラメータ[n]に与えられた値を隠しているので、
 ここでは証明項はここでは線形にしか見えません。
-
 (* suhara:
 以下を実行すると納得できる：
 Unset Printing Notations.
@@ -91,11 +89,9 @@ Print even_256.
 Set Printing Notations.
 Unset Printing Implicit.
 *)
-
 また、証明項は内部的に構文木として表現され、ノード表現を共有する機会がありますが、
 この章では、ほぼ同等の2つの尺度、証明文の長さを簡単なテキストの長さとして、
 または、用語の構文木のノード数として測定します。
-
 時には明らかに大きな証明項でも、内部では十分な共有を持っているため、
 予想以上のメモリを消費することはありませんが、
 共有のない(sharing-free)バージョンのサイズが十分に小さいことを保証することによって、
@@ -1251,7 +1247,6 @@ The traditional [tauto] tactic introduces a quadratic blow-up in the size of the
 上記の[quote] タクティクの動作は手品のように見えます。
 どういうわけか、それは任意の型の副項(subterms)どうしが等しいかどうかの比較(equality comparison)
 を実行するので、これらの副項は同じ具象化された(reified)変数でされるでしょう。
-
 [quote]はOCamlで実装されていますが、具象化のプロセス(reification process)
 をLtacで完全にコードすることができます。
 仕事をより簡単にするために、変数を[nat]として表現し、
@@ -1329,7 +1324,6 @@ Ltac lookup x xs :=
 
 次の構成要素(building block)は、許可されたすべての変数値のリストを指定して、
 項を具象化する手順です。
-
 変数のリストに含まれていない副項(subterm)を含む項の具象化を試みると、
 タクティクの失敗が引き起こされる可能性があるため、
 この手続きは部分的(partial)になります(free to make this procedure partial)。
