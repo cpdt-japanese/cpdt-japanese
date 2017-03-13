@@ -614,9 +614,9 @@ Coq戦術の一般的なスタイルの代わりに、
 手作業では、場合分け分析の対象となる式を選択する必要があります。
 
  *)
-(* suhara: MoreDep がうまく読めないので、スキップする。
+(* suhara: MoreDep がうまく読めないので「Cpdt.」を付けた。 *)
 (* begin hide *)
-Require Import MoreDep.
+Require Import Cpdt.MoreDep.
 (* end hide *)
 
 Theorem cfold_correct : forall t (e : exp t), expDenote e = expDenote (cfold e).
@@ -781,7 +781,7 @@ Qed.
 *)
 
 Reset reassoc_correct.
-suhara: MoreDep がうまく読めないので、ここまでスキップする。*) 
+
 Theorem confounder : forall e1 e2 e3,
   eval e1 * eval e2 * eval e3 = eval e1 * (eval e2 + 1 - 1) * eval e3.
   crush.
