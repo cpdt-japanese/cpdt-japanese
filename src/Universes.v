@@ -126,6 +126,7 @@ Check Set.
      *)
 
 Check Type.
+(**
 (** %\vspace{-.15in}% [[
   Type $ Top.3 ^
      : Type $ (Top.3)+1 ^
@@ -138,6 +139,19 @@ Check Type.
   In the third query's output, we see that the occurrence of [Type] that we check is assigned a fresh%\index{universe variable}% _universe variable_ [Top.3].  The output type increments [Top.3] to move up a level in the universe hierarchy.  As we write code that uses definitions whose types mention universe variables, unification may refine the values of those variables.  Luckily, the user rarely has to worry about the details.
 
   Another crucial concept in CIC is%\index{predicativity}% _predicativity_.  Consider these queries. *)
+*)
+(** %\vspace{-.15in}% [[
+  Type $ Top.3 ^
+     : Type $ (Top.3)+1 ^
+     ]]
+
+  [Type] の出現は、コメント内に追加の情報で注釈されています。これらの注釈は [Type] の背景にある秘密と関係があります。これは型の無限の階層を表しているのです。[Set] の型は [Type(0)]、[Type(0)] の型は [Type(1)]、[Type(1)] の型は [Type(2)] などです。このようにして "[Type : Type]" パラドックスを回避しています。利便性のため、この宇宙(universe)の階層は Coq における一種の部分型付けを利用しています。型がレベル [i] における [Type] である任意の項は、[j > i] であるレベル [j] における [Type] でも特徴付けられます。
+
+  最初の [Check] クエリの出力において、 [Set] の型の型レベルは [(0)+1] であるとわかります。ここで [0] は [Set] のレベルであり、これをインクリメントすると [Set] を _分類(classify)する_ レベルに到達します。
+
+  三番目のクエリの出力においては、ここで調べた [Type] の出現にはフレッシュな%\index{宇宙変数(universe variable)}% _宇宙変数(universe variable)_ [Top.3] が割り当てられています。出力された型は [Top.3] をインクリメントすることで宇宙の階層を１レベル上に移動しています。型が宇宙変数に言及する定義を用いたコードを書くときは、単一化によりこれらの変数の値が詳細かされることがあります。幸運にも、利用者はこの詳細を気にする必要はほとんどありません。
+
+  CIC におけるもう一つの重要な概念は%\index{可述性}% _可述性_ です。次のクエリについて考えてみましょう。*)
 
 Check forall T : nat, fin T.
 (** %\vspace{-.15in}% [[
@@ -154,6 +168,7 @@ Check forall T : Set, T.
      *)
 
 Check forall T : Type, T.
+(**
 (** %\vspace{-.15in}% [[
   forall T : Type $ Top.9 ^ , T
      : Type $ max(Top.9, (Top.9)+1) ^
@@ -162,10 +177,20 @@ Check forall T : Type, T.
   These outputs demonstrate the rule for determining which universe a [forall] type lives in.  In particular, for a type [forall x : T1, T2], we take the maximum of the universes of [T1] and [T2].  In the first example query, both [T1] ([nat]) and [T2] ([fin T]) are in [Set], so the [forall] type is in [Set], too.  In the second query, [T1] is [Set], which is at level [(0)+1]; and [T2] is [T], which is at level [0].  Thus, the [forall] exists at the maximum of these two levels.  The third example illustrates the same outcome, where we replace [Set] with an occurrence of [Type] that is assigned universe variable [Top.9].  This universe variable appears in the places where [0] appeared in the previous query.
 
   The behind-the-scenes manipulation of universe variables gives us predicativity.  Consider this simple definition of a polymorphic identity function, where the first argument [T] will automatically be marked as implicit, since it can be inferred from the type of the second argument [x]. *)
+*)
+(** %\vspace{-.15in}% [[
+  forall T : Type $ Top.9 ^ , T
+     : Type $ max(Top.9, (Top.9)+1) ^
+     ]]
+
+  これらの出力は [forall] 型がどの宇宙にあるか決定するための規則を実演しています。特に、型 [forall x : T1, T2] について、[T1] と [T2] の宇宙の最大値をを取っています。最初のクエリ例では、[T1] ([nat]) と [T2] ([fin T]) は [Set] にあるため、[forall] 型も同様に [Set] にあります。二つ目のクエリでは、[T1] は [Set] であり、レベル [(0)+1] にあります。[T2] は [T] であり、レベルは [0] です。従って、この [forall] はこれら二つのレベルの最大値のレベルに存在します。三番目の例も同様の結論を示しており、ここでは [Set] を宇宙変数 [Top.9] に割り当てられた [Type] の出現で置き換えています。この宇宙変数は以前のクエリに現れた [0] の位置に現れています。
+
+  宇宙変数の舞台裏における操作が可述性を生みます。次の多相的な恒等関数の単純な定義を考えてみましょう。ここで最初の引数 [T] は二番目の引数 [x] の型から推論できるため、自動的に暗黙であるとマークされます。 *)
 
 Definition id (T : Set) (x : T) : T := x.
 
 Check id 0.
+(**
 (** %\vspace{-.15in}% [[
   id 0
      : nat
@@ -181,6 +206,22 @@ which should be coercible to "Set".
 >>
 
   The parameter [T] of [id] must be instantiated with a [Set].  The type [nat] is a [Set], but [Set] is not.  We can try fixing the problem by generalizing our definition of [id]. *)
+*)
+(** %\vspace{-.15in}% [[
+  id 0
+     : nat
+ 
+Check id Set.
+]]
+
+<<
+Error: Illegal application (Type Error):
+...
+The 1st term has type "Type ( * (Top.15)+1 * )"
+which should be coercible to "Set".
+>>
+
+  [id] の 引数 [T] は [Set] で具体化されなければなりません。型 [nat] は [Set] ですが、 [Set] は違います。この問題は [id] の定義を一般化して、修正を試みることができます。 *)
 
 Reset id.
 Definition id (T : Type) (x : T) : T := x.
@@ -205,6 +246,7 @@ Check id Type.
   ]]
   *)
 
+(**
 (** So far so good.  As we apply [id] to different [T] values, the inferred index for [T]'s [Type] occurrence automatically moves higher up the type hierarchy.
    [[
 Check id id.
@@ -215,10 +257,21 @@ Error: Universe inconsistency (cannot enforce Top.16 < Top.16).
 >>
 
   %\index{universe inconsistency}%This error message reminds us that the universe variable for [T] still exists, even though it is usually hidden.  To apply [id] to itself, that variable would need to be less than itself in the type hierarchy.  Universe inconsistency error messages announce cases like this one where a term could only type-check by violating an implied constraint over universe variables.  Such errors demonstrate that [Type] is _predicative_, where this word has a CIC meaning closely related to its usual mathematical meaning.  A predicative system enforces the constraint that, when an object is defined using some sort of quantifier, none of the quantifiers may ever be instantiated with the object itself.  %\index{impredicativity}%Impredicativity is associated with popular paradoxes in set theory, involving inconsistent constructions like "the set of all sets that do not contain themselves" (%\index{Russell's paradox}%Russell's paradox).  Similar paradoxes would result from uncontrolled impredicativity in Coq. *)
+*)
+(** ここまではこれで良いようです。[id] を異なる値 [T] に適用するので、[T] の型 [Type] の出現について自動的に推論されるインデックスは自動的に型階層を高い方へと昇ることになります。
+   [[
+Check id id.
+]]
 
+<<
+Error: Universe inconsistency (cannot enforce Top.16 < Top.16).
+>>
+
+  %\index{宇宙の矛盾(universe inconsistency)}%このエラーメッセージは [T] に関する宇宙変数が、普通は隠されているものの、依然として存在していることを思い出させます。[id] をそれ自身に適用するには、この変数が型階層においてそれ自身よりも小さくある必要があります。宇宙の矛盾(universe inconsistency) エラーはこのような、項が宇宙変数に関して導かれた制約に違反することでしか型検査が通らない場合について知らせてくれます。このようなエラーは [Type] が _可述的_ であることを示しています。ここで CIC における可述性の意味は、通常の数学での意味にごく近いです。可述性をもつ系は、あるオブジェクトがある種の限量子を用いて定義されたとき、どの限量子もそのオブジェクトそれ自体で具体化されてはならないという制約を強制します。%\index{非可述性}%非可述性は集合論においてよく知られたパラドックスと関連しており、「それ自体を含まない全ての集合の集合」のような矛盾する構成を伴います。 (%\index{ラッセルのパラドックス}%ラッセルのパラドックス).  Coq においては、非可述性を制御しないと類似のパラドックスを産みます。 *)
 
 (** ** Inductive Definitions *)
 
+(**
 (** Predicativity restrictions also apply to inductive definitions.  As an example, let us consider a type of expression trees that allows injection of any native Coq value.  The idea is that an [exp T] stands for an encoded expression of type [T].
    [[
 Inductive exp : Set -> Set :=
@@ -232,15 +285,34 @@ Error: Large non-propositional inductive types must be in Type.
 >>
 
    This definition is%\index{large inductive types}% _large_ in the sense that at least one of its constructors takes an argument whose type has type [Type].  Coq would be inconsistent if we allowed definitions like this one in their full generality.  Instead, we must change [exp] to live in [Type].  We will go even further and move [exp]'s index to [Type] as well. *)
+*)
+(** 可述性の制限は帰納的定義にも適用されます。例えば、任意のネイティブな Coq の値を注入できる式木の型を考えましょう。ここでのアイデアは [exp T] 型が 型 [T] に関してエンコードされた式を表すということです。
+   [[
+Inductive exp : Set -> Set :=
+| Const : forall T : Set, T -> exp T
+| Pair : forall T1 T2, exp T1 -> exp T2 -> exp (T1 * T2)
+| Eq : forall T, exp T -> exp T -> exp bool.
+]]
+
+<<
+Error: Large non-propositional inductive types must be in Type.
+>>
+
+   この定義は%\index{巨大な帰納型(large inductive types)}% 少なくとも一つの構築子が型 [Type] を持つ型を持つ引数を取るという意味で _巨大_ です。Coq における最大限の一般性のもとでは、このような定義を認めると矛盾します。代わりに、[exp] が [Type] にあるように変更しなければなりません。さらに [exp] のインデックスも [Type] になるような例について考えます。 *)
 
 Inductive exp : Type -> Type :=
 | Const : forall T, T -> exp T
 | Pair : forall T1 T2, exp T1 -> exp T2 -> exp (T1 * T2)
 | Eq : forall T, exp T -> exp T -> exp bool.
 
+(**
 (** Note that before we had to include an annotation [: Set] for the variable [T] in [Const]'s type, but we need no annotation now.  When the type of a variable is not known, and when that variable is used in a context where only types are allowed, Coq infers that the variable is of type [Type], the right behavior here, though it was wrong for the [Set] version of [exp].
 
    Our new definition is accepted.  We can build some sample expressions. *)
+*)
+(** 以前は変数 [T] に型注釈 [: Set] を含めなければなりませんでしたが、ここでは不要であることに注意してください。変数の型が分からず、その変数が型しか許されていない文脈で使われているとき、Coq はその変数が型 [Type] を持つと推論します。これはここでは正しい振る舞いですが、[Set] バージョンの [exp]　では間違っていました。
+
+   新しい定義が受理されました。 いくつかのサンプルの式を構築できます。 *)
 
 Check Const 0.
 (** %\vspace{-.15in}% [[
