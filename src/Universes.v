@@ -23,40 +23,74 @@ Set Asymmetric Patterns.
 
 (** %\chapter{Universes and Axioms}% *)
 
+(**
 (** Many traditional theorems can be proved in Coq without special knowledge of CIC, the logic behind the prover.  A development just seems to be using a particular ASCII notation for standard formulas based on %\index{set theory}%set theory.  Nonetheless, as we saw in Chapter 4, CIC differs from set theory in starting from fewer orthogonal primitives.  It is possible to define the usual logical connectives as derived notions.  The foundation of it all is a dependently typed functional programming language, based on dependent function types and inductive type families.  By using the facilities of this language directly, we can accomplish some things much more easily than in mainstream math.
 
    %\index{Gallina}%Gallina, which adds features to the more theoretical CIC%~\cite{CIC}%, is the logic implemented in Coq.  It has a relatively simple foundation that can be defined rigorously in a page or two of formal proof rules.  Still, there are some important subtleties that have practical ramifications.  This chapter focuses on those subtleties, avoiding formal metatheory in favor of example code. *)
+*)
+(**
+多くの伝統的な定理は CIC (Coq の背後にある論理体系) の特別な知識を用いずに Coq で証明できます。証明の開発とは、%\index{集合論}%集合論に基づく標準的な論理式のための ASCII 記法を用いることであるように見えるでしょう。それでもやはり、4章で見たように、 CIC はより少ない直交するプリミティブから始まるという点で集合論とは異なります。通常の論理結合子は派生的な概念として定義できます。それらすべての基礎は依存型のついた関数型言語であり、依存関数型と帰納型の族に基づいています。これらの言語機能を直接的に用いれば、いくつかのことを主流の数学より簡単に達成できます。
 
+   %\index{Gallina}%Gallina は Coq に実装された論理体系であり、より理論的な CIC%~\cite{CIC}% に機能を追加しています。Gallina は1,2ページの形式的な証明規則で厳密に定義された比較的単純な基礎を持っています。それでも、実際的な影響を及ぼすいくつかの重要な細部があります。本章では、形式的なメタ理論は避け、コード例によりこれらの細部に焦点を合わせます。
+*)
 
 (** * The [Type] Hierarchy *)
 
+(**
 (** %\index{type hierarchy}%Every object in Gallina has a type. *)
+*)
+(** %\index{型階層}%Gallina におけるすべてのオブジェクトは型を持ちます。*)
 
 Check 0.
+(**
 (** %\vspace{-.15in}% [[
   0
      : nat
      ]]
 
   It is natural enough that zero be considered as a natural number. *)
+*)
+(** %\vspace{-.15in}% [[
+  0
+     : nat
+     ]]
+
+  ゼロが自然数であると考えるのはごく自然なことです。 *)
 
 Check nat.
+(**
 (** %\vspace{-.15in}% [[
   nat
      : Set
      ]]
 
   From a set theory perspective, it is unsurprising to consider the natural numbers as a "set." *)
+*)
+(** %\vspace{-.15in}% [[
+  nat
+     : Set
+     ]]
+
+  集合論の観点では、自然数の集まりが「集合」であるとみなすのは意外ではありません。*)
 
 Check Set.
+(**
 (** %\vspace{-.15in}% [[
   Set
      : Type
      ]]
 
   The type [Set] may be considered as the set of all sets, a concept that set theory handles in terms of%\index{class (in set theory)}% _classes_.  In Coq, this more general notion is [Type]. *)
+*)
+(** %\vspace{-.15in}% [[
+  Set
+     : Type
+     ]]
+
+  型 [Set] はすべての集合の集合、つまり集合論では%\index{クラス (集合論)}% _クラス_ という用語で表される概念と見なせます。 より一般的なこの概念は、 Coq においては [Type] です。 *)
 
 Check Type.
+(**
 (** %\vspace{-.15in}% [[
   Type
      : Type
@@ -65,6 +99,15 @@ Check Type.
   Strangely enough, [Type] appears to be its own type.  It is known that polymorphic languages with this property are inconsistent, via %\index{Girard's paradox}%Girard's paradox%~\cite{GirardsParadox}%.  That is, using such a language to encode proofs is unwise, because it is possible to "prove" any proposition.  What is really going on here?
 
   Let us repeat some of our queries after toggling a flag related to Coq's printing behavior.%\index{Vernacular commands!Set Printing Universes}% *)
+ *)
+(** %\vspace{-.15in}% [[
+  Type
+     : Type
+     ]]
+
+  おかしなことに、[Type] はそれ自身の型であるようです。この性質を持つ多相的な言語は、%\index{ジラールのパラドックス}%ジラールのパラドックス%~\cite{GirardsParadox}% により矛盾することが知られています。 つまり、そのような言語で証明をエンコードするのは賢くありません。なぜならどんな命題も「証明」できるからです。実のところ、ここで何が起こっているのでしょう？
+
+  これらのクエリーをCoqの印字動作に関わるフラグ%\index{Vernacular commands!Set Printing Universes}%をトグルして再度入力してみましょう。 *)
 
 Set Printing Universes.
 
@@ -133,7 +176,7 @@ Check id Set.
 <<
 Error: Illegal application (Type Error):
 ...
-The 1st term has type "Type (* (Top.15)+1 *)"
+The 1st term has type "Type ( * (Top.15)+1 * )"
 which should be coercible to "Set".
 >>
 
