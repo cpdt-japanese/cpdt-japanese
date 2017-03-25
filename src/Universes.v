@@ -20,8 +20,10 @@ Set Asymmetric Patterns.
 (** printing ^ %*{})% #*<a/>)# *)
 
 
-
+(*
 (** %\chapter{Universes and Axioms}% *)
+*)
+(** %\chapter{宇宙と公理}% *)
 
 (**
 (** Many traditional theorems can be proved in Coq without special knowledge of CIC, the logic behind the prover.  A development just seems to be using a particular ASCII notation for standard formulas based on %\index{set theory}%set theory.  Nonetheless, as we saw in Chapter 4, CIC differs from set theory in starting from fewer orthogonal primitives.  It is possible to define the usual logical connectives as derived notions.  The foundation of it all is a dependently typed functional programming language, based on dependent function types and inductive type families.  By using the facilities of this language directly, we can accomplish some things much more easily than in mainstream math.
@@ -29,12 +31,15 @@ Set Asymmetric Patterns.
    %\index{Gallina}%Gallina, which adds features to the more theoretical CIC%~\cite{CIC}%, is the logic implemented in Coq.  It has a relatively simple foundation that can be defined rigorously in a page or two of formal proof rules.  Still, there are some important subtleties that have practical ramifications.  This chapter focuses on those subtleties, avoiding formal metatheory in favor of example code. *)
 *)
 (**
-多くの伝統的な定理は CIC (Coq の背後にある論理体系) の特別な知識を用いずに Coq で証明できます。証明の開発とは、%\index{集合論}%集合論に基づく標準的な論理式のための ASCII 記法を用いることであるように見えるでしょう。それでもやはり、4章で見たように、 CIC はより少ない直交するプリミティブから始まるという点で集合論とは異なります。通常の論理結合子は派生的な概念として定義できます。それらすべての基礎は依存型のついた関数型言語であり、依存関数型と帰納型の族に基づいています。これらの言語機能を直接的に用いれば、いくつかのことを主流の数学より簡単に達成できます。
+多くの伝統的な定理は CIC (Coq の背後にある論理体系) の特別な知識を用いずに Coq で証明できます。証明の開発が、%\index{集合論}%集合論に基づく標準的な論理式のための特別な ASCII 記法を用いることであるように思えるかもしれません。それでもやはり、4章で見たように、 CIC はより少ない直交するプリミティブで始まるという点で集合論とは異なります。通常の論理結合子は派生的な概念として定義できます。それらすべての基礎は依存型のついた関数型言語であり、依存関数型と帰納型の族に基づいています。これらの言語機能を直接的に用いれば、いくつかのことを主流の数学より簡単に達成できます。
 
    %\index{Gallina}%Gallina は Coq に実装された論理体系であり、より理論的な CIC%~\cite{CIC}% に機能を追加しています。Gallina は1,2ページの形式的な証明規則で厳密に定義された比較的単純な基礎を持っています。それでも、実際的な影響を及ぼすいくつかの重要な細部があります。本章では、形式的なメタ理論は避け、コード例によりこれらの細部に焦点を合わせます。
 *)
 
+(*
 (** * The [Type] Hierarchy *)
+*)
+(** * [Type] の階層 *)
 
 (**
 (** %\index{type hierarchy}%Every object in Gallina has a type. *)
@@ -87,7 +92,7 @@ Check Set.
      : Type
      ]]
 
-  型 [Set] はすべての集合の集合、つまり集合論では%\index{クラス (集合論)}% _クラス_ という用語で表される概念と見なせます。 より一般的なこの概念は、 Coq においては [Type] です。 *)
+  型 [Set] はすべての集合の集合、つまり集合論では%\index{クラス (集合論)}% _クラス_ という用語で表される概念と見なせます。 この、より一般的な概念は、 Coq においては [Type] です。 *)
 
 Check Type.
 (**
@@ -105,9 +110,9 @@ Check Type.
      : Type
      ]]
 
-  おかしなことに、[Type] はそれ自身の型であるようです。この性質を持つ多相的な言語は、%\index{ジラールのパラドックス}%ジラールのパラドックス%~\cite{GirardsParadox}% により矛盾することが知られています。 つまり、そのような言語で証明をエンコードするのは賢くありません。なぜならどんな命題も「証明」できるからです。実のところ、ここで何が起こっているのでしょう？
+  おかしなことに、[Type] はそれ自身の型であるようです。この性質を持つ多相的な言語は、%\index{ジラールのパラドックス}%ジラールのパラドックス%~\cite{GirardsParadox}% により矛盾することが知られています。 つまり、そのような言語で証明をエンコードするのは愚かなことです。なぜならどんな命題も「証明」できるからです。実のところ、ここでは何が起こっているのでしょう？
 
-  これらのクエリーをCoqの印字動作に関わるフラグ%\index{Vernacular commands!Set Printing Universes}%をトグルして再度入力してみましょう。 *)
+  これらのクエリーをCoqの印字動作に関わるフラグ%\index{Vernacular commands!Set Printing Universes}%をトグルしてから再度入力してみましょう。 *)
 
 Set Printing Universes.
 
@@ -145,11 +150,11 @@ Check Type.
      : Type $ (Top.3)+1 ^
      ]]
 
-  [Type] の出現は、コメント内に追加の情報で注釈されています。これらの注釈は [Type] の背景にある秘密と関係があります。これは型の無限の階層を表しているのです。[Set] の型は [Type(0)]、[Type(0)] の型は [Type(1)]、[Type(1)] の型は [Type(2)] などです。このようにして "[Type : Type]" パラドックスを回避しています。利便性のため、この宇宙(universe)の階層は Coq における一種の部分型付けを利用しています。型がレベル [i] における [Type] である任意の項は、[j > i] であるレベル [j] における [Type] でも特徴付けられます。
+  [Type] の出現が、コメントの中において追加の情報で注釈されています。これらの注釈は [Type] の背景にある秘密と関係があります。これは型の無限の階層を表しているのです。[Set] の型は [Type(0)]、[Type(0)] の型は [Type(1)]、[Type(1)] の型は [Type(2)] などです。このようにして "[Type : Type]" パラドックスを回避しています。利便性のため、この宇宙(universe)の階層は Coq における一種の部分型付けを利用しています。型がレベル [i] における [Type] である任意の項は、[j > i] であるレベル [j] における [Type] でも自動的に説明(FIXME:describe)されます。
 
   最初の [Check] クエリの出力において、 [Set] の型の型レベルは [(0)+1] であるとわかります。ここで [0] は [Set] のレベルであり、これをインクリメントすると [Set] を _分類(classify)する_ レベルに到達します。
 
-  三番目のクエリの出力においては、ここで調べた [Type] の出現にはフレッシュな%\index{宇宙変数(universe variable)}% _宇宙変数(universe variable)_ [Top.3] が割り当てられています。出力された型は [Top.3] をインクリメントすることで宇宙の階層を１レベル上に移動しています。型が宇宙変数に言及する定義を用いたコードを書くときは、単一化によりこれらの変数の値が詳細かされることがあります。幸運にも、利用者はこの詳細を気にする必要はほとんどありません。
+  三番目のクエリの出力においては、ここで調べた [Type] の出現にはフレッシュな%\index{宇宙変数(universe variable)}% _宇宙変数(universe variable)_ [Top.3] が割り当てられています。出力された型は [Top.3] をインクリメントすることで宇宙の階層を１レベル上に移動しています。型が宇宙変数に言及する定義を用いたコードを書くときには、単一化によりこれらの変数の値が詳細化されることがあります。幸運にも、利用者はこの詳細を気にする必要はほとんどありません。
 
   CIC におけるもう一つの重要な概念は%\index{可述性}% _可述性_ です。次のクエリについて考えてみましょう。*)
 
@@ -185,7 +190,7 @@ Check forall T : Type, T.
 
   これらの出力は [forall] 型がどの宇宙にあるか決定するための規則を実演しています。特に、型 [forall x : T1, T2] について、[T1] と [T2] の宇宙の最大値をを取っています。最初のクエリ例では、[T1] ([nat]) と [T2] ([fin T]) は [Set] にあるため、[forall] 型も同様に [Set] にあります。二つ目のクエリでは、[T1] は [Set] であり、レベル [(0)+1] にあります。[T2] は [T] であり、レベルは [0] です。従って、この [forall] はこれら二つのレベルの最大値のレベルに存在します。三番目の例も同様の結論を示しており、ここでは [Set] を宇宙変数 [Top.9] に割り当てられた [Type] の出現で置き換えています。この宇宙変数は以前のクエリに現れた [0] の位置に現れています。
 
-  宇宙変数の舞台裏における操作が可述性を生みます。次の多相的な恒等関数の単純な定義を考えてみましょう。ここで最初の引数 [T] は二番目の引数 [x] の型から推論できるため、自動的に暗黙であるとマークされます。 *)
+  宇宙変数の舞台裏における操作が可述性をもたらします。次の多相的な恒等関数の単純な定義を考えてみましょう。ここで最初の引数 [T] は二番目の引数 [x] の型から推論できるため、自動的に暗黙であるとマークされます。 *)
 
 Definition id (T : Set) (x : T) : T := x.
 
@@ -201,7 +206,7 @@ Check id Set.
 <<
 Error: Illegal application (Type Error):
 ...
-The 1st term has type "Type ( * (Top.15)+1 * )"
+The 1st term has type "Type (* (Top.15)+1 *)"
 which should be coercible to "Set".
 >>
 
@@ -220,6 +225,7 @@ Error: Illegal application (Type Error):
 The 1st term has type "Type ( * (Top.15)+1 * )"
 which should be coercible to "Set".
 >>
+(FIXME: 上の (Top.15)+1 を囲むコメントのところでエラーになるので少し変えている)
 
   [id] の 引数 [T] は [Set] で具体化されなければなりません。型 [nat] は [Set] ですが、 [Set] は違います。この問題は [id] の定義を一般化して、修正を試みることができます。 *)
 
@@ -258,7 +264,7 @@ Error: Universe inconsistency (cannot enforce Top.16 < Top.16).
 
   %\index{universe inconsistency}%This error message reminds us that the universe variable for [T] still exists, even though it is usually hidden.  To apply [id] to itself, that variable would need to be less than itself in the type hierarchy.  Universe inconsistency error messages announce cases like this one where a term could only type-check by violating an implied constraint over universe variables.  Such errors demonstrate that [Type] is _predicative_, where this word has a CIC meaning closely related to its usual mathematical meaning.  A predicative system enforces the constraint that, when an object is defined using some sort of quantifier, none of the quantifiers may ever be instantiated with the object itself.  %\index{impredicativity}%Impredicativity is associated with popular paradoxes in set theory, involving inconsistent constructions like "the set of all sets that do not contain themselves" (%\index{Russell's paradox}%Russell's paradox).  Similar paradoxes would result from uncontrolled impredicativity in Coq. *)
 *)
-(** ここまではこれで良いようです。[id] を異なる値 [T] に適用するので、[T] の型 [Type] の出現について自動的に推論されるインデックスは自動的に型階層を高い方へと昇ることになります。
+(** ここまではこれで良いようです。[id] を異なる値 [T] に適用するに従って、[T] の [Type] の出現で推論されたインデックスは自動的に型階層を高い方へと昇っています。
    [[
 Check id id.
 ]]
@@ -267,9 +273,12 @@ Check id id.
 Error: Universe inconsistency (cannot enforce Top.16 < Top.16).
 >>
 
-  %\index{宇宙の矛盾(universe inconsistency)}%このエラーメッセージは [T] に関する宇宙変数が、普通は隠されているものの、依然として存在していることを思い出させます。[id] をそれ自身に適用するには、この変数が型階層においてそれ自身よりも小さくある必要があります。宇宙の矛盾(universe inconsistency) エラーはこのような、項が宇宙変数に関して導かれた制約に違反することでしか型検査が通らない場合について知らせてくれます。このようなエラーは [Type] が _可述的_ であることを示しています。ここで CIC における可述性の意味は、通常の数学での意味にごく近いです。可述性をもつ系は、あるオブジェクトがある種の限量子を用いて定義されたとき、どの限量子もそのオブジェクトそれ自体で具体化されてはならないという制約を強制します。%\index{非可述性}%非可述性は集合論においてよく知られたパラドックスと関連しており、「それ自体を含まない全ての集合の集合」のような矛盾する構成を伴います。 (%\index{ラッセルのパラドックス}%ラッセルのパラドックス).  Coq においては、非可述性を制御しないと類似のパラドックスを産みます。 *)
+  %\index{宇宙の矛盾(universe inconsistency)}%このエラーメッセージは [T] に関する宇宙変数が、普通は隠されているものの、依然として存在していることを思い出させます。[id] をそれ自身に適用するには、この変数が型階層においてそれ自身よりも小さくある必要があります。宇宙の矛盾(universe inconsistency) エラーはこのような、項が宇宙変数に関して導かれた制約に違反することでしか型検査が通らない場合について知らせてくれます。このようなエラーは [Type] が _可述的_ であることを示しています。ここで CIC における可述性の意味は、通常の数学での意味にごく近いです。可述性をもつ系は、あるオブジェクトがある種の限量子を用いて定義されたとき、どの限量子もそのオブジェクトそれ自体で具体化されてはならないという制約を強制します。%\index{非可述性}%非可述性は集合論においてよく知られたパラドックスと関連しており、「それ自体を含まない全ての集合の集合」のような矛盾する構成を伴います (%\index{ラッセルのパラドックス}%ラッセルのパラドックス)。  Coq においても、非可述性を制御しないと類似のパラドックスがもたらされます。 *)
 
+(*
 (** ** Inductive Definitions *)
+*)
+(** ** 帰納的定義 *)
 
 (**
 (** Predicativity restrictions also apply to inductive definitions.  As an example, let us consider a type of expression trees that allows injection of any native Coq value.  The idea is that an [exp T] stands for an encoded expression of type [T].
@@ -329,6 +338,7 @@ Check Pair (Const 0) (Const tt).
      *)
 
 Check Eq (Const Set) (Const Type).
+(**
 (** %\vspace{-.15in}% [[
   Eq (Const Set) (Const Type $ Top.59 ^ )
      : exp bool
@@ -344,6 +354,24 @@ Error: Universe inconsistency (cannot enforce Top.42 < Top.42).
 >>
 
   We are unable to instantiate the parameter [T] of [Const] with an [exp] type.  To see why, it is helpful to print the annotated version of [exp]'s inductive definition. *)
+*)
+(** %\vspace{-.15in}% [[
+  Eq (Const Set) (Const Type $ Top.59 ^ )
+     : exp bool
+     ]]
+
+型を伴うようなファンシーな式なども含め、多くの式をチェックできます。しかしながら、型検査の壁にぶつかるのもそう難しくはありません。
+  [[
+Check Const (Const O).
+]]
+
+<<
+Error: Universe inconsistency (cannot enforce Top.42 < Top.42).
+>>
+
+  [Const] のパラメータ [T] は、 [exp] 型で具体化できません。その理由を知るには、注釈されたバージョンの [exp] の帰納的定義を印字すると良いです。
+*)
+(*
 (** [[
 Print exp.
 ]]
@@ -361,8 +389,28 @@ Inductive exp
   We see that the index type of [exp] has been assigned to universe level [Top.8].  In addition, each of the four occurrences of [Type] in the types of the constructors gets its own universe variable.  Each of these variables appears explicitly in the type of [exp].  In particular, any type [exp T] lives at a universe level found by incrementing by one the maximum of the four argument variables.  Therefore, [exp] _must_ live at a higher universe level than any type which may be passed to one of its constructors.  This consequence led to the universe inconsistency.
 
   Strangely, the universe variable [Top.8] only appears in one place.  Is there no restriction imposed on which types are valid arguments to [exp]?  In fact, there is a restriction, but it only appears in a global set of universe constraints that are maintained "off to the side," not appearing explicitly in types.  We can print the current database.%\index{Vernacular commands!Print Universes}% *)
+*)
+
+(** [[
+Print exp.
+]]
+%\vspace{-.15in}%[[
+Inductive exp
+              : Type $ Top.8 ^ ->
+                Type
+                $ max(0, (Top.11)+1, (Top.14)+1, (Top.15)+1, (Top.19)+1) ^ :=
+    Const : forall T : Type $ Top.11 ^ , T -> exp T
+  | Pair : forall (T1 : Type $ Top.14 ^ ) (T2 : Type $ Top.15 ^ ),
+           exp T1 -> exp T2 -> exp (T1 * T2)
+  | Eq : forall T : Type $ Top.19 ^ , exp T -> exp T -> exp bool
+  ]]
+
+[exp] のインデックス型に宇宙レベル [Top.8] が割り当てられたことが分かります。それに加えて、構築子の型における [Type] の4つの出現がそれぞれ宇宙変数を持っています。これらの変数それぞれは [exp] の型に陽に現れます。特に、 どの型 [exp T] も、4つの引数の最大値をひとつインクリメントした宇宙レベルにあります。このため、 [exp] は_必ず_構築子に渡されるどの型よりも高い宇宙レベルにあります。この帰結として、宇宙の矛盾 (universe inconsistency) になります。
+
+  不思議なことに、宇宙変数 [Top.8] は一ヶ所にしか現れていません。 [exp] の引数としてどの型が妥当かという制限はないのでしょうか？実際のところ制限はありますが、これは「脇に置いて」保たれている宇宙制約のグローバルな集合にのみ現れ、型には陽に現れません。現時点でのこのデータベースを印字することができます。%\index{Vernacular commands!Print Universes}% *)
 
 Print Universes.
+(*
 (** %\vspace{-.15in}% [[
 Top.19 < Top.9 <= Top.8
 Top.15 < Top.9 <= Top.8 <= Coq.Init.Datatypes.38
@@ -373,6 +421,17 @@ Top.11 < Top.9 <= Top.8
 The command outputs many more constraints, but we have collected only those that mention [Top] variables.  We see one constraint for each universe variable associated with a constructor argument from [exp]'s definition.  Universe variable [Top.19] is the type argument to [Eq].  The constraint for [Top.19] effectively says that [Top.19] must be less than [Top.8], the universe of [exp]'s indices; an intermediate variable [Top.9] appears as an artifact of the way the constraint was generated.
 
 The next constraint, for [Top.15], is more complicated.  This is the universe of the second argument to the [Pair] constructor.  Not only must [Top.15] be less than [Top.8], but it also comes out that [Top.8] must be less than [Coq.Init.Datatypes.38].  What is this new universe variable?  It is from the definition of the [prod] inductive family, to which types of the form [A * B] are desugared. *)
+*)
+(** %\vspace{-.15in}% [[
+Top.19 < Top.9 <= Top.8
+Top.15 < Top.9 <= Top.8 <= Coq.Init.Datatypes.38
+Top.14 < Top.9 <= Top.8 <= Coq.Init.Datatypes.37
+Top.11 < Top.9 <= Top.8
+]]
+
+このコマンドはもっと多くの制約を出力しますが、[Top] 変数に言及するものだけを集めました。ここで、 [exp] の定義における構築子の引数に関連づけられたひとつの宇宙変数につきひとつの制約を確認できます。宇宙変数 [Top.19] は [Eq] の型引数です。[Top.19] の制約は [Top.19] が [exp] のインデックスの宇宙である [Top.8] より小さくなければならないことを実質的に言っています。また、中間の変数である [Top.9] は制約が生成される途中でできたもののようです。
+
+次の制約である [Top.15] はより複雑です。これは [Pair] 構築子への二つ目の引数の宇宙です。[Top.15] が [Top.8] より小さいだけでなく、[Top.8] も [Coq.Init.Datatypes.28] より小さくなくてはなりません。この新しい宇宙変数は何でしょう？これは [prod] という帰納的定義に由来し、[A * B] の形が展開 (desugar) されてこの型になります。*)
 
 (* begin hide *)
 (* begin thide *)
@@ -381,6 +440,7 @@ Reset prod.
 (* end thide *)
 (* end hide *)
 
+(*
 (** %\vspace{-.3in}%[[
 Print prod.
 ]]
@@ -400,17 +460,46 @@ Inductive prod (A : Type $ Coq.Init.Datatypes.37 ^ )
   The annotated definition of [prod] reveals something interesting.  A type [prod A B] lives at a universe that is the maximum of the universes of [A] and [B].  From our earlier experiments, we might expect that [prod]'s universe would in fact need to be _one higher_ than the maximum.  The critical difference is that, in the definition of [prod], [A] and [B] are defined as _parameters_; that is, they appear named to the left of the main colon, rather than appearing (possibly unnamed) to the right.
 
   Parameters are not as flexible as normal inductive type arguments.  The range types of all of the constructors of a parameterized type must share the same parameters.  Nonetheless, when it is possible to define a polymorphic type in this way, we gain the ability to use the new type family in more ways, without triggering universe inconsistencies.  For instance, nested pairs of types are perfectly legal. *)
+*)
+(** %\vspace{-.3in}%[[
+Print prod.
+]]
+%\vspace{-.15in}%[[
+Inductive prod (A : Type $ Coq.Init.Datatypes.37 ^ )
+          (B : Type $ Coq.Init.Datatypes.38 ^ )
+            : Type $ max(Coq.Init.Datatypes.37, Coq.Init.Datatypes.38) ^ :=
+    pair : A -> B -> A * B
+    ]]
+
+この制約は [exp] が [prod] の [B]の引数より高い宇宙のレベルにあってはならないことを強制していることが分かります。上記にあるその次の制約は対称的な条件を [A]　について確立しています。
+
+このように、 Coq は宇宙変数の集合に関する不等式の病的な集合を舞台裏で維持していることは明らかです。いくつかの関数が引数の宇宙レベルにおいて多相的であるように見えるかもしれませんが、実際には制約系の命令的な更新が発生し、関数の全ての使用について宇宙レベルの大域的な集合との一貫性を持たせています。もし制約システムが健全に進行しない場合、宇宙の矛盾エラーが発生します。
+
+  %\medskip%
+
+  ここで注釈を加えられた [prod] の定義から興味深いことが分かります。型 [prod A B] は [A] と [B] の最大値であるような宇宙にあるのです。 ここまでの実験から、 [prod] の宇宙は実際のところこの最大値よりも _１つだけ高い_ レベルである必要があるようにも思えます。 この決定的な違いは、[prod] の定義において [A] と [B] は _仮引数_ として定義されていることです。つまり、これらはメインのコロンよりも左手で名付けられて現れており、名前を持たないまま右手に現れているわけではないということです。
+
+  パラメータは帰納型の引数ほどには柔軟ではありません。パラメータ化された型のすべての構築子において型が動く範囲は同じパラメータを共有しなければなりません。そうではあるものの、この方法で多相型を定義できるとき、この型の族を、宇宙の矛盾を引き起こすことなく、より多くの方法で使うことができるようになます。例えば、型のペアのネストは完全に合法です。 *)
 
 Check (nat, (Type, Set)).
+(*
 (** %\vspace{-.15in}% [[
   (nat, (Type $ Top.44 ^ , Set))
      : Set * (Type $ Top.45 ^ * Type $ Top.46 ^ )
   ]]
 
   The same cannot be done with a counterpart to [prod] that does not use parameters. *)
+*)
+(** %\vspace{-.15in}% [[
+  (nat, (Type $ Top.44 ^ , Set))
+     : Set * (Type $ Top.45 ^ * Type $ Top.46 ^ )
+  ]]
+
+  同じことはパラメータを用いない [prod] に対応する型ではできません。 *)
 
 Inductive prod' : Type -> Type -> Type :=
 | pair' : forall A B : Type, A -> B -> prod' A B.
+(*
 (** %\vspace{-.15in}%[[
 Check (pair' nat (pair' Type Set)).
 ]]
@@ -422,6 +511,18 @@ Error: Universe inconsistency (cannot enforce Top.51 < Top.51).
 The key benefit parameters bring us is the ability to avoid quantifying over types in the types of constructors.  Such quantification induces less-than constraints, while parameters only introduce less-than-or-equal-to constraints.
 
 Coq includes one more (potentially confusing) feature related to parameters.  While Gallina does not support real %\index{universe polymorphism}%universe polymorphism, there is a convenience facility that mimics universe polymorphism in some cases.  We can illustrate what this means with a simple example. *)
+*)
+(** %\vspace{-.15in}%[[
+Check (pair' nat (pair' Type Set)).
+]]
+
+<<
+Error: Universe inconsistency (cannot enforce Top.51 < Top.51).
+>>
+
+パラメータの利点はコンストラクタの型において量化を避けられることです。そのような量化は「より低い(less-than)」という制約をもたらしますが、パラメータは「以下 (less-than-or-equal)」という制約を導入するだけです。
+
+Coq は パラメータに関してもう一つ (使用者が混乱しがちな) 機能があります。Gallina が真の%\index{宇宙多相}%宇宙多相をサポートしない一方で、いくつかの場合には宇宙多相をまねる便宜的な手段があります。 これが何を意味するのかは、単純な例で示すことができます。 *)
 
 Inductive foo (A : Type) : Type :=
 | Foo : A -> foo A.
@@ -445,6 +546,7 @@ Check foo Set.
      *)
 
 Check foo True.
+(*
 (** %\vspace{-.15in}% [[
   foo True
      : Prop
@@ -453,17 +555,33 @@ Check foo True.
   The basic pattern here is that Coq is willing to automatically build a "copied-and-pasted" version of an inductive definition, where some occurrences of [Type] have been replaced by [Set] or [Prop].  In each context, the type-checker tries to find the valid replacements that are lowest in the type hierarchy.  Automatic cloning of definitions can be much more convenient than manual cloning.  We have already taken advantage of the fact that we may re-use the same families of tuple and list types to form values in [Set] and [Type].
 
   Imitation polymorphism can be confusing in some contexts.  For instance, it is what is responsible for this weird behavior. *)
+*)
+(** %\vspace{-.15in}% [[
+  foo True
+     : Prop
+     ]]
+
+ここでの基本的なパターンは Coq が帰納的定義の「コピー＆ペーストした」バージョンを自動的に構築しようとしていることです。この定義において [Type] のいくつかの出現は [Set] か [Prop] で置き換えられています。どの文脈においても、型検査器は型の階層においてもっとも低く、かつ置き換えが妥当な型を探します。定義のクローンは手動のクローンよりもぐっと便利になり得ます。これまでにも、[Set] や [Type] における値を形成するために同じ組やリスト型を採用できるという事実から既に恩恵を得ています。
+
+  模造の多相性はいくつかの文脈では混乱させがちです。このせいで、例えば、次のような奇妙な問題があります。 *)
 
 Inductive bar : Type := Bar : bar.
 
 Check bar.
+(*
 (** %\vspace{-.15in}% [[
   bar
      : Prop
      ]]
 
   The type that Coq comes up with may be used in strictly more contexts than the type one might have expected. *)
+*)
+(** %\vspace{-.15in}% [[
+  bar
+     : Prop
+     ]]
 
+  Coq の型は期待したよりも真に多くの文脈で使われることがあるのです。 *)
 
 (** ** Deciphering Baffling Messages About Inability to Unify *)
 
