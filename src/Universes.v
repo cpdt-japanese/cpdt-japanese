@@ -732,9 +732,14 @@ Qed.
 *)
 (** * [Prop] 宇宙 *)
 
+(*
 (** In Chapter 4, we saw parallel versions of useful datatypes for "programs" and "proofs."  The convention was that programs live in [Set], and proofs live in [Prop].  We gave little explanation for why it is useful to maintain this distinction.  There is certainly documentation value from separating programs from proofs; in practice, different concerns apply to building the two types of objects.  It turns out, however, that these concerns motivate formal differences between the two universes in Coq.
 
    Recall the types [sig] and [ex], which are the program and proof versions of existential quantification.  Their definitions differ only in one place, where [sig] uses [Type] and [ex] uses [Prop]. *)
+*)
+(** 4章で, 「プログラム」と「証明」という並列な二つのバージョンの便利なデータ型を説明しました。プログラムは [Set] にあり、証明は [Prop] にあるというのが慣例でした。この区別をすることがなぜ便利なのかについては説明しませんでした。証明からのプログラムの分離について説明するのは確かに価値があります。実際、この二種類のオブジェクトを構築するには異なる関心事が適用されます。しかしながら、これらの関心事は Coq の二つの宇宙の形式的な違いの動機となるもののです。
+
+   型 [sig] と [ex] の違いについて思い出してみましょう。これらは存在量化のプログラムバージョンと証明バージョンです。定義の違いは [sig] が [Type] を用い、 [ex] が [Prop] を用いているという点のみです。 *)
 
 Print sig.
 (** %\vspace{-.15in}% [[
@@ -744,12 +749,20 @@ Print sig.
     *)
 
 Print ex.
+(*
 (** %\vspace{-.15in}% [[
   Inductive ex (A : Type) (P : A -> Prop) : Prop :=
     ex_intro : forall x : A, P x -> ex P
     ]]
 
   It is natural to want a function to extract the first components of data structures like these.  Doing so is easy enough for [sig]. *)
+*)
+(** %\vspace{-.15in}% [[
+  Inductive ex (A : Type) (P : A -> Prop) : Prop :=
+    ex_intro : forall x : A, P x -> ex P
+    ]]
+
+  このようなデータ構造の最初の成分を抽出する機能が欲しいと思うのは自然なことです。それは [sig] については非常に簡単です。 *)
 
 Definition projS A (P : A -> Prop) (x : sig P) : A :=
   match x with
@@ -762,6 +775,7 @@ Definition projE := O.
 (* end thide *)
 (* end hide *)
 
+(*
 (** We run into trouble with a version that has been changed to work with [ex].
    [[
 Definition projE A (P : A -> Prop) (x : ex P) : A :=
@@ -784,6 +798,29 @@ because proofs can be eliminated only to build proofs.
   This restriction matches informal practice.  We think of programs and proofs as clearly separated, and, outside of constructive logic, the idea of computing with proofs is ill-formed.  The distinction also has practical importance in Coq, where it affects the behavior of extraction.
 
   Recall that %\index{program extraction}%extraction is Coq's facility for translating Coq developments into programs in general-purpose programming languages like OCaml.  Extraction _erases_ proofs and leaves programs intact.  A simple example with [sig] and [ex] demonstrates the distinction. *)
+ *)
+(** [ex] についてこれを行うように変更したバージョンでは困ったことになります。
+   [[
+Definition projE A (P : A -> Prop) (x : ex P) : A :=
+  match x with
+    | ex_intro v _ => v
+  end.
+]]
+
+<<
+Error:
+Incorrect elimination of "x" in the inductive type "ex":
+the return type has sort "Type" while it should be "Prop".
+Elimination of an inductive object of sort Prop
+is not allowed on a predicate in sort Type
+because proofs can be eliminated only to build proofs.
+>>
+
+  Coq の形式的な専門用語において、 %\index{除去}%「除去 (elimination)」は「パターンマッチング」を意味します。Gallinaの型付け規則は、 [match] の結果の型が [Prop] 以外を持つとき、 [Prop] に属する型をもつ場合分けのパターンマッチングを禁じています。これはある種の「情報流」ポリシーであり、証明であるとマークされていない部分の開発に証明の詳細が影響を及ぼさないように型システムが保証しています。
+
+  この制限は非形式的な実践に対応しています。プログラムと証明は明確に分離されており、構成的論理の外側では、証明による計算はill-formedです。この区別は Coq において実際的な重要性を持ちます。抽出に関する振る舞いに影響するのです。
+
+  %\index{プログラム抽出}%抽出は Coq で開発したものを OCaml のような一般目的のプログラミング言語に変換する Coq の機能であることを思い出してください。抽出は証明を_消去_しますがプログラムはそのままです。[sig] と [ex] を用いた例がこの違いをよく実演しています。 *)
 
 Definition sym_sig (x : sig (fun n => n = 0)) : sig (fun n => 0 = n) :=
   match x with
@@ -791,6 +828,7 @@ Definition sym_sig (x : sig (fun n => n = 0)) : sig (fun n => 0 = n) :=
   end.
 
 Extraction sym_sig.
+(*
 (** <<
 (** val sym_sig : nat -> nat **)
 
@@ -798,6 +836,14 @@ let sym_sig x = x
 >>
 
 Since extraction erases proofs, the second components of [sig] values are elided, making [sig] a simple identity type family.  The [sym_sig] operation is thus an identity function. *)
+*)
+(** <<
+(** val sym_sig : nat -> nat **)
+
+let sym_sig x = x
+>>
+
+抽出は証明を消去するので、 [sig] の二番目の成分は省略され、 [sig] は単純な恒等的な型の族になります。このため [sym_sig] 操作は恒等関数です。 *)
 
 Definition sym_ex (x : ex (fun n => n = 0)) : ex (fun n => 0 = n) :=
   match x with
@@ -805,6 +851,7 @@ Definition sym_ex (x : ex (fun n => n = 0)) : ex (fun n => 0 = n) :=
   end.
 
 Extraction sym_ex.
+(*
 (** <<
 (** val sym_ex : __ **)
 
@@ -820,8 +867,25 @@ Many fans of the %\index{Curry-Howard correspondence}%Curry-Howard correspondenc
 %\medskip%
 
 We have seen two of the differences between proofs and programs: proofs are subject to an elimination restriction and are elided by extraction.  The remaining difference is that [Prop] is%\index{impredicativity}% _impredicative_, as this example shows. *)
+*)
+(** <<
+(** val sym_ex : __ **)
+
+let sym_ex = __
+>>
+
+この例では、[ex] 型は [Prop] にあるため、[ex] パッケージ全体が消去されます。Coq は全ての命題を (Coq特有の) 型 <<__>> として抽出します。その構築子は <<__>> です。証明が [__] に置き換えられるだけでなく、関数の証明引数も、ここで見たように、完全に削除されます。
+
+抽出は証明を含むプログラムの最適化として非常に便利です。Haskell のような言語では、特殊な定義を型検査器に受理させる方法として、先進的な機能で証明付きのプログラムを書くことができます。残念ながら、証明が GADT%~\cite{GADT}% の値としてエンコードすると、これらの証明は実行時にも存在しリソースを消費します。対照的に、Coqを使えば、すべての証明が [Prop] に保持されている限り、抽出がそれらを消去することが保証されています。
+
+%\index{カリー・ハワード同型対応}%カリー・ハワード同型対応の多くのファンは_証明からプログラムを抽出する_というアイデアを支持しています。現実には、ほとんどのCoqユーザーと関連ツールはそのようなことをしていません。そうではなく、抽出は表現力の高い型付けの実行時コストを削減する最適化のひとつ見なすほうが良いです。
+
+%\medskip%
+
+ここまで証明とプログラムの違いを二つ見てきました。つまり、証明は除去の制限が課されており、抽出によって省略されます。残りの違いは、[Prop] が%\index{非可述性}% _非可述的_であることで、この例が示しています。 *)
 
 Check forall P Q : Prop, P \/ Q -> Q \/ P.
+(*
 (** %\vspace{-.15in}% [[
   forall P Q : Prop, P \/ Q -> Q \/ P
      : Prop
@@ -830,6 +894,15 @@ Check forall P Q : Prop, P \/ Q -> Q \/ P.
   We see that it is possible to define a [Prop] that quantifies over other [Prop]s.  This is fortunate, as we start wanting that ability even for such basic purposes as stating propositional tautologies.  In the next section of this chapter, we will see some reasons why unrestricted impredicativity is undesirable.  The impredicativity of [Prop] interacts crucially with the elimination restriction to avoid those pitfalls.
 
   Impredicativity also allows us to implement a version of our earlier [exp] type that does not suffer from the weakness that we found. *)
+*)
+(** %\vspace{-.15in}% [[
+  forall P Q : Prop, P \/ Q -> Q \/ P
+     : Prop
+     ]]
+
+  他の [Prop] の上で量化された [Prop] を定義できることが分かります。これは有難いことです、なぜなら命題的トートロジーをノベルような基本的な用途でさえそのような能力が必要になってくるからです。この章の次の節で、無制限な非可述性が好ましくない理由を見ていくことになるでしょう。そのような落とし穴を避けるため、[Prop] の非可述性は除去の制限との間に重要な相互作用があります。
+
+  また非可述性により、以前の [exp] 型について、先に見た弱点の影響を受けない別バージョンを実装できます。 *)
 
 Inductive expP : Type -> Prop :=
 | ConstP : forall T, T -> expP T
@@ -858,12 +931,20 @@ Check EqP (ConstP Set) (ConstP Type).
      *)
 
 Check ConstP (ConstP O).
+(*
 (** %\vspace{-.15in}% [[
   ConstP (ConstP 0)
      : expP (expP nat)
      ]]
 
   In this case, our victory is really a shallow one.  As we have marked [expP] as a family of proofs, we cannot deconstruct our expressions in the usual programmatic ways, which makes them almost useless for the usual purposes.  Impredicative quantification is much more useful in defining inductive families that we really think of as judgments.  For instance, this code defines a notion of equality that is strictly more permissive than the base equality [=]. *)
+*)
+(** %\vspace{-.15in}% [[
+  ConstP (ConstP 0)
+     : expP (expP nat)
+     ]]
+
+  この場合、我々の勝利は非常に薄っぺらいものです。我々は [expP] を証明の一族であるとマークしたため、その式は普通のプログラミング的な方法ではdeconstructできず、通常の用途にはほとんど使い物にならないのです。非可述的な量化はまさしく判定(judgments)のような帰納的な命題の族を定義するときに非常に便利です。例えば、このコードは基本の等価性 [=] よりも真に許容的であるような等価性の概念を定義します。 *)
 
 Inductive eqPlus : forall T, T -> T -> Prop :=
 | Base : forall T (x : T), eqPlus x x
@@ -892,10 +973,15 @@ Check (Base (Base 1)).
      ]]
      *)
 
+(*
 (** Stating equality facts about proofs may seem baroque, but we have already seen its utility in the chapter on reasoning about equality proofs. *)
+*)
+(** 証明に関する等価性の事実を述べるのは装飾的に見えるかもしれませんが、その利便性は既に等価性の証明に関する論証の章で見てきました。*)
 
-
+(*
 (** * Axioms *)
+*)
+(** * 公理 *)
 
 (** While the specific logic Gallina is hardcoded into Coq's implementation, it is possible to add certain logical rules in a controlled way.  In other words, Coq may be used to reason about many different refinements of Gallina where strictly more theorems are provable.  We achieve this by asserting%\index{axioms}% _axioms_ without proof.
 
