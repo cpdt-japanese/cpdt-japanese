@@ -900,7 +900,7 @@ Check forall P Q : Prop, P \/ Q -> Q \/ P.
      : Prop
      ]]
 
-  他の [Prop] の上で量化された [Prop] を定義できることが分かります。これは有難いことです、なぜなら命題的トートロジーをノベルような基本的な用途でさえそのような能力が必要になってくるからです。この章の次の節で、無制限な非可述性が好ましくない理由を見ていくことになるでしょう。そのような落とし穴を避けるため、[Prop] の非可述性は除去の制限との間に重要な相互作用があります。
+  他の [Prop] の上で量化された [Prop] を定義できることが分かります。これは有難いことです、なぜなら命題的トートロジーを述べるような基本的な用途でさえそのような能力が必要になってくるからです。この章の次の節で、無制限な非可述性が好ましくない理由を見ていくことになるでしょう。そのような落とし穴を避けるため、[Prop] の非可述性は除去の制限との間に重要な相互作用があります。
 
   また非可述性により、以前の [exp] 型について、先に見た弱点の影響を受けない別バージョンを実装できます。 *)
 
@@ -983,33 +983,59 @@ Check (Base (Base 1)).
 *)
 (** * 公理 *)
 
+(*
 (** While the specific logic Gallina is hardcoded into Coq's implementation, it is possible to add certain logical rules in a controlled way.  In other words, Coq may be used to reason about many different refinements of Gallina where strictly more theorems are provable.  We achieve this by asserting%\index{axioms}% _axioms_ without proof.
 
    We will motivate the idea by touring through some standard axioms, as enumerated in Coq's online FAQ.  I will add additional commentary as appropriate. *)
+*)
+(** 特定の論理体系である Gallina が Coq の実装にハードコードされている一方で、制御された方法である種の論理規則を追加することも可能です。言い換えると、Coq は真により多くの定理を証明可能な、数多くの異なる Gallina の詳細化について論証するのに使えます。 これは証明を持たない %\index{公理}%_公理_ を用いて達成します。
 
+   Coq のオンライン FAQ に並べられている、いくつかの標準的な公理をひととおり見物してこのアイデアの動機付けをします。しかるべきところには追加の解説を加えておきます。 *)
+
+(*
 (** ** The Basics *)
+*)
+(** ** 基本 *)
 
+(*
 (** One simple example of a useful axiom is the %\index{law of the excluded middle}%law of the excluded middle. *)
+*)
+(** 有用な公理の単純な例の一つは%\index{排中律}%排中律です。 *)
 
 Require Import Classical_Prop.
 Print classic.
+(*
 (** %\vspace{-.15in}% [[
   *** [ classic : forall P : Prop, P \/ ~ P ]
   ]]
 
   In the implementation of module [Classical_Prop], this axiom was defined with the command%\index{Vernacular commands!Axiom}% *)
+*)
+(** %\vspace{-.15in}% [[
+  *** [ classic : forall P : Prop, P \/ ~ P ]
+  ]]
+
+  [Classical_Prop] モジュールの実装において、この公理はコマンド%\index{Vernacular commands!Axiom}%で定義されています。*)
 
 Axiom classic : forall P : Prop, P \/ ~ P.
 
+(*
 (** An [Axiom] may be declared with any type, in any of the universes.  There is a synonym %\index{Vernacular commands!Parameter}%[Parameter] for [Axiom], and that synonym is often clearer for assertions not of type [Prop].  For instance, we can assert the existence of objects with certain properties. *)
+*)
+(** [Axiom] はどのような型でも、どのような宇宙にも宣言できます。[Axiom] と同義の %\index{Vernacular commands!Parameter}%[Parameter] があり、これを使えば型 [Prop] でない表明をする時にしばしばより明確にできます。例えば、ある性質を持つオブジェクトの存在を表明できます。*)
 
 Parameter num : nat.
 Axiom positive : num > 0.
 Reset num.
 
+(*
 (** This kind of "axiomatic presentation" of a theory is very common outside of higher-order logic.  However, in Coq, it is almost always preferable to stick to defining your objects, functions, and predicates via inductive definitions and functional programming.
 
    In general, there is a significant burden associated with any use of axioms.  It is easy to assert a set of axioms that together is%\index{inconsistent axioms}% _inconsistent_.   That is, a set of axioms may imply [False], which allows any theorem to be proved, which defeats the purpose of a proof assistant.  For example, we could assert the following axiom, which is consistent by itself but inconsistent when combined with [classic]. *)
+*)
+(** この種の「公理的な説明」は高階論理の世界の外では非常によくあることです。しかしながら、Coq では、ほとんど常にオブジェクト、関数、述語を帰納的定義や関数プログラミングで定義することに固執したほうが良いです。
+
+   一般に、公理はどのような使い方においても非常な苦痛を伴います。互いに%\index{矛盾する公理}% _矛盾する_公理の集合を表明するのは簡単です。つまり、公理の集合が [False] を含意し、どのような定理も証明でき、定理証明支援器の目的を否定してしまいます。例えば、それ自体では無矛盾ですが [classic] と組み合わせると矛盾する、次のような公理を表明できます。*)
 
 Axiom not_classic : ~ forall P : Prop, P \/ ~ P.
 
@@ -1023,6 +1049,7 @@ Qed.
 
 Reset not_classic.
 
+(*
 (** On the subject of the law of the excluded middle itself, this axiom is usually quite harmless, and many practical Coq developments assume it.  It has been proved metatheoretically to be consistent with CIC.  Here, "proved metatheoretically" means that someone proved on paper that excluded middle holds in a _model_ of CIC in set theory%~\cite{SetsInTypes}%.  All of the other axioms that we will survey in this section hold in the same model, so they are all consistent together.
 
    Recall that Coq implements%\index{constructive logic}% _constructive_ logic by default, where the law of the excluded middle is not provable.  Proofs in constructive logic can be thought of as programs.  A [forall] quantifier denotes a dependent function type, and a disjunction denotes a variant type.  In such a setting, excluded middle could be interpreted as a decision procedure for arbitrary propositions, which computability theory tells us cannot exist.  Thus, constructive logic with excluded middle can no longer be associated with our usual notion of programming.
@@ -1030,6 +1057,14 @@ Reset not_classic.
    Given all this, why is it all right to assert excluded middle as an axiom?  The intuitive justification is that the elimination restriction for [Prop] prevents us from treating proofs as programs.  An excluded middle axiom that quantified over [Set] instead of [Prop] _would_ be problematic.  If a development used that axiom, we would not be able to extract the code to OCaml (soundly) without implementing a genuine universal decision procedure.  In contrast, values whose types belong to [Prop] are always erased by extraction, so we sidestep the axiom's algorithmic consequences.
 
    Because the proper use of axioms is so precarious, there are helpful commands for determining which axioms a theorem relies on.%\index{Vernacular commands!Print Assumptions}% *)
+*)
+(** 排中律それ自体については、大抵の場合はその公理に全く害はなく、Coq を用いた実践的な開発の多くはこれを仮定しています。これは CIC と矛盾しないことがメタ理論的に証明されています。ここで、「メタ理論的に証明された」とは、集合論%~\cite{SetsInTypes}%における CIC の_モデル_において排中律が成り立つことを誰かが紙の上で証明したことを意味します。この節で調べる他の全ての公理は同じモデルで成り立つため、すべては同時に無矛盾です。
+
+   Coq は、排中律が証明できない%\index{構成的論理}%_構成的論理_をデフォルトで実装していることを思い出してください。 構成的論理の証明はプログラムであると見なせます。[forall] 量化子は依存関数型を示し、選言はヴァリアント型を示します。そのような状況において、排中律は任意の命題のための決定手続きと解釈し得るのですが、計算可能性理論によればそのような手続きは存在しません。このため、構成的論理と排中律はいつものプログラミングの概念と関連付けることは出来なくなります。
+
+   それでは、なぜ排中律を公理として表明してよいのでしょうか？直観的な説明は、[Prop] の除去に関する制限のため、証明をプログラムとして扱えなくしていることです。[Prop] でなく [Set] の上で量化された排中律の公理は問題がある_でしょう_。ある開発においてその公理が用いられたら、真に普遍的な決定手続きを実装せずOCamlにコードを (健全に) 抽出することはできないかもしれません。対照的に、[Prop] に属する型の値は抽出により消去されるため、この公理のアルゴリズム論的な結論は回避されるのです。
+
+   公理の適切な使用はとても危ういため、ある定理がどの公理に依存しているか知るための有用なコマンドがあります。%\index{Vernacular commands!Print Assumptions}% *)
 
 Theorem t1 : forall P : Prop, P -> ~ ~ P.
   tauto.
@@ -1053,12 +1088,20 @@ Error: tauto failed.
 Qed.
 
 Print Assumptions t2.
+(*
 (** %\vspace{-.15in}% [[
   Axioms:
   classic : forall P : Prop, P \/ ~ P
   ]]
 
   It is possible to avoid this dependence in some specific cases, where excluded middle _is_ provable, for decidable families of propositions. *)
+*)
+(** %\vspace{-.15in}% [[
+  Axioms:
+  classic : forall P : Prop, P \/ ~ P
+  ]]
+
+  決定可能な種類の命題については、排中律_が_証明可能であり、そのようなケースにおいてはこの依存関係を避けることができます。 *)
 
 Theorem nat_eq_dec : forall n m : nat, n = m \/ n <> m.
   induction n; destruct m; intuition; generalize (IHn m); intuition.
@@ -1069,6 +1112,7 @@ Theorem t2' : forall n m : nat, ~ ~ (n = m) -> n = m.
 Qed.
 
 Print Assumptions t2'.
+(*
 (** <<
 Closed under the global context
 >>
@@ -1076,15 +1120,30 @@ Closed under the global context
   %\bigskip%
 
   Mainstream mathematical practice assumes excluded middle, so it can be useful to have it available in Coq developments, though it is also nice to know that a theorem is proved in a simpler formal system than classical logic.  There is a similar story for%\index{proof irrelevance}% _proof irrelevance_, which simplifies proof issues that would not even arise in mainstream math. *)
+*)
+(** <<
+Closed under the global context
+>>
+
+  %\bigskip%
+
+  主流の数学的な実践では排中律を前提としているため、Coq における開発でそれを支えるようにしておくのは便利ですが、ある定理が古典論理よりも単純な形式システムで証明できると知っておくのも良いことです。同様の話は、主流の数学では関わってくることさえない証明上の問題を単純化します。 *)
 
 Require Import ProofIrrelevance.
 Print proof_irrelevance.
 
+(*
 (** %\vspace{-.15in}% [[
   *** [ proof_irrelevance : forall (P : Prop) (p1 p2 : P), p1 = p2 ]
   ]]
 
   This axiom asserts that any two proofs of the same proposition are equal.  Recall this example function from Chapter 6. *)
+*)
+(** %\vspace{-.15in}% [[
+  *** [ proof_irrelevance : forall (P : Prop) (p1 p2 : P), p1 = p2 ]
+  ]]
+
+  この公理は同じ命題に関するどんな2つの証明も等価であると表明します。6章で見た以下の例の関数を思い出して下さい。*)
 
 (* begin hide *)
 Lemma zgtz : 0 > 0 -> False.
@@ -1098,26 +1157,38 @@ Definition pred_strong1 (n : nat) : n > 0 -> nat :=
     | S n' => fun _ => n'
   end.
 
+(*
 (** We might want to prove that different proofs of [n > 0] do not lead to different results from our richly typed predecessor function. *)
+*)
+(** [n > 0] の異なる証明が、このリッチに型付けされた前者関数において異なる結果にならないことを証明したいかもしれません。 *)
 
 Theorem pred_strong1_irrel : forall n (pf1 pf2 : n > 0), pred_strong1 pf1 = pred_strong1 pf2.
   destruct n; crush.
 Qed.
 
+(*
 (** The proof script is simple, but it involved peeking into the definition of [pred_strong1].  For more complicated function definitions, it can be considerably more work to prove that they do not discriminate on details of proof arguments.  This can seem like a shame, since the [Prop] elimination restriction makes it impossible to write any function that does otherwise.  Unfortunately, this fact is only true metatheoretically, unless we assert an axiom like [proof_irrelevance].  With that axiom, we can prove our theorem without consulting the definition of [pred_strong1]. *)
+*)
+(** 証明スクリプトはシンプルですが、[pred_strong1] の定義を覗き込むことになります。より複雑な関数定義に対しては、証明引数の詳細について場合分けしないことを証明するのはかなりの大仕事になり得ます。これは残念なことです。なぜなら [Prop] 除去の制限により、そのようなことをする関数を書くことはもはや不可能になっているからです。残念ながら、[proof_irrelevance] のような公理を表明しないかぎり、この事実はメタ理論上でのみ真です。この公理により、[pred_strong1] の定義を参照することなく上の定理を証明できます。 *)
 
 Theorem pred_strong1_irrel' : forall n (pf1 pf2 : n > 0), pred_strong1 pf1 = pred_strong1 pf2.
   intros; f_equal; apply proof_irrelevance.
 Qed.
 
 
+(*
 (** %\bigskip%
 
    In the chapter on equality, we already discussed some axioms that are related to proof irrelevance.  In particular, Coq's standard library includes this axiom: *)
+*)
+(** %\bigskip%
+
+   等価性の章で、既に proof irrelevance に関連するいくつかの公理について議論しました。特に、Coq の標準ライブラリはこの公理を含んでいます。 *)
 
 Require Import Eqdep.
 Import Eq_rect_eq.
 Print eq_rect_eq.
+(*
 (** %\vspace{-.15in}% [[
   *** [ eq_rect_eq : 
   forall (U : Type) (p : U) (Q : U -> Type) (x : Q p) (h : p = p),
@@ -1125,6 +1196,14 @@ Print eq_rect_eq.
   ]]
 
   This axiom says that it is permissible to simplify pattern matches over proofs of equalities like [e = e].  The axiom is logically equivalent to some simpler corollaries.  In the theorem names, "UIP" stands for %\index{unicity of identity proofs}%"unicity of identity proofs", where "identity" is a synonym for "equality." *)
+*)
+(** %\vspace{-.15in}% [[
+  *** [ eq_rect_eq : 
+  forall (U : Type) (p : U) (Q : U -> Type) (x : Q p) (h : p = p),
+  x = eq_rect p Q x p h ]
+  ]]
+
+  この公理は、[e = e] のような等価性の証明の上でのパターンマッチを単純化することは許容できると述べています。この公理はより単純な系と論理的に等価です。定理の名前において、「UIP」は%\index{恒等性の証明の単一性 (unicity of identity proofs)}%「恒等性の証明の単一性 (unicity of identity proofs)」を表しており、ここで「恒等性」は「等価性」と同義です。 *)
 
 Corollary UIP_refl : forall A (x : A) (pf : x = x), pf = eq_refl x.
   intros; replace pf with (eq_rect x (eq x) (eq_refl x) x pf); [
@@ -1149,6 +1228,7 @@ Require Eqdep_dec.
 (* end thide *)
 (* end hide *)
 
+(*
 (** These corollaries are special cases of proof irrelevance.  In developments that only need proof irrelevance for equality, there is no need to assert full irrelevance.
 
    Another facet of proof irrelevance is that, like excluded middle, it is often provable for specific propositions.  For instance, [UIP] is provable whenever the type [A] has a decidable equality operation.  The module [Eqdep_dec] of the standard library contains a proof.  A similar phenomenon applies to other notable cases, including less-than proofs.  Thus, it is often possible to use proof irrelevance without asserting axioms.
@@ -1156,9 +1236,18 @@ Require Eqdep_dec.
    %\bigskip%
 
    There are two more basic axioms that are often assumed, to avoid complications that do not arise in set theory. *)
+*)
+(** これらの系は proof irrelevance の特殊な場合です。等価性のためだけに proof irrelevance が必要な開発では、フルの irrelevance を表明する必要はないのです。
+
+   Proof irrelevance の別の側面は、排中律のように、特定の命題において証明可能であることです。例えば、[UIP] は型 [A] が決定可能な等価性演算を備えている場合にはいつでも証明可能です。似たような現象は他の、「〜以下」の証明などの重要な事例にも当てはまります。このため、proof irrelevance はしばしば公理を表明せずに証明できます。
+
+   %\bigskip%
+
+   集合論に無いような複雑さを避けるためによく仮定される基本的な公理が他に2つあります。 *)
 
 Require Import FunctionalExtensionality.
 Print functional_extensionality_dep.
+(*
 (** %\vspace{-.15in}% [[
   *** [ functional_extensionality_dep : 
   forall (A : Type) (B : A -> Type) (f g : forall x : A, B x),
@@ -1169,20 +1258,43 @@ Print functional_extensionality_dep.
   This axiom says that two functions are equal if they map equal inputs to equal outputs.  Such facts are not provable in general in CIC, but it is consistent to assume that they are.
 
   A simple corollary shows that the same property applies to predicates. *)
+*)
+(** %\vspace{-.15in}% [[
+  *** [ functional_extensionality_dep : 
+  forall (A : Type) (B : A -> Type) (f g : forall x : A, B x),
+  (forall x : A, f x = g x) -> f = g ]
+ 
+  ]]
+
+  この公理は、等価な入力を等価な出力に写像する2つの関数は等価であると述べています。そのような事実は一般に CIC では証明できませんが、それがあると仮定しても無矛盾です。
+
+  単純な系により、述語において同様の性質を適用できます。*)
 
 Corollary predicate_extensionality : forall (A : Type) (B : A -> Prop) (f g : forall x : A, B x),
   (forall x : A, f x = g x) -> f = g.
   intros; apply functional_extensionality_dep; assumption.
 Qed.
 
+(*
 (** In some cases, one might prefer to assert this corollary as the axiom, to restrict the consequences to proofs and not programs. *)
+*)
+(** いくつかの場合には、その結論を証明にのみ制限しプログラムには適用しないようにするため、この系を公理として表明したいこともあるでしょう。*)
 
 
+(*
 (** ** Axioms of Choice *)
+*)
+(** ** 選択公理 *)
 
+(*
 (** Some Coq axioms are also points of contention in mainstream math.  The most prominent example is the %\index{axiom of choice}%axiom of choice.  In fact, there are multiple versions that we might consider, and, considered in isolation, none of these versions means quite what it means in classical set theory.
 
    First, it is possible to implement a choice operator _without_ axioms in some potentially surprising cases. *)
+*)
+
+(** いくつかの Coq の公理は主流の数学における論点でもあります。最も顕著な例は%\index{選択公理}%選択公理です。実際、考慮すべき複数のバージョンがあり、独立して考慮すべきであり、どのバージョンも古典的な集合論における意味と同じことを必ずしも意味しません。
+
+   まず、公理を_用いず_に選択演算子を実装できるいくつかの驚くべきかもしれないケースがあります。 *)
 
 Require Import ConstructiveEpsilon.
 Check constructive_definite_description.
@@ -1197,6 +1309,7 @@ Check constructive_definite_description.
        *)
 
 Print Assumptions constructive_definite_description.
+(*
 (** <<
 Closed under the global context
 >>
@@ -1204,9 +1317,18 @@ Closed under the global context
   This function transforms a decidable predicate [P] into a function that produces an element satisfying [P] from a proof that such an element exists.  The functions [f] and [g], in conjunction with an associated injectivity property, are used to express the idea that the set [A] is countable.  Under these conditions, a simple brute force algorithm gets the job done: we just enumerate all elements of [A], stopping when we find one satisfying [P].  The existence proof, specified in terms of _unique_ existence [exists!], guarantees termination.  The definition of this operator in Coq uses some interesting techniques, as seen in the implementation of the [ConstructiveEpsilon] module.
 
   Countable choice is provable in set theory without appealing to the general axiom of choice.  To support the more general principle in Coq, we must also add an axiom.  Here is a functional version of the axiom of unique choice. *)
+*)
+(** <<
+Closed under the global context
+>>
+
+  この関数は決定可能な述語 [P] を、 [P] を満たす要素が存在するという証明から、その要素を出力する関数へと変換する関数です。関数 [f] と [g] は、それと結びついた単射性の性質と共に用いられ、集合 [A] が可算であるというアイデアを表現しています。このような条件下では、単純なブルートフォースのアルゴリズムが用を為します。つまり、全ての [A] の要素を列挙し、[P] を満たす要素が見つかったら止まればよいのです。_唯一_存在する [exists!] という方法で述べられた存在証明が、停止性を保証してくれます。[ConstructiveEpsilon] モジュールの実装に見られるように、Coq におけるこの演算子の定義はいくつかの興味深いテクニックを使っています。
+
+  集合論において、可算個の選択は一般の選択公理に訴えることなく証明可能です。Coq でより一般的な原理を裏付けるには、やはり公理を加えねばなりません。これが汎関数バージョンの、唯一性をもつ選択の公理 (axiom of unique choice) です。 *)
 
 Require Import ClassicalUniqueChoice.
 Check dependent_unique_choice.
+(*
 (** %\vspace{-.15in}% [[
   dependent_unique_choice
      : forall (A : Type) (B : A -> Type) (R : forall x : A, B x -> Prop),
@@ -1216,6 +1338,16 @@ Check dependent_unique_choice.
   ]]
 
   This axiom lets us convert a relational specification [R] into a function implementing that specification.  We need only prove that [R] is truly a function.  An alternate, stronger formulation applies to cases where [R] maps each input to one or more outputs.  We also simplify the statement of the theorem by considering only non-dependent function types. *)
+*)
+(** %\vspace{-.15in}% [[
+  dependent_unique_choice
+     : forall (A : Type) (B : A -> Type) (R : forall x : A, B x -> Prop),
+       (forall x : A, exists! y : B x, R x y) ->
+       exists f : forall x : A, B x,
+         forall x : A, R x (f x)
+  ]]
+
+  この公理は関係による仕様 [R] を、その仕様を実装する関数に変換してくれます。我々は、[R] が真に関数であると証明すれば良いのです。別の、より強い定式化により、[R] がそれぞれの入力を一つ以上の出力に写像する場合に適用されます。非依存的な関数型(non-dependent function types)についてのみ考慮して、この定理をより単純化します。*)
 
 (* begin hide *)
 (* begin thide *)
@@ -1225,6 +1357,7 @@ Require RelationalChoice.
 
 Require Import ClassicalChoice.
 Check choice.
+(*
 (** %\vspace{-.15in}% [[
 choice
      : forall (A B : Type) (R : A -> B -> Prop),
@@ -1235,12 +1368,24 @@ choice
   This principle is proved as a theorem, based on the unique choice axiom and an additional axiom of relational choice from the [RelationalChoice] module.
 
   In set theory, the axiom of choice is a fundamental philosophical commitment one makes about the universe of sets.  In Coq, the choice axioms say something weaker.  For instance, consider the simple restatement of the [choice] axiom where we replace existential quantification by its Curry-Howard analogue, subset types. *)
+*)
+(** %\vspace{-.15in}% [[
+choice
+     : forall (A B : Type) (R : A -> B -> Prop),
+       (forall x : A, exists y : B, R x y) ->
+       exists f : A -> B, forall x : A, R x (f x)
+   ]]
+
+  この原理は、唯一性を持つ選択の公理と、 [RelationalChoice] モジュールの、関係についての選択に関する追加の公理に基づき、定理として証明されます。
+
+  集合論では、選択公理は基礎的かつ哲学的な、集合の宇宙に関する約束事です。Coq における選択公理は、何かしら弱いことを述べています。例えば、存在量化を部分集合型に関するカリー・ハワードのアナロジーで置き換えた、[choice] 公理の単純な言い換えについて考えてみましょう。 *)
 
 Definition choice_Set (A B : Type) (R : A -> B -> Prop) (H : forall x : A, {y : B | R x y})
   : {f : A -> B | forall x : A, R x (f x)} :=
   exist (fun f => forall x : A, R x (f x))
   (fun x => proj1_sig (H x)) (fun x => proj2_sig (H x)).
 
+(*
 (** %\smallskip{}%Via the Curry-Howard correspondence, this "axiom" can be taken to have the same meaning as the original.  It is implemented trivially as a transformation not much deeper than uncurrying.  Thus, we see that the utility of the axioms that we mentioned earlier comes in their usage to build programs from proofs.  Normal set theory has no explicit proofs, so the meaning of the usual axiom of choice is subtly different.  In Gallina, the axioms implement a controlled relaxation of the restrictions on information flow from proofs to programs.
 
    However, when we combine an axiom of choice with the law of the excluded middle, the idea of "choice" becomes more interesting.  Excluded middle gives us a highly non-computational way of constructing proofs, but it does not change the computational nature of programs.  Thus, the axiom of choice is still giving us a way of translating between two different sorts of "programs," but the input programs (which are proofs) may be written in a rich language that goes beyond normal computability.  This combination truly is more than repackaging a function with a different type.
@@ -1250,17 +1395,36 @@ Definition choice_Set (A B : Type) (R : A -> B -> Prop) (H : forall x : A, {y : 
    The Coq tools support a command-line flag %\index{impredicative Set}%<<-impredicative-set>>, which modifies Gallina in a more fundamental way by making [Set] impredicative.  A term like [forall T : Set, T] has type [Set], and inductive definitions in [Set] may have constructors that quantify over arguments of any types.  To maintain consistency, an elimination restriction must be imposed, similarly to the restriction for [Prop].  The restriction only applies to large inductive types, where some constructor quantifies over a type of type [Type].  In such cases, a value in this inductive type may only be pattern-matched over to yield a result type whose type is [Set] or [Prop].  This rule contrasts with the rule for [Prop], where the restriction applies even to non-large inductive types, and where the result type may only have type [Prop].
 
    In old versions of Coq, [Set] was impredicative by default.  Later versions make [Set] predicative to avoid inconsistency with some classical axioms.  In particular, one should watch out when using impredicative [Set] with axioms of choice.  In combination with excluded middle or predicate extensionality, inconsistency can result.  Impredicative [Set] can be useful for modeling inherently impredicative mathematical concepts, but almost all Coq developments get by fine without it. *)
+*)
+(** %\smallskip{}%カリー・ハワード同型対応を介して、この「公理」はオリジナルと同じ意味を持つと見なすことができます。これは、非カリー化よりもそれほど深くない変換によって、ごく簡単に実装できます。このため、以前に言及したこの公理の実用性は、証明からプログラムを構築するための使用法として現れることが分かります。普通の集合論は陽に証明を扱わないため、通常の選択公理とは微妙に意味が違います。Gallina では、この公理は、証明からプログラムへの情報流の制限について、管理されたやり方により緩和する方法を実装します。
 
+   しかしながら、選択公理と排中律を組み合わせると、「選択」のアイデアはより興味深いものとなります。排中律は非常に非計算論的な方法で証明を構築する方法を提供しますが、プログラムの計算論的な性質を変えることはありません。このため、選択公理は二種類の「プログラム」の間を変換する方法を依然として提供していますが、入力となるプログラム (証明) は通常の計算可能性を超えたリッチな言語で書かれているかもしれません。この組み合わせは関数を別の型で再パッケージ化する以上のものです。
+
+   %\bigskip%
+
+   Coq のツールはコマンドラインフラグ%\index{impredicative Set}%<<-impredicative-set>> をサポートしており、これは [Set] を非可述的にすることにより Gallina を根本的に変えてしまいます。[forall T : Set, T] のような項は型 [Set] を持ち、[Set] における帰納的定義は任意の型の上で量化した構築子を持つことができます。無矛盾性を保つため、[Prop] における制限と同様に、除去の制限が課されます。この制限は、型 [Type] をもつ型の上で量化するいくつかの構築子をもつ、大きな帰納型にのみ適用されます。そのような場合、この帰納型の値は [Set] か [Prop] の型を持つ結果の型を返すためにだけパターンマッチできます。この規則は、この制限が大きくない帰納型にも適用され、結果の型が型 [Prop] しか持てない [Prop] のそれとは対照的です。
+
+   Coq の古いバージョンでは、[Set] はデフォルトで非可述的でした。後のバージョンでは、古典論理の公理との矛盾を避けるため [Set] は可述的になっています。特に、非可述的な [Set] と選択公理を共に用いる時に注意が必要です。排中律や述語の外延性 (predicate extensionality) と組み合わせることで、矛盾が起こり得ます。非可述的な [Set] は本質的に非可述的な概念をモデル化するのに便利ですが、Coq における開発のほとんどはそれ無しでも大丈夫です。 *)
+
+(*
 (** ** Axioms and Computation *)
+*)
+(** ** 公理と計算 *)
 
+(*
 (** One additional axiom-related wrinkle arises from an aspect of Gallina that is very different from set theory: a notion of _computational equivalence_ is central to the definition of the formal system.  Axioms tend not to play well with computation.  Consider this example.  We start by implementing a function that uses a type equality proof to perform a safe type-cast. *)
+*)
+(** Gallinaに由来し、集合論とは非常に異なる側面に由来した、公理に関するもう一つの引っかかり(winkle)があります。それは、_computational equivalence_ という、この形式体系の定義における中心的な概念です。公理は計算とあまりうまくやってくれない傾向があります。この例を考えてみてください。まず安全な型キャストを行うために型の等価性証明を使う関数を実装します。 *)
 
 Definition cast (x y : Set) (pf : x = y) (v : x) : y :=
   match pf with
     | eq_refl => v
   end.
 
+(*
 (** Computation over programs that use [cast] can proceed smoothly. *)
+*)
+(** [cast] を用いるプログラムの計算はスムースに進行できます。*)
 
 Eval compute in (cast (eq_refl (nat -> nat)) (fun n => S n)) 12.
 (** %\vspace{-.15in}%[[
@@ -1269,7 +1433,10 @@ Eval compute in (cast (eq_refl (nat -> nat)) (fun n => S n)) 12.
      ]]
      *)
 
+(*
 (** Things do not go as smoothly when we use [cast] with proofs that rely on axioms. *)
+*)
+(** [cast] を公理に依存する証明とともに用いたとき、スムースにはいかなくなります。 *)
 
 Theorem t3 : (forall n : nat, fin (S n)) = (forall n : nat, fin (n + 1)). 
   change ((forall n : nat, (fun n => fin (S n)) n) = (forall n : nat, (fun n => fin (n + 1)) n));
@@ -1277,6 +1444,7 @@ Theorem t3 : (forall n : nat, fin (S n)) = (forall n : nat, fin (n + 1)).
 Qed.
 
 Eval compute in (cast t3 (fun _ => First)) 12.
+(*
 (** %\vspace{-.15in}%[[
      = match t3 in (_ = P) return P with
        | eq_refl => fun n : nat => First
@@ -1285,6 +1453,15 @@ Eval compute in (cast t3 (fun _ => First)) 12.
      ]]
 
   Computation gets stuck in a pattern-match on the proof [t3].  The structure of [t3] is not known, so the match cannot proceed.  It turns out a more basic problem leads to this particular situation.  We ended the proof of [t3] with [Qed], so the definition of [t3] is not available to computation.  That mistake is easily fixed. *)
+*)
+(** %\vspace{-.15in}%[[
+     = match t3 in (_ = P) return P with
+       | eq_refl => fun n : nat => First
+       end 12
+     : fin (12 + 1)
+     ]]
+
+  証明 [t3] のパターンマッチで計算が詰まって (stuck) います。[t3] の構造が分かっておらず、照合が進められないのです。より基本的な問題から、この特別な状況に至っているのです。この [t3] の証明を [Qed] で終えたため、[t3] の証明は計算において利用できないのです。この失敗は簡潔に修正できます。*)
 
 Reset t3.
 
@@ -1294,6 +1471,7 @@ Theorem t3 : (forall n : nat, fin (S n)) = (forall n : nat, fin (n + 1)).
 Defined.
 
 Eval compute in (cast t3 (fun _ => First)) 12.
+(*
 (** %\vspace{-.15in}%[[
      = match
          match
@@ -1305,6 +1483,18 @@ Eval compute in (cast t3 (fun _ => First)) 12.
   We elide most of the details.  A very unwieldy tree of nested matches on equality proofs appears.  This time evaluation really _is_ stuck on a use of an axiom.
 
   If we are careful in using tactics to prove an equality, we can still compute with casts over the proof. *)
+*)
+(** %\vspace{-.15in}%[[
+     = match
+         match
+           match
+             functional_extensionality
+     ....
+     ]]
+
+  殆どの詳細は省略します。等価性証明を照合するネストした手に負えない大きさの木が現れます。今度こそ、公理を用いることで評価が本当に_詰まった_のです。
+
+  もし我々が等価性を証明するために注意深くタクティクを使うならば、依然として証明の上でキャストを用いることができます。*)
 
 Lemma plus1 : forall n, S n = n + 1.
   induction n; simpl; intuition.
@@ -1315,15 +1505,26 @@ Theorem t4 : forall n, fin (S n) = fin (n + 1).
 Defined.
 
 Eval compute in cast (t4 13) First.
+(*
 (** %\vspace{-.15in}% [[
      = First
      : fin (13 + 1)
      ]]
 
    This simple computational reduction hides the use of a recursive function to produce a suitable [eq_refl] proof term.  The recursion originates in our use of [induction] in [t4]'s proof. *)
+*)
+(** %\vspace{-.15in}% [[
+     = First
+     : fin (13 + 1)
+     ]]
+
+   この単純で計算的な簡約により、適切な [eq_refl] の証明項を生成する再帰関数の使用を隠しています。この再帰は [t4] の証明に対する我々の [induction] の使用に由来しています。 *)
 
 
+(*
 (** ** Methods for Avoiding Axioms *)
+*)
+(** ** 公理を避けるための手法 *)
 
 (** The last section demonstrated one reason to avoid axioms: they interfere with computational behavior of terms.  A further reason is to reduce the philosophical commitment of a theorem.  The more axioms one assumes, the harder it becomes to convince oneself that the formal system corresponds appropriately to one's intuitions.  A refinement of this last point, in applications like %\index{proof-carrying code}%proof-carrying code%~\cite{PCC}% in computer security, has to do with minimizing the size of a%\index{trusted code base}% _trusted code base_.  To convince ourselves that a theorem is true, we must convince ourselves of the correctness of the program that checks the theorem.  Axioms effectively become new source code for the checking program, increasing the effort required to perform a correctness audit.
 
