@@ -1279,7 +1279,7 @@ Ltac addToList x xs :=
   let b := inList x xs in
     match b with
       | true => xs
-      | false => constr:(x, xs)
+      | false => constr:((x, xs))
     end.
 
 (**
@@ -1349,8 +1349,8 @@ Inductive formula' : Set :=
 
 Ltac reifyTerm xs e :=
   match e with
-    | True => constr:Truth'
-    | False => constr:Falsehood'
+    | True => Truth'
+    | False => Falsehood'
     | ?e1 /\ ?e2 =>
       let p1 := reifyTerm xs e1 in
       let p2 := reifyTerm xs e2 in

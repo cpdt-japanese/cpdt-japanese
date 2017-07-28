@@ -883,7 +883,7 @@ Ltacプログラムは動的に型付けされているので、[type of f] を�
  *)
 
 Goal False.
-  let ls := map (nat * nat)%type ltac:(fun x => constr:(x, x)) (1 :: 2 :: 3 :: nil) in
+  let ls := map (nat * nat)%type ltac:(fun x => constr:((x, x))) (1 :: 2 :: 3 :: nil) in
     pose ls.
   (** [[
   l := (1, 1) :: (2, 2) :: (3, 3) :: nil : list (nat * nat)

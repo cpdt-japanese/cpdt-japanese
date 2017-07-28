@@ -1648,7 +1648,9 @@ Lemma proj1_again' : forall r, proof r
 
   The first goal looks reasonable.  Hypothesis [H0] is clearly contradictory, as [discriminate] can show. *)
 
-  discriminate.
+  try discriminate. (* Note: Coq 8.6 is now solving this subgoal automatically!
+                     * This line left here to keep everything working in
+                     * 8.4, 8.5, and 8.6. *)
 (** %\vspace{-.15in}%[[
   H : proof p
   H1 : And p q = And p0 q0

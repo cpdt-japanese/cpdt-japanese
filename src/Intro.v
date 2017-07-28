@@ -1,4 +1,4 @@
-(* Copyright (c) 2008-2013, 2015, Adam Chlipala
+(* Copyright (c) 2008-2013, 2015, 2017, Adam Chlipala
  * 
  * This work is licensed under a
  * Creative Commons Attribution-Noncommercial-No Derivative Works 3.0
@@ -334,7 +334,7 @@ Coqにあらかじめあるタクティクは十分高レベルな自動化を�
 
 (**
 (**
-At the start of the next chapter, I assume that you have installed Coq and Proof General.  The code in this book is tested with Coq versions 8.4pl5 and 8.5beta2.  Though parts may work with other versions, it is expected that the book source will fail to build with _earlier_ versions.
+At the start of the next chapter, I assume that you have installed Coq and Proof General.  The code in this book is tested with Coq versions 8.4pl6, 8.5pl3, and 8.6.  Though parts may work with other versions, it is expected that the book source will fail to build with _earlier_ versions.
 
 %\index{Proof General|(}%To set up your Proof General environment to process the source to the next chapter, a few simple steps are required.
 
@@ -371,7 +371,7 @@ With Proof General, the portion of a buffer that Coq has processed is highlighte
 %\index{Proof General|)}% *)
 *)
 (**
-次の章の最初では、皆さんがCoqとProof Generalをインストールした状態であることを仮定します。本書のコードはCoqバージョン8.4pl5と8.5beta2でテストされています。部分的には他のバージョンで動くかもしれませんが、本書のソースはより以前のバージョンではビルドに失敗すると予想されます。
+次の章の最初では、皆さんがCoqとProof Generalをインストールした状態であることを仮定します。本書のコードはCoqバージョン8.4pl6、8.5pl3、8.6でテストされています。部分的には他のバージョンで動くかもしれませんが、本書のソースはより以前のバージョンではビルドに失敗すると予想されます。
 
 %\index{Proof General|(}%次の章でソースを処理するためにProof Generalの設定をするには、以下のシンプルなステップが必要です。
 
