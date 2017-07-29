@@ -822,10 +822,7 @@ Lemma cassociativity1 : forall A B C (f : A -> comp B) (g : B -> comp C) r c,
   match goal with
     | [ H : Bnd _ _ = Bnd _ _ |- _ ] => injection H; clear H; intros; try subst
   end.
-  move H3 after A.
-  generalize dependent B0.
-  do 2 intro.
-  subst.
+  try subst B. (* This line expected to fail in Coq 8.4 and succeed in Coq 8.6. *)
   crush.
   inversion H; clear H; crush.
   eauto.
@@ -839,10 +836,7 @@ Lemma cassociativity2 : forall A B C (f : A -> comp B) (g : B -> comp C) r c,
   match goal with
     | [ H : Bnd _ _ = Bnd _ _ |- _ ] => injection H; clear H; intros; try subst
   end.
-  move H3 after B.
-  generalize dependent B0.
-  do 2 intro.
-  subst.
+  try subst A. (* Same as above *)
   crush.
   inversion H0; clear H0; crush.
   eauto.
