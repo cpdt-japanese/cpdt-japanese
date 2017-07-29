@@ -201,7 +201,7 @@ Dependent types are useful not only because they help you express correctness pr
 
 公然のことですが，%\index{ACL2}%ACL2と%\index{HOL}%HOLでは依存型は使えません．
 %\index{PVS}%PVSと%\index{Twelf}%TwelfはCoqの依存型言語のそれぞれ別の真部分集合をサポートします．
-Twelfの型言語はbare-bonesに制限されています．つまり単形のラムダ計算です．
+Twelfの型言語はbare-bonesに制限されています．つまり単相ラムダ計算です．
 そのため型の内部での計算に重大な制約が置かれます．
 この制約はTwelfが証明を表現したり証明したりするアプローチの健全性を議論するときに重要です．
 
