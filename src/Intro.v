@@ -150,21 +150,40 @@ Isabelle%~\cite{Isabelle}%を用いて実装されており,
 (** * Why Coq? *)
 
 (**
+(**
 This book is going to be about certified programming using Coq, and I am convinced that it is the best tool for the job.  Coq has a number of very attractive properties, which I will summarize here, mentioning which of the other candidate tools lack which properties.
+*)
+この本はCoqを使った認証を伴うプログラミングについての本になる予定です．
+私はそれ（Coq）がこの仕事（certified programming）に最良のツールだと確信しています．
+Coqにはとても魅力的な性質が多く備わっていますので，ここ（以下）でまとめます．
+同時に他の候補となるツールがどの性質を欠いているかも説明します．
 *)
 
 
+(**
 (** ** Based on a Higher-Order Functional Programming Language *)
+*)
+(** ** 高階の関数型プログラミング言語に基づいている *)
 
+(**
 (**
 %\index{higher-order vs. first-order languages}%There is no reason to give up the familiar comforts of functional programming when you start writing certified programs.  All of the tools I listed are based on functional programming languages, which means you can use them without their proof-related features to write and run regular programs.
 
 %\index{ACL2}%ACL2 is notable in this field for having only a _first-order_ language at its foundation.  That is, you cannot work with functions over functions and all those other treats of functional programming.  By giving up this facility, ACL2 can make broader assumptions about how well its proof automation will work, but we can generally recover the same advantages in other proof assistants when we happen to be programming in first-order fragments.
 *)
+認証を伴うプログラムを書くとき，関数型プログラミング言語のよく知られた便利さをあきらめる理由はありません．ここで挙げるツールは関数型プログラミング言語を基礎としているため，証明に関係する機能を使わなくても普通のプログラムを書いたり実行したりできます．
+＿1階の＿言語のみを基礎とするという点点でACL2は重要です．
+つまり，(1階の言語のツールでは)関数上の関数などの関数型プログラミングの便利な機能が使えないのです．
+この便利さの代わりに，自動証明がいかにうまく動くかについてより多様な仮定がACL2ではできるのですが，他の証明支援系でも1階のプログラムを書くときは同様の利点を回復できます．
+*)
 
 
+(**
 (** ** Dependent Types *)
+*)
+(** ** 依存型 *)
 
+(**
 (**
 A language with _dependent types_ may include references to programs inside of types.  For instance, the type of an array might include a program expression giving the size of the array, making it possible to verify absence of out-of-bounds accesses statically.  Dependent types can go even further than this, effectively capturing any correctness property in a type.  For instance, later in this book, we will see how to give a compiler a type that guarantees that it maps well-typed source programs to well-typed target programs.
 
@@ -175,17 +194,64 @@ In contrast, %\index{PVS}%PVS's dependent types are much more general, but they 
 Dependent types are useful not only because they help you express correctness properties in types.  Dependent types also often let you write certified programs _without writing anything that looks like a proof_.  Even with subset types, which for many contexts can be used to express any relevant property with enough acrobatics, the human driving the proof assistant usually has to build some proofs explicitly.  Writing formal proofs is hard, so we want to avoid it as far as possible.  Dependent types are invaluable for this purpose.
 
 *)
+＿依存型＿を持つ言語は型の内部への言及を含むことができます．
+例えば，配列をあらわす型にはその配列のサイズを与えるプログラム式を含むことができるので，配列の範囲外アクセスがないことを静的に確かめることができるようになります．
+型の正しさを表す性質を効果的に捉えることで，依存型はさらに先まで行けます．
+例えば，この本で後ほど，正しく型付けされたソースプログラムから正しく型付けされたターゲットプログラムに変換することを保証する型をコンパイラに与える方法を見ます．
 
+公然のことですが，%\index{ACL2}%ACL2と%\index{HOL}%HOLでは依存型は使えません．
+%\index{PVS}%PVSと%\index{Twelf}%TwelfはCoqの依存型言語のそれぞれ別の真部分集合をサポートします．
+Twelfの型言語はbare-bonesに制限されています．つまり単相ラムダ計算です．
+そのため型の内部での計算に重大な制約が置かれます．
+この制約はTwelfが証明を表現したり証明したりするアプローチの健全性を議論するときに重要です．
+
+それに対して%\index{PVS}%PVSの依存型はより一般的ですが，subset typeという単一の仕組みに制限されています．
+つまり，通常の型は述語を付加することで定義されます．
+subset typeの要素の1つ1つはbase typeの要素のうちその述語を満たすものです．
+この本の6章ではこの様式のプログラミングをCoqでする方法を紹介します．
+一方Part IIの他の章ではCoqによる依存型を扱い，PVSがサポートする範囲外です．
+
+依存型が有用なのは，型の正しさを表現するのを助けるからだけではありません．
+依存型のおかげで，しばしば証明らしいものを書かずにcertified programを書くことができるようになるんです．
+subset typeだけだと，離れ業を十分駆使すれば妥当な性質を表現できるのですが，人間が操作するような証明支援機は通常，証明を明示的に構築する必要があります．
+形式的な証明を書くのは大変なので，なるべく避けたいものです．
+この目的のために，依存型には計り知れない価値があります．
+*)
+
+(**
 (** ** An Easy-to-Check Kernel Proof Language *)
+*)
+(** ** 確認しやすいカーネル証明言語 *)
 
+(**
 (**
 %\index{de Bruijn criterion}%Scores of automated decision procedures are useful in practical theorem proving, but it is unfortunate to have to trust in the correct implementation of each procedure.  Proof assistants satisfy the "de Bruijn criterion" when they produce _proof terms_ in small kernel languages, even when they use complicated and extensible procedures to seek out proofs in the first place.  These core languages have feature complexity on par with what you find in proposals for formal foundations for mathematics (e.g., ZF set theory).  To believe a proof, we can ignore the possibility of bugs during _search_ and just rely on a (relatively small) proof-checking kernel that we apply to the _result_ of the search.
 
 Coq meets the de Bruijn criterion, while %\index{ACL2}%ACL2 does not, as it employs fancy decision procedures that produce no "evidence trails" justifying their results.  %\index{PVS}%PVS supports _strategies_ that implement fancier proof procedures in terms of a set of primitive proof steps, where the primitive steps are less primitive than in Coq.  For instance, a propositional tautology solver is included as a primitive, so it is a question of taste whether such a system meets the de Bruijn criterion.  The HOL implementations meet the de Bruijn criterion more manifestly; for Twelf, the situation is murkier.
 *)
 
-(** ** Convenient Programmable Proof Automation *)
+%\index{de Bruijn criterion}%自動化された決定手続きが判定してくれるというのは実践的な定理証明では有用です．
+しかし，一つずつの手続きが正しく実装されているということを信頼しないと行けないのは残念です．
+複雑で拡張可能な手順を使って証明を探し出すのが先かどうかに関わらず，証明支援機が核となる小さな言語で表現された_証明項_を生成するとき，
+その証明支援機はde Bruijn criterionを満たすと言います．
+数学の形式的な基礎の提案の中で見られるのと同様の複雑さをこのようなコア言語も持っています．
+証明を_探す_際のバグの可能性は無視してもよく，証明を検証するのに必要な小さな部分だけだけによって，証明を信じることができます．
 
+Coqはde Bruijn criterionを満たします．一方%\index{ACL2}%ACL2は満たしません．
+というのは，ACL2は手の込んだ決定手続きを採用し，ACL2の結果を正当化する証跡を生成しないからです．
+%\index{PVS}%PVSは_戦略_をサポートします．戦略では手の込んだ証明手順を「原始的な」証明の段階で実装します．
+ここで「原始的な」といってもCoqほど原始的ではないです．
+例えば，命題論理の恒真式ソルバはPVSでは原始的とされるため，そういうものがde Bruijn criterionを満たすかどうかという好みの問題になります．
+HOLの実装がde Bruijn criterionに適合するのはより明らかです．Twelfに対してはより不明瞭です．
+*)
+
+(**
+(** ** Convenient Programmable Proof Automation *)
+*)
+
+(** ** 便利でプログラム可能な証明自動化 *)
+
+(**
 (**
 A commitment to a kernel proof language opens up wide possibilities for user extension of proof automation systems, without allowing user mistakes to trick the overall system into accepting invalid proofs.  Almost any interesting verification problem is undecidable, so it is important to help users build their own procedures for solving the restricted problems that they encounter in particular theorems.
 
@@ -196,14 +262,48 @@ Of the remaining tools, all can support user extension with new decision procedu
 %\index{Isabelle/HOL}%Isabelle/HOL and Coq both support coding new proof manipulations in ML in ways that cannot lead to the acceptance of invalid proofs.  Additionally, Coq includes a domain-specific language for coding decision procedures in normal Coq source code, with no need to break out into ML.  This language is called %\index{Ltac}%Ltac, and I think of it as the unsung hero of the proof assistant world.  Not only does Ltac prevent you from making fatal mistakes, it also includes a number of novel programming constructs which combine to make a "proof by decision procedure" style very pleasant.  We will meet these features in the chapters to come.
 *)
 
-(** ** Proof by Reflection *)
+残りのツールについては，全て，新しい決定手続きのユーザー拡張をサポートします．
+それは，直接ツールの実装（Coqの場合はOCamlです）をハックする形になります．
+ACL2とPVSはde Bruijn条件を満たさないため，全体の正しさは新しい手順を作った人に左右されてしまいます．
 
+ISabelle/HOLとCoqはどちらもあらあな証明操作をMLでコードすることをサポートします．
+それによって不正な証明が受け入れられることはありません．
+加えて，Coqはドメイン特化言語をもっていて決定手続きを通常のCoqソースコードの中でコーディングすることができます．
+MLに抜け出す必要はありません．
+この言語（DSL）はLtacと呼ばれていて，私が思うに，Ltacは証明支援系の世界における無名の英雄です．
+Ltacは深刻な間違い犯すことを防ぐだけではありません．多くの画期的なプログラム構成要素を持っていて，それを組み合わせることで「決定手続きによる証明」というスタイルをとても快適にしてくれます．
+私たちはこれらの機能を後の章で見て行きます．
+*)
+
+(**
+(** ** Proof by Reflection *)
+*)
+
+(** ** リフレクションによる証明 *)
+
+(**
 (**
 %\index{reflection}\index{proof by reflection}%A surprising wealth of benefits follows from choosing a proof language that integrates a rich notion of computation.  Coq includes programs and proof terms in the same syntactic class.  This makes it easy to write programs that compute proofs.  With rich enough dependent types, such programs are _certified decision procedures_.  In such cases, these certified procedures can be put to good use _without ever running them_!  Their types guarantee that, if we did bother to run them, we would receive proper "ground" proofs.
 
 The critical ingredient for this technique, many of whose instances are referred to as _proof by reflection_, is a way of inducing non-trivial computation inside of logical propositions during proof checking.  Further, most of these instances require dependent types to make it possible to state the appropriate theorems.  Of the proof assistants I listed, only Coq really provides support for the type-level computation style of reflection, though PVS supports very similar functionality via refinement types.
 *)
+*)
 
+(**
+計算についての概念を豊富に統合した証明言語を選ぶことで驚くほど多くの利点が得られます．
+Coqはプログラムと証明項を同じ構文クラスで表現します（？）
+これによって証明を計算するプログラムを作るのが簡単になります．
+十分豊富な依存型があることで，そのようなプログラムは＿認証を伴う決定手続き＿になります．
+そのような場合，それらの認証を伴う手続きは走らせないとしても有用なのです．
+もしそのプログラムをわざわざ実行した場合，適切な十分な根拠のある証明が得られる，ということをそれらの型が保証してくれます．
+
+このテクニックは多くは＿リフレクションによる証明＿と呼ばれます．
+証明検査の際，論理的な命題の中に非自明な計算を取り入れるというものです．
+さらに，このようなもののほとんどの例では適切な定理を表現するために依存型を必要とします．
+先ほどより挙げている証明支援機の中では，Coqだけが型レベルでの計算をするというスタイルのリフレクションを提供しています．
+一方PVSではとても似た機能をrefinement typeを使ってサポートしています．
+
+*)
 
 (**
 (** * Why Not a Different Dependently Typed Language? *)

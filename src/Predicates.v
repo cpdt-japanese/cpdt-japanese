@@ -31,9 +31,20 @@ Reset unit.
 (* end thide *)
 (* end hide *)
 
+(**
 (** %\chapter{Inductive Predicates}% *)
+*)
+(** %\chapter{帰納的な述語}% *)
 
+(**
 (** The so-called %\index{Curry-Howard correspondence}``%#"#Curry-Howard correspondence#"#%''~\cite{Curry,Howard}% states a formal connection between functional programs and mathematical proofs.  In the last chapter, we snuck in a first introduction to this subject in Coq.  Witness the close similarity between the types [unit] and [True] from the standard library: *)
+*)
+
+(**
+いわゆる「Curry-Howard同型対応」というものがあり，それは，関数型プログラムと数学的証明の形式的な対応のことです．
+前の章では，このテーマの最初の導入を行いました．
+標準ライブラリの[unit]と[True]について非常に類似していることを見てみましょう．
+*)
 
 Print unit.
 (** %\vspace{-.15in}%[[
@@ -42,6 +53,7 @@ Print unit.
 *)
 
 Print True.
+(**
 (** %\vspace{-.15in}%[[
   Inductive True : Prop :=  I : True
   ]]
@@ -53,18 +65,74 @@ The type [unit] has one value, [tt].  The type [True] has one proof, [I].  Why d
 The essence of the argument is roughly this: to an engineer, not all functions of type [A -> B] are created equal, but all proofs of a proposition [P -> Q] are.  This idea is known as%\index{proof irrelevance}% _proof irrelevance_, and its formalizations in logics prevent us from distinguishing between alternate proofs of the same proposition.  Proof irrelevance is compatible with, but not derivable in, Gallina.  Apart from this theoretical concern, I will argue that it is most effective to do engineering with Coq by employing different techniques for programs versus proofs.  Most of this book is organized around that distinction, describing how to program, by applying standard functional programming techniques in the presence of dependent types; and how to prove, by writing custom Ltac decision procedures.
 
 With that perspective in mind, this chapter is sort of a mirror image of the last chapter, introducing how to define predicates with inductive definitions.  We will point out similarities in places, but much of the effective Coq user's bag of tricks is disjoint for predicates versus "datatypes."  This chapter is also a covert introduction to dependent types, which are the foundation on which interesting inductive predicates are built, though we will rely on tactics to build dependently typed proof terms for us for now.  A future chapter introduces more manual application of dependent types. *)
+*)
 
+(** %\vspace{-.15in}%[[
+  Inductive True : Prop :=  I : True
+  ]]
 
+[unit]はただ1つの値をとる型で，[True]は常に成り立つ命題であったことを思い出してください．
+この2つの概念には表面的な違いがありますが，両者ともにInductiveを使った定義になっている点は同じです．
+[unit]と[True]の類似点はまだあります．
+[unit]を[True]に，[tt]を[I]に，[Set]を[Prop]に置き換えると[True]の定義になるということがわかります．
+最初の2つの違いは名前の変更なので重要ではありませんが，3つ目の違いは重要なもので，プログラムと証明をわけるものです．
+[Set]型の[T]という項があればそれはプログラムの集合を表す型で，[T]型を持つ項はプログラムです．
+[Prop]型の[T]という項があればそれは論理的な命題で，その証明は[T]型を持ちます．
+12章ではもっと詳細に[Prop]と[Set]の理論的な違いを説明します．
+今の所は，証明が何かということについて，一般的な感覚に基づいておくことにします．
+
+[unit]という型は[tt]という1つの値を取ります．
+[True]という型には[I]という1つの証明があります．
+なぜこれらの型を区別するのでしょうか？
+抽象的な文脈でカリーハワードのことを読んだことがあっても証明工学で使ったことのない人は，実はこれら2つの型は区別する＿べきではない＿と答えるでしょう．
+確かにこの見方には美しさを訴えかけてくるものがあります．しかし，実用的な証明においてカリーハワードはとてもゆるく扱われるべきだということを私は言いたいのです．
+このような区別をした方が良いCoq特有の理由があります．
+コンパイルを効率的に行うことと古典主義の数学（論理学）に存在するパラドクスを避けるためというのもありますが，私はむしろ，証明とプログラミングを一緒にしなくなるようなより一般的な法則を主張します．
+
+議論の重要なところはだいたいこのようなものです：[A -> B]の全ての関数が同じではありませんが，[P -> Q]という命題の全ての証明は等しいのです．
+この考えは＿proof irrelevance＿として知られています．そしてそれを論理学において形式化すると同じ命題の異なる証明を区別するのが難しくなります．
+Proof irrelevanceはGallinaでは互換性はあるけど推論はできません（？）．
+このような理論的な懸念とは別に，私はCoqで開発をするのがもっとも効果的だと考えています．プログラムと証明に別々のテクニックを使えるからです．
+この本のほとんどの部分はこの区別のもとに書かれています．
+プログラムの際は依存型の存在を前提とした標準的な関数型プログタミングのテクニックを使います．
+そして証明の際はカスタムのLtac決定手続きを書きます．
+
+上記の見方に注意すると，この章は前章の鏡像のようなものです．帰納的な定義を使って命題を定義する方法を紹介します．
+所々で類似性を指摘するでしょうが，効果的なCoqユーザーの知恵袋は命題とデータ型で交わりません．
+依存型をもつ証明項を構築するタクティク使っていく一方で，この章はまた依存型のひそかな紹介でもあります．依存型は興味深い帰納的命題を作る土台になっています．
+さらに先の章ではより手動による依存型の応用も扱って行きます．
+*)
+
+(**
 (** * Propositional Logic *)
+*)
+(** * 命題論理 *)
 
+(**
 (** Let us begin with a brief tour through the definitions of the connectives for propositional logic.  We will work within a Coq section that provides us with a set of propositional variables.  In Coq parlance, these are just variables of type [Prop]. *)
+*)
+
+(**
+命題論理に出てくる結合記号の定義を簡単に見ていくことから始めましょう．
+これからしばらくの間は，命題変数の集合を定めたCoqセクションに入っておくことにします．
+Coq用語では，命題とは単に[Prop]型の変数です．
+*)
 
 Section Propositional.
   Variables P Q R : Prop.
 
+(**
   (** In Coq, the most basic propositional connective is implication, written [->], which we have already used in almost every proof.  Rather than being defined inductively, implication is built into Coq as the function type constructor.
 
 We have also already seen the definition of [True].  For a demonstration of a lower-level way of establishing proofs of inductive predicates, we turn to this trivial theorem. *)
+*)
+
+(**
+Coqでは，命題の結合記号のうち最も基本的なのは含意であり，[->]で表します．これは今までのほぼ全ての証明でも使ってきました．
+含意は，帰納的に（Inductiveを使って）定義されているわけではなく，むしろCoqに関数型のコンストラクタとして組み込まれています．
+既に[True]の定義は紹介してあります．
+次の自明な定理を通して，帰納的な述語の証明における低レベル部分の様子を説明していきます．
+*)
   
   Theorem obvious : True.
 (* begin thide *)
@@ -72,7 +140,14 @@ We have also already seen the definition of [True].  For a demonstration of a lo
 (* end thide *)
   Qed.
 
+(**
   (** We may always use the [apply] tactic to take a proof step based on applying a particular constructor of the inductive predicate that we are trying to establish.  Sometimes there is only one constructor that could possibly apply, in which case a shortcut is available:%\index{tactics!constructor}% *)
+*)
+
+(**
+構成しようとしている帰納的な述語のコンストラクタをつかって証明を進めるために[apply]タクティクを使うことができます．
+時には，適用しうるコンストラクタがただ1つしかないことがあります．そのような場合は以下のようにショートカットが使えます．
+*)  
 
 (* begin thide *)
   Theorem obvious' : True.
@@ -81,14 +156,23 @@ We have also already seen the definition of [True].  For a demonstration of a lo
 
 (* end thide *)
 
+(**
   (** There is also a predicate [False], which is the Curry-Howard mirror image of [Empty_set] from the last chapter. *)
+*)
+(**
+また，[False]という述語もあります．これは[Empty_set]のカリーハワード鏡像です．
+*)
 
   Print False.
   (** %\vspace{-.15in}%[[
   Inductive False : Prop :=
   ]]
-
+  
+(*
   We can conclude anything from [False], doing case analysis on a proof of [False] in the same way we might do case analysis on, say, a natural number.  Since there are no cases to consider, any such case analysis succeeds immediately in proving the goal. *)
+例えば自然数に対してと同じケース分析を[False]に対しても行うことで，[False]からはあらゆる結論を導くことができます．
+考えるべきケースがないため，そのようなケース分析は即時に成功しゴールを証明してしまいます．
+*)
 
   Theorem False_imp : False -> 2 + 2 = 5.
 (* begin thide *)
@@ -96,13 +180,29 @@ We have also already seen the definition of [True].  For a demonstration of a lo
 (* end thide *)
   Qed.
 
+(**
   (** In a consistent context, we can never build a proof of [False].  In inconsistent contexts that appear in the courses of proofs, it is usually easiest to proceed by demonstrating the inconsistency with an explicit proof of [False]. *)
+*)
+
+(**
+無矛盾のコンテキストからは[False]の証明は作れません．
+証明の過程の途中に出てくる矛盾したコンテキストでは，明確な[False]の証明により矛盾を証明して進むのが通常は最も簡単です．
+*)
 
   Theorem arith_neq : 2 + 2 = 5 -> 9 + 9 = 835.
 (* begin thide *)
     intro.
 
+(**
     (** At this point, we have an inconsistent hypothesis [2 + 2 = 5], so the specific conclusion is not important.  We use the %\index{tactics!elimtype}%[elimtype] tactic.  For a full description of it, see the Coq manual.  For our purposes, we only need the variant [elimtype False], which lets us replace any conclusion formula with [False], because any fact follows from an inconsistent context. *)
+*)
+
+(**
+この時点で，矛盾した仮定[2 + 2 = 5]があるので，特定の結論には意味がないのです．
+このような時は[elimtype]タクティクを使います．
+それの完全な説明はCoqドキュメントをあたってください．
+ここで目的のためには，その変種の[elimtype False]のみを使って結論を[False]にします．なぜなら，矛盾したコンテキストからは任意の事実が従うからです．
+*)
 
     elimtype False.
     (** [[
@@ -112,13 +212,17 @@ We have also already seen the definition of [True].  For a demonstration of a lo
  
    ]]
 
-   For now, we will leave the details of this proof about arithmetic to [crush]. *)
+   (** For now, we will leave the details of this proof about arithmetic to [crush]. *)
+   ここで，算術の残っていますが，[crush]を使います．*)
 
     crush.
 (* end thide *)
   Qed.
 
+(**
   (** A related notion to [False] is logical negation. *)
+  論理否定は[False]に関係のある概念です．
+*)
 
   (* begin hide *)
   Definition foo := not.
@@ -130,7 +234,13 @@ We have also already seen the definition of [True].  For a demonstration of a lo
       : Prop -> Prop
      ]]
 
-     We see that [not] is just shorthand for implication of [False].  We can use that fact explicitly in proofs.  The syntax [~ P] %(written with a tilde in ASCII)% expands to [not P]. *)
+(**
+     We see that [not] is just shorthand for implication of [False].  We can use that fact explicitly in proofs.  The syntax [~ P] %(written with a tilde in ASCII)% expands to [not P].
+*)
+上記で[not]は[False]への含意のことだとわかります．
+この事実を照明中に明示的に使用することもできます．
+[~ P]という文法（ASCII文字のチルダを使う）で[not P]と展開されます．
+ *)
 
   Theorem arith_neq' : ~ (2 + 2 = 5).
 (* begin thide *)
@@ -145,19 +255,33 @@ We have also already seen the definition of [True].  For a demonstration of a lo
 (* end thide *)
   Qed.
 
+(**
   (** We also have conjunction, which we introduced in the last chapter. *)
+*)
+
+(**
+先の章で導入した連言（「かつ」のこと）もまたあります．
+*)
 
   Print and.
 (** %\vspace{-.15in}%[[
     Inductive and (A : Prop) (B : Prop) : Prop :=  conj : A -> B -> A /\ B
   ]]
-  
+  (**
   The interested reader can check that [and] has a Curry-Howard equivalent called %\index{Gallina terms!prod}%[prod], the type of pairs.  However, it is generally most convenient to reason about conjunction using tactics.  An explicit proof of commutativity of [and] illustrates the usual suspects for such tasks.  The operator [/\] is an infix shorthand for [and]. *)
+興味を持った読者は [and] は [prod] （ペアの型）というカリーハワード同値を持つことを確かめられるでしょう．
+しかし，連言を証明するにはタクティクを使ってするのが最も便利です．
+[and] の可換性を明示的に証明することでそれが確認できます．
+[/\]演算子は[and]の中置略記です．
+*)
 
   Theorem and_comm : P /\ Q -> Q /\ P.
 
 (* begin thide *)
+(**
     (** We start by case analysis on the proof of [P /\ Q]. *)
+[P /\ Q] のケース分析からはじめます．
+*)
 
     destruct 1.
     (** [[
@@ -168,7 +292,12 @@ We have also already seen the definition of [True].  For a demonstration of a lo
    
    ]]
 
+(**
     Every proof of a conjunction provides proofs for both conjuncts, so we get a single subgoal reflecting that.  We can proceed by splitting this subgoal into a case for each conjunct of [Q /\ P].%\index{tactics!split}% *)
+連言の証明はそれぞれの連言肢の証明を含んでいます（ので仮定がPとQになりました）．
+それを反映したサブゴールができました．
+このサブゴール [Q /\ P] のそれぞれの連言肢のケースに分割することで証明を進めることができます．
+*)
 
     split.
 (** [[
@@ -185,14 +314,20 @@ subgoal 2 is
  
  ]]
 
+(**
  In each case, the conclusion is among our hypotheses, so the %\index{tactics!assumption}%[assumption] tactic finishes the process. *)
+それぞのケースで，結論は過程と同じですので，[assumption]タクティクで証明を完了します．
+*)
 
     assumption.
     assumption.
 (* end thide *)
   Qed.
 
+(**
   (** Coq disjunction is called %\index{Gallina terms!or}%[or] and abbreviated with the infix operator [\/]. *)
+Coqの選言は[or]という名前で，中置演算子[\/]で使えます．
+*)
 
   Print or.
 (** %\vspace{-.15in}%[[
@@ -200,12 +335,24 @@ subgoal 2 is
     or_introl : A -> A \/ B | or_intror : B -> A \/ B
 ]]
 
+(**
 We see that there are two ways to prove a disjunction: prove the first disjunct or prove the second.  The Curry-Howard analogue of this is the Coq %\index{Gallina terms!sum}%[sum] type.  We can demonstrate the main tactics here with another proof of commutativity. *)
+*)
+(**
+選言を証明する方法が2つあることがわかりました：1つめの連言肢を証明するか，2つめの連言肢を証明するかです．
+カリーハワード対応による類似物はCoqの[sum]型です．
+可換性をもう一度証明することで，主要なタクティクを実演しましょう．
+*)
 
   Theorem or_comm : P \/ Q -> Q \/ P.
 
 (* begin thide *)
+(**
     (** As in the proof for [and], we begin with case analysis, though this time we are met by two cases instead of one. *)
+*)
+(**
+[and]の証明のときと同様にケース分析から始めますが，今回はケースが2つあります．
+*)
 
     destruct 1.
 (** [[
@@ -221,12 +368,19 @@ subgoal 2 is
  
  ]]
 
+(**
  We can see that, in the first subgoal, we want to prove the disjunction by proving its second disjunct.  The %\index{tactics!right}%[right] tactic telegraphs this intent. *)
+ *)
+ (**
+ 最初のサブゴールにおいては，2つめの選言肢を証明することで（ゴールの）選言を証明したいのだとわかります．
+ [right]タクティクによってその意図を伝えることができます．
+ *)
 
     right; assumption.
-
+(**
     (** The second subgoal has a symmetric proof.%\index{tactics!left}%
-
+2つ目のサブゴールは対称的な証明を持ちます．
+*)
        [[
 1 subgoal
   
@@ -286,8 +440,15 @@ subgoal 2 is
 
 (* end hide *)
 
-
+(**
   (** It would be a shame to have to plod manually through all proofs about propositional logic.  Luckily, there is no need.  One of the most basic Coq automation tactics is %\index{tactics!tauto}%[tauto], which is a complete decision procedure for constructive propositional logic.  (More on what "constructive" means in the next section.)  We can use [tauto] to dispatch all of the purely propositional theorems we have proved so far. *)
+*)
+(**
+命題論理の全ての証明を手動でこつこつ進めないといけないというのは残念なことです．
+幸運なことに，その必要はありません．
+最も基本的なCoqの自動化タクティクの1つである[tauto]は，構成的な命題論理の完全な決定手続きです（「構成的」の意味については次の節でより詳しく説明します）．
+ここまで証明してきた純粋な命題論理の定理は[tauto]を使うことで片付けることができます．
+*)
 
   Theorem or_comm' : P \/ Q -> Q \/ P.
 (* begin thide *)
@@ -295,7 +456,16 @@ subgoal 2 is
 (* end thide *)
   Qed.
 
+(**
   (** Sometimes propositional reasoning forms important plumbing for the proof of a theorem, but we still need to apply some other smarts about, say, arithmetic.  The tactic %\index{tactics!intuition}%[intuition] is a generalization of [tauto] that proves everything it can using propositional reasoning.  When some further facts must be established to finish the proof, [intuition] uses propositional laws to simplify them as far as possible.  Consider this example, which uses the list concatenation operator %\coqdocnotation{%#<tt>#++#</tt>#%}% from the standard library. *)
+*)
+
+(**
+命題論理的な理由づけは定理の証明の重要な部品になることもたまにはありますが，他の知恵が必要になることもあります．例えば算術です．
+[intuition]タクティクは[tauto]の一般化で，命題論理的な推論で証明できる全てを証明できます．
+証明を完了させるのにさらに他の事実が必要な場合でも，[intuition]は命題の法則を使ってなるべく簡単にしてくれます．
+次の例を考えて下さい．ここでは標準ライブラリのリスト連結演算%\coqdocnotation{%#<tt>#++#</tt>#%}%を使っています．
+*)
 
   Theorem arith_comm : forall ls1 ls2 : list nat,
     length ls1 = length ls2 \/ length ls1 + length ls2 = 6
@@ -303,7 +473,14 @@ subgoal 2 is
 (* begin thide *)
     intuition.
 
+(**
     (** A lot of the proof structure has been generated for us by [intuition], but the final proof depends on a fact about lists.  The remaining subgoal hints at what cleverness we need to inject. *)
+*)
+
+(**
+多くの証明構造が[intuition]によって生成されますが，最終的な証明はリストに関する事実のみによっています．
+残りのサブゴールは人間が他にどんな知恵を入れなければならないかを示しています．
+*)
 
     (** [[
   ls1 : list nat
@@ -314,7 +491,10 @@ subgoal 2 is
  
    ]]
 
+(**
    We can see that we need a theorem about lengths of concatenated lists, which we proved last chapter and is also in the standard library. *)
+連結されたリストの長さについての定理が必要だとわかります．その定理については前の章でも証明したし，標準ライブラリにも含まれています．
+*)
 
     rewrite app_length.
     (** [[
@@ -326,13 +506,24 @@ subgoal 2 is
  
    ]]
 
+(**
    Now the subgoal follows by purely propositional reasoning.  That is, we could replace [length ls1 + length ls2 = 6] with [P] and [length ls1 = length ls2] with [Q] and arrive at a tautology of propositional logic. *)
+ここまで来たら，純粋な命題論理の推論でサブゴールは証明できます．
+すなわち，[length ls1 + length ls2 = 6]を[P]と考え，[length ls1 = length ls2]を[Q]と考えて命題論理のトートロジに到達します．
+*)
 
     tauto.
 (* end thide *)
   Qed.
 
+(**
   (** The [intuition] tactic is one of the main bits of glue in the implementation of [crush], so, with a little help, we can get a short automated proof of the theorem. *)
+*)
+
+(**
+[intuition]タクティクは[crush]の実装の主要なつなぎの1つです．
+そのため，少し助けることで定理に対する短くて自動化された証明を得ることができます．
+*)
 
 (* begin thide *)
   Theorem arith_comm' : forall ls1 ls2 : list nat,
@@ -346,11 +537,21 @@ subgoal 2 is
 
 End Propositional.
 
+(**
 (** Ending the section here has the same effect as always.  Each of our propositional theorems becomes universally quantified over the propositional variables that we used. *)
+*)
 
+(**
+セクションの終わりの意味はいつもと同じです．
+ここで定義した命題の定理は普遍的に量化されます．
+*)
 
+(**
 (** * What Does It Mean to Be Constructive? *)
+*)
+(** * 構成的とはどういうことか? *)
 
+(**
 (** One potential point of confusion in the presentation so far is the distinction between [bool] and [Prop].  The datatype [bool] is built from two values [true] and [false], while [Prop] is a more primitive type that includes among its members [True] and [False].  Why not collapse these two concepts into one, and why must there be more than two states of mathematical truth, [True] and [False]?
 
 The answer comes from the fact that Coq implements%\index{constructive logic}% _constructive_ or%\index{intuitionistic logic|see{constructive logic}}% _intuitionistic_ logic, in contrast to the%\index{classical logic}% _classical_ logic that you may be more familiar with.  In constructive logic, classical tautologies like [~ ~ P -> P] and [P \/ ~ P] do not always hold.  In general, we can only prove these tautologies when [P] is%\index{decidability}% _decidable_, in the sense of %\index{computability|see{decidability}}%computability theory.  The Curry-Howard encoding that Coq uses for [or] allows us to extract either a proof of [P] or a proof of [~ P] from any proof of [P \/ ~ P].  Since our proofs are just functional programs which we can run, a general %\index{law of the excluded middle}%law of the excluded middle would give us a decision procedure for the halting problem, where the instantiations of [P] would be formulas like "this particular Turing machine halts."
@@ -362,7 +563,43 @@ Hence the distinction between [bool] and [Prop].  Programs of type [bool] are co
 Constructive logic lets us define all of the logical connectives in an aesthetically appealing way, with orthogonal inductive definitions.  That is, each connective is defined independently using a simple, shared mechanism.  Constructivity also enables a trick called%\index{program extraction}% _program extraction_, where we write programs by phrasing them as theorems to be proved.  Since our proofs are just functional programs, we can extract executable programs from our final proofs, which we could not do as naturally with classical proofs.
 
 We will see more about Coq's program extraction facility in a later chapter.  However, I think it is worth interjecting another warning at this point, following up on the prior warning about taking the Curry-Howard correspondence too literally.  It is possible to write programs by theorem-proving methods in Coq, but hardly anyone does it.  It is almost always most useful to maintain the distinction between programs and proofs.  If you write a program by proving a theorem, you are likely to run into algorithmic inefficiencies that you introduced in your proof to make it easier to prove.  It is a shame to have to worry about such situations while proving tricky theorems, and it is a happy state of affairs that you almost certainly will not need to, with the ideal of extracting programs from proofs being confined mostly to theoretical studies. *)
+*)
 
+(**
+ここまで提示してきたことのなかで混乱しそうなことは，[bool]と[Prop]の区別です．
+[bool]というデータ型は[true]と[false]という2つの値から構成されていますが，[Prop]はより原始的な型で，[True]や[False]といった要素は[Prop]に含まれます．
+これら2つ（boolとProp）の概念を1つにまとめてしまってはどうでしょうか？
+また，[True]と[False]という2つの真偽状態以外が存在するとはどのようなことでしょうか？
+
+Coqは＿構成的＿あるいは＿直観主義的＿な論理学に基づいている，というとこから答えが出てきます．
+古典論理だったら，もっと馴染みがあったでしょうが．
+構成的な論理では，古典的な恒真命題すなわち[~ ~ P -> P]や[P \/ ~ P]は常には成り立ちません．
+一般的には，これらの恒真命題を証明できるのは[P]が計算可能性の理論でいう＿決定可能＿の場合のみです．
+Coqが使っている[or]のカリーハワード埋め込みによると，[P \/ ~ P]の証明から[P]の証明または[~ P]の証明が抽出できるということになります．
+我々の証明は実行可能なただの関数型プログラムなので，一般的な排中律を許してしまうと停止問題への決定手続きを与えることになってしまうのです．停止問題として例えば「このチューリングマシンは停止する」というようなものも選べます．
+
+同様の矛盾がある状況は全ての命題は[True]または[False]に評価されるとした倍にも発生します．
+Coqにおける評価は決定可能ですので，命題も決定可能なものに限ることにしています．
+
+ということで[bool]と[Prop]の区別があるのです．[bool]型のプログラムは作った時から計算的です・・・結果を決めるために実行することは常に可能です．
+多くの[Prop]は決定不能なので，[bool]に比べて[Prop]を使えばより表現力豊かに式を書くことができます．
+しかし，避けられない結末として，「真偽を確かめるために[Prop]を実行する」ことはできなくなってしまいます．
+
+構成的な論理によって全ての論理結合記号を審美的な魅力のある方法で定義できるようになります．
+直交した帰納的な定義です．
+すなわち，それぞれの結合記号は単純な共通の仕組みを使って独立に定義されます．
+構成的であることで，プログラム抽出ということもできるようになります．
+そこでは，プログラムを定理として記述して証明します．
+我々の証明はただの関数型プログラムなので，実行できるプログラムを最終的な証明から抽出できます．これは，古典的な証明からは自然に行うことはできませんでした．
+
+後の章でCoqのプログラム抽出機能についてもっと見ていきます．
+しかしここでひとつ注意をしておきましょう．先に注意したカリーハワード対応を文面通りに受け取りすぎることです．
+プログラムをCoqの定理証明を使って書くことはできますが，そんなことをする人はほぼいません．
+証明とプログラムの区別を常にしておくことは最も有用です．
+もしも定理を証明することでプログラムを書いてしまったら，おそらく，証明を簡単にするためにアルゴリズムが非効率的になってしまうでしょう．
+微妙な定理を証明してる時にそのような状況を心配しないといけないというのは恥ずかしいことです．ですが，おそらくそのような必要はありません．
+というのは，証明からプログラムを抽出するという理想は理論的な研究に限定されているからです．
+*)
 
 (** * First-Order Logic *)
 
