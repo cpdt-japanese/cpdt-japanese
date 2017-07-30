@@ -44,21 +44,14 @@ We can use a new command, %\index{Vernacular commands!Extraction}\index{program 
 
 Extraction pred.
 
-(** %\begin{verbatim}
+(** <<
 (** val pred : nat -> nat **)
 
 let pred = function
   | O -> O
   | S u -> u
-\end{verbatim}%
-
-#<pre>
-(** val pred : nat -> nat **)
-
-let pred = function
-  | O -> O
-  | S u -> u
-</pre># *)
+>>
+*)
 
 (** Returning 0 as the predecessor of 0 can come across as somewhat of a hack.  In some situations, we might like to be sure that we never try to take the predecessor of 0.  We can enforce this by giving [pred] a stronger, dependent type. *)
 
@@ -122,21 +115,15 @@ Let us now take a look at the OCaml code Coq generates for [pred_strong1]. *)
 
 Extraction pred_strong1.
 
-(** %\begin{verbatim}
+(** 
+<<
 (** val pred_strong1 : nat -> nat **)
 
 let pred_strong1 = function
   | O -> assert false (* absurd case *)
   | S n' -> n'
-\end{verbatim}%
-
-#<pre>
-(** val pred_strong1 : nat -> nat **)
-
-let pred_strong1 = function
-  | O -> assert false (* absurd case *)
-  | S n' -> n'
-</pre># *)
+>>
+*)
 
 (** The proof argument has disappeared!  We get exactly the OCaml code we would have written manually.  This is our first demonstration of the main technically interesting feature of Coq program extraction: proofs are erased systematically.
 
@@ -184,21 +171,14 @@ Eval compute in pred_strong2 (exist _ 2 two_gt0).
 
 Extraction pred_strong2.
 
-(** %\begin{verbatim}
+(**
+<<
 (** val pred_strong2 : nat -> nat **)
 
 let pred_strong2 = function
   | O -> assert false (* absurd case *)
   | S n' -> n'
-\end{verbatim}%
-
-#<pre>
-(** val pred_strong2 : nat -> nat **)
-
-let pred_strong2 = function
-  | O -> assert false (* absurd case *)
-  | S n' -> n'
-</pre>#
+>>
 
 We arrive at the same OCaml code as was extracted from [pred_strong1], which may seem surprising at first.  The reason is that a value of [sig] is a pair of two pieces, a value and a proof about it.  Extraction erases the proof, which reduces the constructor [exist] of [sig] to taking just a single argument.  An optimization eliminates uses of datatypes with single constructors taking single arguments, and we arrive back where we started.
 
@@ -235,21 +215,14 @@ By now, the reader is probably ready to believe that the new [pred_strong] leads
 
 Extraction pred_strong3.
 
-(** %\begin{verbatim}
+(**
+<<
 (** val pred_strong3 : nat -> nat **)
 
 let pred_strong3 = function
   | O -> assert false (* absurd case *)
   | S n' -> n'
-\end{verbatim}%
-
-#<pre>
-(** val pred_strong3 : nat -> nat **)
-
-let pred_strong3 = function
-  | O -> assert false (* absurd case *)
-  | S n' -> n'
-</pre>#
+>>
 
 We have managed to reach a type that is, in a formal sense, the most expressive possible for [pred].  Any other implementation of the same type must have the same input-output behavior.  However, there is still room for improvement in making this kind of code easier to write.  Here is a version that takes advantage of tactic-based theorem proving.  We switch back to passing a separate proof argument instead of using a subset type for the function's input, because this leads to cleaner code.  (Recall that [False_rec] is the [Set]-level induction principle for [False], which can be used to produce a value in any [Set] given a proof of [False].) *)
 
@@ -436,7 +409,8 @@ Note that the %\coqdocnotation{%#<tt>#Yes#</tt>#%}% and %\coqdocnotation{%#<tt>#
 
 Extraction eq_nat_dec.
 
-(** %\begin{verbatim}
+(**
+<<
 (** val eq_nat_dec : nat -> nat -> sumbool **)
 
 let rec eq_nat_dec n m =
@@ -447,7 +421,7 @@ let rec eq_nat_dec n m =
     | S n' -> (match m with
                  | O -> Right
                  | S m' -> eq_nat_dec n' m')
-\end{verbatim}%
+>>
 
 #<pre>
 (** val eq_nat_dec : nat -> nat -> sumbool **)
@@ -473,7 +447,8 @@ Defined.
 Extract Inductive sumbool => "bool" ["true" "false"].
 Extraction eq_nat_dec'.
 
-(** %\begin{verbatim}
+(**
+<<
 (** val eq_nat_dec' : nat -> nat -> bool **)
 
 let rec eq_nat_dec' n m0 =
@@ -484,20 +459,8 @@ let rec eq_nat_dec' n m0 =
     | S n0 -> (match m0 with
                  | O -> false
                  | S n1 -> eq_nat_dec' n0 n1)
-\end{verbatim}%
-
-#<pre>
-(** val eq_nat_dec' : nat -> nat -> bool **)
-
-let rec eq_nat_dec' n m0 =
-  match n with
-    | O -> (match m0 with
-              | O -> true
-              | S n0 -> false)
-    | S n0 -> (match m0 with
-                 | O -> false
-                 | S n1 -> eq_nat_dec' n0 n1)
-</pre># *)
+>>
+*)
 
 (** %\smallskip%
 
@@ -543,7 +506,8 @@ The [In_dec] function has a reasonable extraction to OCaml. *)
 Extraction In_dec.
 (* end thide *)
 
-(** %\begin{verbatim}
+(**
+<<
 (** val in_dec : ('a1 -> 'a1 -> bool) -> 'a1 -> 'a1 list -> bool **)
 
 let rec in_dec a_eq_dec x = function
@@ -552,18 +516,7 @@ let rec in_dec a_eq_dec x = function
       (match a_eq_dec x x' with
          | true -> true
          | false -> in_dec a_eq_dec x ls')
-\end{verbatim}%
-
-#<pre>
-(** val in_dec : ('a1 -> 'a1 -> bool) -> 'a1 -> 'a1 list -> bool **)
-
-let rec in_dec a_eq_dec x = function
-  | Nil -> false
-  | Cons (x', ls') ->
-      (match a_eq_dec x x' with
-         | true -> true
-         | false -> in_dec a_eq_dec x ls')
-</pre>#
+>>
 
 This is more or the less code for the corresponding function from the OCaml standard library. *)
 
@@ -792,7 +745,8 @@ The type checker also extracts to some reasonable OCaml code. *)
 
 Extraction typeCheck.
 
-(** %\begin{verbatim}
+(**
+<<
 (** val typeCheck : exp -> type0 maybe **)
 
 let rec typeCheck = function
@@ -824,41 +778,8 @@ let rec typeCheck = function
                               | true -> Found TBool
                               | false -> Unknown)
                        | false -> Unknown)))
-\end{verbatim}%
-
-#<pre>
-(** val typeCheck : exp -> type0 maybe **)
-
-let rec typeCheck = function
-  | Nat n -> Found TNat
-  | Plus (e1, e2) ->
-      (match typeCheck e1 with
-         | Unknown -> Unknown
-         | Found t1 ->
-             (match typeCheck e2 with
-                | Unknown -> Unknown
-                | Found t2 ->
-                    (match eq_type_dec t1 TNat with
-                       | true ->
-                           (match eq_type_dec t2 TNat with
-                              | true -> Found TNat
-                              | false -> Unknown)
-                       | false -> Unknown)))
-  | Bool b -> Found TBool
-  | And (e1, e2) ->
-      (match typeCheck e1 with
-         | Unknown -> Unknown
-         | Found t1 ->
-             (match typeCheck e2 with
-                | Unknown -> Unknown
-                | Found t2 ->
-                    (match eq_type_dec t1 TBool with
-                       | true ->
-                           (match eq_type_dec t2 TBool with
-                              | true -> Found TBool
-                              | false -> Unknown)
-                       | false -> Unknown)))
-</pre># *)
+>>
+*)
 
 (** %\smallskip%
 
