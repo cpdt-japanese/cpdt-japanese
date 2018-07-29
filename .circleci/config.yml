@@ -8,13 +8,50 @@ jobs:
       - checkout
       - run:
           shell: /bin/bash --login -eo pipefail
-          name: compile 
+          name: type check
           command: |
             make
+      - persist_to_workspace:
+          root: /tmp/cpdt
+          paths:
+              - src
+
+  make_doc:
+    working_directory: /tmp/cpdt
+    docker:
+      - image: eldesh/coq:8.5pl3
+    steps:
+      - checkout
+      - attach_workspace:
+          at: /tmp/cpdt/src
+      - run:
+          name: install texlive
+          command: |
+            sudo apt-get update -y
+            sudo apt-get install -y --no-install-recommends texlive-science texlive-lang-japanese texlive-latex-extra lmodern
+
+      - run:
+          shell: /bin/bash --login -eo pipefail
+          name: generate html
+          command: |
+            make html
+      - store_artifacts:
+          path: ./html
+
+      - run:
+          shell: /bin/bash --login -eo pipefail
+          name: generate pdf
+          command: |
+            make latex/cpdt.pdf
+      - store_artifacts:
+          path: ./latex/cpdt.pdf
 
 workflows:
   version: 2
   build_doc:
     jobs:
       - type_check
+      - make_doc:
+          requires:
+            - type_check
 
