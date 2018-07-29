@@ -8,7 +8,7 @@
  *)
 
 
-(** %\chapter{Some Quick Examples}% *)
+(** %\chapter{いくつかの手短かな例}% *)
 
 (**
 (** I will start off by jumping right in to a fully worked set of examples, building certified compilers from increasingly complicated source languages to stack machines.  We will meet a few useful tactics and see how they can be used in manual proofs, and we will also see how easily these proofs can be automated instead.  This chapter is not meant to give full explanations of the features that are employed.  Rather, it is meant more as an advertisement of what is possible.  Later chapters will introduce all of the concepts in bottom-up fashion.  In other words, it is expected that most readers will not understand what exactly is going on here, but I hope this demo will whet your appetite for the remaining chapters!
@@ -171,7 +171,8 @@ Fixpoint expDenote (e : exp) : nat :=
 To return to our test evaluations, we run the [Eval] command using the [simpl] evaluation strategy, whose definition is best postponed until we have learned more about Coq's foundations, but which usually gets the job done. *)
 *)
 (**
-これらの定義の性質の証明をする前に、テストができれば好都合です。コマンド %\index{Vernacular commands!Eval}%[Eval] を使っていくつかの例を評価し、私たちのセマンティクスがもっともらしいことを確かめてみましょう。このコマンドは%\index{簡約戦略}%「簡約戦略」(reduction strategy)、別の言葉で「評価順序」(order of evaluation)を表す引数を取ります。ML の先行評価や、Haskell の遅延評価とは違い、Coq ではこれらや他の様々な評価順序を選べます。これが可能なのはすべての Coq プログラムが停止するからです。実は、Coq は内部で上の [Fixpoint] で定義した関数の%\index{termination checking}%停止性をチェックしています。Coq は再帰呼び出しごとに引数のサイズが単調減少していることを見て、停止性を判断しています。さらに言うと、再帰呼び出しは [match] 式によって分割された元々の引数によって作られていないといけません。(In Chapter 7, we will see some ways of getting around this restriction, though simply removing the restriction would leave Coq useless as a theorem proving tool, for reasons we will start to learn about in the next chapter.)
+これらの定義の性質の証明をする前に、テストができれば好都合です。コマンド %\index{Vernacular commands!Eval}%[Eval] を使っていくつかの例を評価し、私たちのセマンティクスがもっともらしいことを確かめてみましょう。このコマンドは%\index{簡約戦略}%「簡約戦略」(reduction strategy)、別の言葉で「評価順序」(order of evaluation)を表す引数を取ります。ML の先行評価や、Haskell の遅延評価とは違い、Coq ではこれらや他の様々な評価順序を選べます。これが可能なのはすべての Coq プログラムが停止するからです。実は、Coq は内部で上の [Fixpoint] で定義した関数の%\index{termination checking}%停止性をチェックしています。Coq は再帰呼び出しごとに引数のサイズが単調減少していることを見て、停止性を判断しています。さらに言うと、再帰呼び出しは [match] 式によって分割された元々の引数によって作られていないといけません。
+(この制限を単順に削除するのはCoqを役に立たない定理証明ツールに変えてしまいます。この理由は次の章で学びます。第7章では、[Fixpoint]の制限に対処するためのいくつかの方法を見ます。)
 
 評価のテストをするために、評価戦略 [simpl] を使って [Eval] コマンドを実行しましょう。[simpl] の定義は Coq の基礎をもっと学むまで後回しにしますが、[simpl] は通常テストを終わらせてくれます。 *)
 
@@ -297,7 +298,7 @@ Eval simpl in progDenote (compile (Binop Times (Binop Plus (Const 2) (Const 2))
 (** We are ready to prove that our compiler is implemented correctly.  We can use a new vernacular command [Theorem] to start a correctness proof, in terms of the semantics we defined earlier:%\index{Vernacular commands!Theorem}% *)
 *)
 (**
-コンパイラが正しく実装されたことを証明しましょう。証明を始めるためには新たな Vernacula コマンド [Theorem] を使います。先ほど定義したセマンティクスを用いて変換の正しさを証明しましょう。%\index{Vernacular commands!Theorem}% *)
+コンパイラが正しく実装されたことを証明しましょう。証明を始めるためには新たな Vernacular コマンド [Theorem] を使います。先ほど定義したセマンティクスを用いて変換の正しさを証明しましょう。%\index{Vernacular commands!Theorem}% *)
 
 Theorem compile_correct : forall e, progDenote (compile e) nil = Some (expDenote e :: nil).
 (* begin thide *)
@@ -692,7 +693,8 @@ What we need is the associative law of list concatenation, which is available as
 
 ]]
 
-今必要なのは、リストの結合に関する結合律(associative law)です。これは標準ライブラリで定理 [app_assoc_reverse] として利用できます。%\index{Vernacular commands!Check}% (Here and elsewhere, it is possible to tell the difference between inputs and outputs to Coq by periods at the ends of the inputs.) *)
+今必要なのは、リストの結合に関する結合律(associative law)です。これは標準ライブラリで定理 [app_assoc_reverse] として利用できます。%\index{Vernacular commands!Check}% (Coqの入力か出力かは、最後にピリオドがあるかどうかで見分けられます。)
+*)
 
 Check app_assoc_reverse.
 (**
@@ -926,7 +928,7 @@ We are almost done.  The lefthand and righthand sides can be seen to match by si
 
 ]]
 
-ほとんどが終わりました。左辺と右辺はシンプルな記号的評価によって一致するように見えます。Coq は記号的評価によって同じ結果に正規化されるものはいつでも同じ項として見なします。[progDenote] の定義よりここでのケースも同様です。詳細は気にせずとも、%\index{tactics!reflexivity}%[reflexivity]% タクティクはこの正規化をし左辺と右辺が構文的に等しいことを確かめます。%\index{tactics!reflexivity}% *)
+ほとんどが終わりました。左辺と右辺はシンプルな記号的評価によって一致するように見えます。Coq は記号的評価によって同じ結果に正規化されるものはいつでも同じ項として見なします。[progDenote] の定義よりここでのケースも同様です。詳細は気にせずとも、%\index{tactics!reflexivity}%[reflexivity] タクティクはこの正規化をし左辺と右辺が構文的に等しいことを確かめます。%\index{tactics!reflexivity}% *)
 
   reflexivity.
 Qed.
@@ -992,9 +994,12 @@ The second restriction is not lifted by GADTs.  In ML and Haskell, indices of ty
 
 ML や Haskell は添字付けされた代数的データ型を持ちます。たとえば、ML や Haskell のリスト型はリストの要素の型によって添字付けられています。しかしながら、ML や Haskelll 98 は Coq に比べるとデータ型の定義に関して二つの大きな制限があります。
 
-First, the indices of the range of each data constructor must be type variables bound at the top level of the datatype definition.  There is no way to do what we did here, where we, for instance, say that [TPlus] is a constructor building a [tbinop] whose indices are all fixed at [Nat].  %\index{generalized algebraic datatypes}\index{GADTs|see{generalized algebraic datatypes}}% _Generalized algebraic datatypes_ (GADTs)%~\cite{GADT}% are a popular feature in %\index{GHC Haskell}%GHC Haskell, OCaml 4, and other languages that removes this first restriction.
+まず、各データコンストラクタの添字はそのデータ型の定義のトップレベルで束縛された型変数でなければいけません。
+たとえば、[TPlus]は添字がすべて[Nat]に固定された[tbinop]を構成するコンストラクタですが、ML や Haskell ではそのようなことができません。
+%\index{generalized algebraic datatypes}\index{GADTs|see{generalized algebraic datatypes}}% _Generalized algebraic datatypes_ (GADTs)%~\cite{GADT}% はこの制限をなくす、広く普及した機能で、%\index{GHC Haskell}%GHC Haskell、OCaml 4や、その他の言語で使用されます。
 
-二つ目の制限は GADTs でも制限されたままです。ML や Haskell では、型の添字は必ず型であって、[式]であってはいけません。Coq では、型は任意の Gallina 項により添字付けできます。型添字はプログラムと同じ領域に住むことができ、それらは通常のプログラムと同様に計算できます。Haskell supports a hobbled form of computation in type indices based on %\index{Haskell}%multi-parameter type classes, and recent extensions like type functions bring Haskell programming even closer to "real" functional programming with types, but, without dependent typing, there must always be a gap between how one programs with types and how one programs normally.
+二つ目の制限は GADTs でも制限されたままです。ML や Haskell では、型の添字は必ず型であって、[式]であってはいけません。Coq では、型は任意の Gallina 項により添字付けできます。型添字はプログラムと同じ領域に住むことができ、それらは通常のプログラムと同様に計算できます。
+Haskellは%\index{Haskell}multi-parameter type classesに基いた型添字の計算を制限付きでサポートしており、type functionのような近年の拡張はHaskellプログラミングを「現実の」型付き関数型プログラミングに近づけさえしましたが、依存型なしでは、型を使ってプログラミングすることと普通にプログラミングすることに常に必ずギャップが生まれます。
 *)
 
 (**
@@ -1039,10 +1044,13 @@ Definition tbinopDenote arg1 arg2 res (b : tbinop arg1 arg2 res)
 The same tricks suffice to define an expression denotation function in an unsurprising way.  Note that the [type] arguments to the [TBinop] constructor must be included explicitly in pattern-matching, but here we write underscores because we do not need to refer to those arguments directly. *)
 *)
 (**
-この関数は先ほど定義した表示関数と比べていくつか違いがあります。まず、[tbinop] は添字付けされた型なので、その添字は [tbinopDenote] の追加の引数になります。次に、*)
-(** This function has just a few differences from the denotation functions we saw earlier.  First, [tbinop] is an indexed type, so its indices become additional arguments to [tbinopDenote].  Second, we need to perform a genuine%\index{dependent pattern matching}% _dependent pattern match_, where the necessary _type_ of each case body depends on the _value_ that has been matched.  At this early stage, we will not go into detail on the many subtle aspects of Gallina that support dependent pattern-matching, but the subject is central to Part II of the book.
+この関数は先ほど定義した表示関数と比べていくつか違いがあります。まず、[tbinop] は添字付けされた型なので、その添字は [tbinopDenote] の追加の引数になります。
+次に、それぞれの場合分けでの[型]がマッチされる[値]に依存する場合には正銘の%\index{依存パターンマッチ}%[依存パターンマッチ]が必要です。
+ここでは依存パターンマッチを支援するGallinaのたくさんのうまい側面について詳細は述べませんが、このテーマは本書の第2部の中心となります。
 
-同じ手法により式の表示関数も自然に定義できます。[TBinop] コンストラクタの [type] 型の引数はパターンマッチの中で明示的に含めなければいけませんが、ここではそれらの引数を直接参照する必要はないのでアンダースコアを書きます。*)
+同じ仕組みにより、式の表示関数を自然な方法で定義できます。
+コンストラクタ[TBinop]の[type]型の引数はパターンマッチの中で明示的に含まなければいけませんが、ここではそれらの引数を直接参照する必要はないのでアンダースコアを書きます。
+*)
 
 Fixpoint texpDenote t (e : texp t) : typeDenote t :=
   match e with
@@ -1083,22 +1091,38 @@ Eval simpl in texpDenote (TBinop TLt (TBinop TPlus (TNConst 2) (TNConst 2))
 *)
 (**
 %\smallskip{}%今、コンパイルのための適切なスタックマシンを定義する準備ができました。*)
-(** %\smallskip{}%Now we are ready to define a suitable stack machine target for compilation. *)
 
 
 (** ** ターゲット言語 *)
 
+(**
 (** In the example of the untyped language, stack machine programs could encounter stack underflows and "get stuck."  This was unfortunate, since we had to deal with this complication even though we proved that our compiler never produced underflowing programs.  We could have used dependent types to force all stack machine programs to be underflow-free.
 
 For our new languages, besides underflow, we also have the problem of stack slots with naturals instead of bools or vice versa.  This time, we will use indexed typed families to avoid the need to reason about potential failures.
 
 We start by defining stack types, which classify sets of possible stacks. *)
+*)
+(**
+型無しの言語の例では、スタックマシーンプログラムはスタックアンダーフローを起こし動かなくなるかもしれません。私たちのコンパイラはアンダーフローするプログラムを生み出さないことを証明したにも関わらず、そのような複雑な状況を扱うのは好ましくありません。
+すべてのスタックマシーンプログラムにアンダーフローがないように強制するために依存型を使えたかもしれません。
+
+私たちの言語では、アンダーフローに加えて、ブール値ではなく自然数がスタックに入ったり、その逆が起きたりする問題があります。
+
+可能なスタックの集合を区別する、スタック型を定義することから始めます。
+*)
 
 Definition tstack := list type.
 
+(**
 (** Any stack classified by a [tstack] must have exactly as many elements, and each stack element must have the type found in the same position of the stack type.
 
 We can define instructions in terms of stack types, where every instruction's type tells us what initial stack type it expects and what final stack type it will produce. *)
+*)
+(**
+[tstack]で区別されるスタックは同じ数だけ要素を持ち、各スタックの要素はそのスタック型における同じ位置にある型を持たなければいけません。
+
+
+*)
 
 Inductive tinstr : tstack -> tstack -> Set :=
 | TiNConst : forall s, nat -> tinstr s (Nat :: s)
@@ -1107,7 +1131,10 @@ Inductive tinstr : tstack -> tstack -> Set :=
   tbinop arg1 arg2 res
   -> tinstr (arg1 :: arg2 :: s) (res :: s).
 
-(** Stack machine programs must be a similar inductive family, since, if we again used the [list] type family, we would not be able to guarantee that intermediate stack types match within a program. *)
+(** (** Stack machine programs must be a similar inductive family, since, if we again used the [list] type family, we would not be able to guarantee that intermediate stack types match within a program. *)*)
+(**
+もしここでも[list]型族を使ったら、中間的なスタック型がプログラムに合うことが保証されないので、スタックマシーンプログラムは必ず同様な帰納的なデータでなればいません。
+*)
 
 Inductive tprog : tstack -> tstack -> Set :=
 | TNil : forall s, tprog s s
@@ -1116,7 +1143,13 @@ Inductive tprog : tstack -> tstack -> Set :=
   -> tprog s2 s3
   -> tprog s1 s3.
 
+(**
 (** Now, to define the semantics of our new target language, we need a representation for stacks at runtime.  We will again take advantage of type information to define types of value stacks that, by construction, contain the right number and types of elements. *)
+*)
+(**
+新しいターゲット言語のセマンティクスを定義するために、ランタイムでのスタックの表現が必要です。正しい数と型を持つ要素を含む値のスタックの型を定義します。ここでも型の情報が役立ちます。
+この構成の仕方から、スタックは正しい数と型を持つ要素を含むようにスタック型が定義されます。
+*)
 
 Fixpoint vstack (ts : tstack) : Set :=
   match ts with
@@ -1124,9 +1157,26 @@ Fixpoint vstack (ts : tstack) : Set :=
     | t :: ts' => typeDenote t * vstack ts'
   end%type.
 
+(**
 (** This is another [Set]-valued function.  This time it is recursive, which is perfectly valid, since [Set] is not treated specially in determining which functions may be written.  We say that the value stack of an empty stack type is any value of type [unit], which has just a single value, [tt].  A nonempty stack type leads to a value stack that is a pair, whose first element has the proper type and whose second element follows the representation for the remainder of the stack type.  We write [%]%\index{notation scopes}\coqdocvar{%#<tt>#type#</tt>#%}% as an instruction to Coq's extensible parser.  In particular, this directive applies to the whole [match] expression, which we ask to be parsed as though it were a type, so that the operator [*] is interpreted as Cartesian product instead of, say, multiplication.  (Note that this use of %\coqdocvar{%#<tt>#type#</tt>#%}% has no connection to the inductive type [type] that we have defined.)
 
 This idea of programming with types can take a while to internalize, but it enables a very simple definition of instruction denotation.  Our definition is like what you might expect from a Lisp-like version of ML that ignored type information.  Nonetheless, the fact that [tinstrDenote] passes the type-checker guarantees that our stack machine programs can never go wrong.  We use a special form of [let] to destructure a multi-level tuple. *)
+*)
+(**
+新しい[Set]値関数です。
+今回は再帰関数です。[Set]はどの関数が書かれるかを決めるのに特別に扱われないため、完全に妥当です。
+この関数は、空のスタック型のスタック値は[unit]型の任意の値であると言っています。
+[unit]はただ一つの値[tt]を持つ型です。
+空でないスタック型はペアの値スタックを導きます。ペアの一つ目の要素は適切な型を持ち、二つ目の要素は残りのスタック型の表現に従います。
+[%]%\index{notation scopes}\coqdocvar{%#<tt>#type#</tt>#%}%と書いてCoqの拡張可能なパーサへある命令をしています。
+特に、この命令は[match]式全体にかかっていて、演算子[*]が乗算ではなくデカルト積として解釈されるようにその[match]式を型であるかのようにパースされるようにしています。
+(ここでの%\coqdocvar{%#<tt>#type#</tt>#%}%は先ほど定義した帰納的データ型[type]とはつながりはありません。)
+
+この、型を使ったプログラミングのアイデアは身につけるのにしばらくかかりますが、instruction denotationのとてもシンプルな定義を可能にします。
+私たちの定義は型情報を無視するLisp的なMLに期待するかもしれないものになっています。
+それにもかかわらず、[tinstrDenote]が型検査を通るという事実は、私たちのスタックマシーンプログラムは絶対にうまくいかなくなることがないということを保証します。
+multi-level tupleを分解するために、[let]の特殊な形を使います。
+*)
 
 Definition tinstrDenote ts ts' (i : tinstr ts ts') : vstack ts -> vstack ts' :=
   match i with
@@ -1137,6 +1187,7 @@ Definition tinstrDenote ts ts' (i : tinstr ts ts') : vstack ts -> vstack ts' :=
         ((tbinopDenote b) arg1 arg2, s')
   end.
 
+(**
 (** Why do we choose to use an anonymous function to bind the initial stack in every case of the [match]?  Consider this well-intentioned but invalid alternative version:
 [[
 Definition tinstrDenote ts ts' (i : tinstr ts ts') (s : vstack ts) : vstack ts' :=
@@ -1158,8 +1209,36 @@ The term "(n, s)" has type "(nat * vstack ts)%type"
 
 This and other mysteries of Coq dependent typing we postpone until Part II of the book.  The upshot of our later discussion is that it is often useful to push inside of [match] branches those function parameters whose types depend on the type of the value being matched.  Our later, more complete treatment of Gallina's typing rules will explain why this helps.
 *)
+*)
+(**
+なぜ[match]の各ケースで無名関数を使って初期のスタックを束縛したのでしょうか？　代わりに次を考えましょう：
+[[
+Definition tinstrDenote ts ts' (i : tinstr ts ts') (s : vstack ts) : vstack ts' :=
+  match i with
+    | TiNConst _ n => (n, s)
+    | TiBConst _ b => (b, s)
+    | TiBinop _ _ _ _ b =>
+      let '(arg1, (arg2, s')) := s in
+        ((tbinopDenote b) arg1 arg2, s')
+  end.
+]]
 
+Coqの型チェッカは以下のようなエラーを出力します：
+
+<<
+The term "(n, s)" has type "(nat * vstack ts)%type"
+ while it is expected to have type "vstack ?119".
+>>
+
+このようなCoqの依存型の型付けの奥深い箇所については2部で述べます。ここでの要点は、関数の引数の型がマッチする値の型に依存するときは、[match]の分岐の中にそれらの引数を入れるとしばしば役立つということです。後に、この理由はGallinaの型付け規則をより完全に取り扱うことで説明されます。
+*)
+
+(**
 (** We finish the semantics with a straightforward definition of program denotation. *)
+*)
+(**
+プログラムの表示の直接的な定義によってセマンティクスを終えます。
+*)
 
 Fixpoint tprogDenote ts ts' (p : tprog ts ts') : vstack ts -> vstack ts' :=
   match p with
@@ -1167,12 +1246,21 @@ Fixpoint tprogDenote ts ts' (p : tprog ts ts') : vstack ts -> vstack ts' :=
     | TCons _ _ _ i p' => fun s => tprogDenote p' (tinstrDenote i s)
   end.
 
+(**
 (** The same argument-postponing trick is crucial for this definition. *)
+*)
+(**
+この定義でも引数を[match]の中に入れるテクニックが重要となります。
+*)
 
+(** ** 翻訳 *)
 
-(** ** Translation *)
-
+(**
 (** To define our compilation, it is useful to have an auxiliary function for concatenating two stack machine programs. *)
+*)
+(**
+コンパイルを定義するために、二つのスタックマシーンプログラムを結合する補助関数が有用になります。
+*)
 
 Fixpoint tconcat ts ts' ts'' (p : tprog ts ts') : tprog ts' ts'' -> tprog ts ts'' :=
   match p with
@@ -1180,7 +1268,12 @@ Fixpoint tconcat ts ts' ts'' (p : tprog ts ts') : tprog ts' ts'' -> tprog ts ts'
     | TCons _ _ _ i p1 => fun p' => TCons i (tconcat p1 p')
   end.
 
+(**
 (** With that function in place, the compilation is defined very similarly to how it was before, modulo the use of dependent typing. *)
+*)
+(**
+この関数によって、コンパイル関数は依存型を使う前とよく似た形で定義されます。
+*)
 
 Fixpoint tcompile t (e : texp t) (ts : tstack) : tprog ts (t :: ts) :=
   match e with
@@ -1190,9 +1283,25 @@ Fixpoint tcompile t (e : texp t) (ts : tstack) : tprog ts (t :: ts) :=
       (tconcat (tcompile e1 _) (TCons (TiBinop _ b) (TNil _)))
   end.
 
+(**
 (** One interesting feature of the definition is the underscores appearing to the right of [=>] arrows.  Haskell and ML programmers are quite familiar with compilers that infer type parameters to polymorphic values.  In Coq, it is possible to go even further and ask the system to infer arbitrary terms, by writing underscores in place of specific values.  You may have noticed that we have been calling functions without specifying all of their arguments.  For instance, the recursive calls here to [tcompile] omit the [t] argument.  Coq's _implicit argument_ mechanism automatically inserts underscores for arguments that it will probably be able to infer.  Inference of such values is far from complete, though; generally, it only works in cases similar to those encountered with polymorphic type instantiation in Haskell and ML.
 
 The underscores here are being filled in with stack types.  That is, the Coq type inferencer is, in a sense, inferring something about the flow of control in the translated programs.  We can take a look at exactly which values are filled in: *)
+*)
+(**
+この定義の中の一つの面白い特徴は、矢印[=>]の右に現れるアンダースコアです。
+HaskellやMLのプログラマーは多相的な値の型パラメータを推論するコンパイラに非常になじみがあるでしょう。
+Coqではさらに踏み込んで、特定の値の位置にアンダースコアを書くことで任意の項に対しそれを推論するようにシステムに尋ねることが可能です。
+これまでの定義で引数をすべては与えずに関数を呼び出していることに読者のみなさんは気付いているかもしれません。
+たとえば、[tcompile]の再帰呼び出しは引数[t]を省略しています。
+Coqの_implicit argument_のメカニズムは推論ができるかもしれない引数に対して自動でアンダースコアを挿入します。
+しかしそのような値の推論は完全からほど遠いです。
+一般に、HaskellやMLの多層型instantiationに似た場合でしか機能しません。
+
+ここでのアンダースコアはスタックの型が入ります。
+つまり、Coqの型推論器は翻訳されたプログラムの制御フローについてのものを推論していると言えます。
+以下のようにして、何の値が入っているか確認できます：
+*)
 
 Print tcompile.
 (** %\vspace{-.15in}%[[
@@ -1212,7 +1321,10 @@ fix tcompile (t : type) (e : texp t) (ts : tstack) {struct e} :
 *)
 
 
-(** We can check that the compiler generates programs that behave appropriately on our sample programs from above: *)
+(**(** We can check that the compiler generates programs that behave appropriately on our sample programs from above: *)*)
+(**
+上から、適切に振舞うプログラムをコンパイラが生成することを確認できます：
+*)
 
 Eval simpl in tprogDenote (tcompile (TNConst 42) nil) tt.
 (** [= (42, tt) : vstack (Nat :: nil)] *)
@@ -1232,12 +1344,14 @@ Eval simpl in tprogDenote (tcompile (TBinop TLt (TBinop TPlus (TNConst 2) (TNCon
   (TNConst 7)) nil) tt.
 (** [= (true, tt) : vstack (Bool :: nil)] *)
 
-(** %\smallskip{}%The compiler seems to be working, so let us turn to proving that it _always_ works. *)
+(**(** %\smallskip{}%The compiler seems to be working, so let us turn to proving that it _always_ works. *)*)
+(** %\smallskip{}%コンパイラは動いているように見えるので、[常に]正しく動くことを証明しましょう。 *)
 
 
-(** ** Translation Correctness *)
+(** ** 翻訳の正しさ *)
 
-(** We can state a correctness theorem similar to the last one. *)
+(** (** We can state a correctness theorem similar to the last one. *)*)
+(** 前回と同様な正しさの定理を主張します。 *)
 
 Theorem tcompile_correct : forall t (e : texp t),
   tprogDenote (tcompile e nil) tt = (texpDenote e, tt).
@@ -1246,18 +1360,28 @@ Abort.
 (* end hide *)
 (* begin thide *)
 
-(** Again, we need to strengthen the theorem statement so that the induction will go through.  This time, to provide an excuse to demonstrate different tactics, I will develop an alternative approach to this kind of proof, stating the key lemma as: *)
+(**(** Again, we need to strengthen the theorem statement so that the induction will go through.  This time, to provide an excuse to demonstrate different tactics, I will develop an alternative approach to this kind of proof, stating the key lemma as: *)*)
+(**
+帰納法がうまくいくように定理の主張を強くする必要がまたあります。
+今回は別のタクティクを見せるために、以下の補題を使って、このような種類の証明に対する代わりのアプローチを取ります。
+*)
 
 Lemma tcompile_correct' : forall t (e : texp t) ts (s : vstack ts),
   tprogDenote (tcompile e ts) s = (texpDenote e, s).
 
-(** While lemma [compile_correct'] quantified over a program that is the "continuation"%~\cite{continuations}% for the expression we are considering, here we avoid drawing in any extra syntactic elements.  In addition to the source expression and its type, we also quantify over an initial stack type and a stack compatible with it.  Running the compilation of the program starting from that stack, we should arrive at a stack that differs only in having the program's denotation pushed onto it.
+(**(** While lemma [compile_correct'] quantified over a program that is the "continuation"%~\cite{continuations}% for the expression we are considering, here we avoid drawing in any extra syntactic elements.  In addition to the source expression and its type, we also quantify over an initial stack type and a stack compatible with it.  Running the compilation of the program starting from that stack, we should arrive at a stack that differs only in having the program's denotation pushed onto it.
 
-   Let us try to prove this theorem in the same way that we settled on in the last section. *)
+   Let us try to prove this theorem in the same way that we settled on in the last section. *)*)
+(**
+補題[compile_correct']は私たちが考えている式の「継続」%~\cite{continuations}%であるようなプログラム上に量化されていますが、ここではwe avoid drawing in any extra syntactic elements.
+ソース言語の式とその方に加えて、初めのスタック型とそれに適合するスタックを量化します。
+そのスタックから始まるプログラムのコンパイルをすると、その上にプログラムの表示的意味がプッシュされたスタックを得ます。
+
+      前節と同じ方法でこの定理を証明しましょう。*)
 
   induction e; crush.
 
-(** We are left with this unproved conclusion:
+(**(** We are left with this unproved conclusion:
 
 [[
 tprogDenote
@@ -1269,6 +1393,21 @@ tprogDenote
 ]]
 
 We need an analogue to the [app_assoc_reverse] theorem that we used to rewrite the goal in the last section.  We can abort this proof and prove such a lemma about [tconcat].
+*)*)
+(**
+次の未証明の結論が残されました。
+
+[[
+tprogDenote
+     (tconcat (tcompile e2 ts)
+        (tconcat (tcompile e1 (arg2 :: ts))
+           (TCons (TiBinop ts t) (TNil (res :: ts))))) s =
+   (tbinopDenote t (texpDenote e1) (texpDenote e2), s)
+
+]]
+
+前節でゴールを書き換えるのに使った定理[app_assoc_reverse]の類似物が必要です。
+証明を中止して[tconcat]についてのそのような補題を証明します。
 *)
 
 Abort.
@@ -1280,22 +1419,44 @@ Lemma tconcat_correct : forall ts ts' ts'' (p : tprog ts ts') (p' : tprog ts' ts
   induction p; crush.
 Qed.
 
+(**
 (** This one goes through completely automatically.
 
 Some code behind the scenes registers [app_assoc_reverse] for use by [crush].  We must register [tconcat_correct] similarly to get the same effect:%\index{Vernacular commands!Hint Rewrite}% *)
+*)
+(**
+これは完全に自動で証明されます。
+
+裏であるコードは[app_assoc_reverse]を[crush]のために登録しています。
+同じ効果を得るために、同様に[tconcat_correct]を登録しなければいけません：%\index{Vernacular  commands!Hint Rewrite}%
+*)
 
 Hint Rewrite tconcat_correct.
 
+(**
 (** Here we meet the pervasive concept of a _hint_.  Many proofs can be found through exhaustive enumerations of combinations of possible proof steps; hints provide the set of steps to consider.  The tactic [crush] is applying such brute force search for us silently, and it will consider more possibilities as we add more hints.  This particular hint asks that the lemma be used for left-to-right rewriting.
 
 Now we are ready to return to [tcompile_correct'], proving it automatically this time. *)
+*)
+(**
+ここで、[ヒント]という有用な概念を学びましょう。
+たくさんの証明は可能な証明ステップの組み合わせの徹底的な列挙によって発見されます。
+ヒントは考えるべきステップの集合を与えます。
+タクティク[crush]はそのようなしらみつぶし探索を暗黙で適用し、ヒントに与えた以上の可能性を考えます。
+この[Hint Rewrite tconcat_correct]は補題[tconcat_correct]を左から右への書換に使うようにヒントとして与えています。
+
+これで、[tcompile_correct']に戻って自動で証明する準備ができました。
+*)
 
 Lemma tcompile_correct' : forall t (e : texp t) ts (s : vstack ts),
   tprogDenote (tcompile e ts) s = (texpDenote e, s).
   induction e; crush.
 Qed.
 
-(** We can register this main lemma as another hint, allowing us to prove the final theorem trivially. *)
+(** (** We can register this main lemma as another hint, allowing us to prove the final theorem trivially. *)*)
+(**
+この主補題を新しいヒントとして登録し、最後の定理を自明に証明することができます。
+*)
 
 Hint Rewrite tcompile_correct'.
 
@@ -1305,10 +1466,20 @@ Theorem tcompile_correct : forall t (e : texp t),
 Qed.
 (* end thide *)
 
+(**
 (** It is probably worth emphasizing that we are doing more than building mathematical models.  Our compilers are functional programs that can be executed efficiently.  One strategy for doing so is based on%\index{program extraction}% _program extraction_, which generates OCaml code from Coq developments.  For instance, we run a command to output the OCaml version of [tcompile]:%\index{Vernacular commands!Extraction}% *)
+*)
+(**
+ここで、私たちは数学的モデルを構築する以上のことをしています。
+私たちのコンパイラは効率的に実行できる関数型プログラムです。
+
+そのようにする一つの戦略は、CoqコードからOCamlコードを生成する、[プログラム抽出]%\index{program extraction}%に基きます。
+たとえば、OCaml版の[tcompile]を出力するためのコマンドを実行しましょう：%\index{Vernacular commands!Extraction}%
+*)
 
 Extraction tcompile.
 
+(**
 (** <<
 let rec tcompile t e ts =
   match e with
@@ -1329,3 +1500,28 @@ let rec tcompile t e ts =
 We can compile this code with the usual OCaml compiler and obtain an executable program with halfway decent performance.
 
 This chapter has been a whirlwind tour through two examples of the style of Coq development that I advocate.  Parts II and III of the book focus on the key elements of that style, namely dependent types and scripted proof automation, respectively.  Before we get there, we will spend some time in Part I on more standard foundational material.  Part I may still be of interest to seasoned Coq hackers, since I follow the highly automated proof style even at that early stage. *)
+*)
+(** <<
+let rec tcompile t e ts =
+  match e with
+  | TNConst n ->
+    TCons (ts, (Cons (Nat, ts)), (Cons (Nat, ts)), (TiNConst (ts, n)), (TNil
+      (Cons (Nat, ts))))
+  | TBConst b ->
+    TCons (ts, (Cons (Bool, ts)), (Cons (Bool, ts)), (TiBConst (ts, b)),
+      (TNil (Cons (Bool, ts))))
+  | TBinop (t1, t2, t0, b, e1, e2) ->
+    tconcat ts (Cons (t2, ts)) (Cons (t0, ts)) (tcompile t2 e2 ts)
+      (tconcat (Cons (t2, ts)) (Cons (t1, (Cons (t2, ts)))) (Cons (t0, ts))
+        (tcompile t1 e1 (Cons (t2, ts))) (TCons ((Cons (t1, (Cons (t2,
+        ts)))), (Cons (t0, ts)), (Cons (t0, ts)), (TiBinop (t1, t2, t0, ts,
+        b)), (TNil (Cons (t0, ts))))))
+>>
+
+このコードは普段使うOCamlのコンパイラでコンパイでき、そこそこ良いパフォーマンスの実行可能プログラムが得られます。
+
+この章は筆者の提案するCoq開発のスタイルの二つの例を紹介するあわただしい案内でした。
+この本の第2部と第3部はこのスタイルの主要素、依存型とscripted proof automationにそれぞれ焦点を当てます。
+それらの前に、第1部ではより標準的な基礎的題材について触れます。
+第1部の早い段階から強い自動証明のスタイルを取るので、経験抱負なCoqハッカーにも第1部は興味深いかもしれません。
+*)
