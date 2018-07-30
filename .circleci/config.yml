@@ -15,6 +15,7 @@ jobs:
           root: /tmp/cpdt
           paths:
               - src
+              - latex
 
   make_doc:
     working_directory: /tmp/cpdt
@@ -23,7 +24,7 @@ jobs:
     steps:
       - checkout
       - attach_workspace:
-          at: /tmp/cpdt/src
+          at: /tmp/cpdt
       - run:
           name: install texlive
           command: |
