@@ -4,10 +4,10 @@ jobs:
     working_directory: /tmp/cpdt
     docker:
       - image: eldesh/coq:8.5pl3
+    shell: /bin/bash --login -eo pipefail
     steps:
       - checkout
       - run:
-          shell: /bin/bash --login -eo pipefail
           name: type check
           command: |
             make
@@ -21,6 +21,7 @@ jobs:
     working_directory: /tmp/cpdt
     docker:
       - image: eldesh/coq:8.5pl3
+    shell: /bin/bash --login -eo pipefail
     steps:
       - checkout
       - attach_workspace:
@@ -32,7 +33,6 @@ jobs:
             sudo apt-get install -y --no-install-recommends texlive-science texlive-lang-japanese texlive-latex-extra lmodern
 
       - run:
-          shell: /bin/bash --login -eo pipefail
           name: generate html
           command: |
             make html
@@ -40,7 +40,6 @@ jobs:
           path: ./html
 
       - run:
-          shell: /bin/bash --login -eo pipefail
           name: generate pdf
           command: |
             make latex/cpdt.pdf
