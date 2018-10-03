@@ -7,112 +7,107 @@
  *   http://creativecommons.org/licenses/by-nc-nd/3.0/
  *)
 
-(** %\chapter{Introduction}% *)
+(**
+(*%\chapter{Introduction}%*)
+%\chapter{イントロダクション}%
+*)
 
-
-(** * Whence This Book? *)
+(** 
+(* * Whence This Book? *)
+* 本書の生い立ち
+*)
 
 (**
 
 (*We would all like to have programs check that our programs are correct.  Due in no small part to some bold but unfulfilled promises in the history of computer science, today most people who write software, practitioners and academics alike, assume that the costs of formal program verification outweigh the benefits.  The purpose of this book is to convince you that the technology of program verification is mature enough today that it makes sense to use it in a support role in many kinds of research projects in computer science.  Beyond the convincing, I also want to provide a handbook on practical engineering of certified programs with the Coq proof assistant.  Almost every subject covered is also relevant to interactive computer theorem-proving in general, such as for traditional mathematical theorems.  In fact, I hope to demonstrate how verified programs are useful as building blocks in all sorts of formalizations.*)
-書いた(*our*)プログラムが正しいことを検査してくれるプログラムが欲しいものです. 
-今日ソフトウェアを書く人々のほとんどが, 
-実践者であるか学者かにかかわらず, 
-形式的プログラム検証のコストが利益を
-上まわってしまう(*outweigh*)ときめつけて(*assume*)います.
-計算機科学の歴史においてかつて語られ, そして失敗した,
-いくつかの強気な展望(*bold promises*)が, このきめつけの少なからぬ原因となっています. 
-本書の目的は, 
-プログラム検証の技術が十分成熟したものであり,
-計算機科学の各種研究プロジェクトの補助として用いる意味があるということを,
-あなたに納得してもらうことです. 
-また, 納得を与えるにとどまらず, 認証されたプログラム(*certified program*)を実用的にエンジニアリングするための手引き書を提供することも私の望みです. 
+
+プログラムの正しさは、プログラムに検査させたいものです。
+実務に携わっている人であれ研究者であれ、
+現在ソフトウェアを書いている人のなかには、
+形式的プログラム検証にかかるコストは利益に見合わないものであると思い込んでいる人がかなり多くいます。
+その思い込みの少なからぬ原因は、
+かつて計算機科学の歴史において約束されながらいまだ成就していない大言壮語の数々にあるのでしょう。
+プログラム検証の技術について言えば、いまや十分に成熟しており、
+計算機科学の各種研究プロジェクトの支援に活用できるものになっています。
+それを納得してもらうのが本書の目的です。
+納得してもらうだけでなく、定理証明支援器Coqを使って認証されたプログラムを工学的に応用するために必要な手引き書となることも目指しています。
 (* ノート(才川): すぐ後でcertified, certification, certificate, provingなどが
    微妙に違う意味で用いられるので, certifyの訳語を認証するとして統一的に訳してみた. 
    これは20161129時点での訳語集と反する（certifiedを証明付きと訳すことになっている）
    のでいずれ調整が必要になる. *)
-本書のあつかう主題のほとんどは, 伝統的な数学の定理の扱いなどを含む, 計算機による対話的な定理証明一般と関係のあるものです. 
-実際に私は, 検証されたプログラムが, 
-あらゆる種類の形式化における構成要素として役にたつのだということを, 
-実証してみせたいと考えています. 
+本書のほとんどすべての題材は、計算機による対話的な定理証明全般にも関係しています。
+そのなかには伝統的な数学の定理を対象にした内容も含まれます。
+筆者には、あらゆる種類の形式化にとって検証されたプログラムが部品となることを本書を通じて実証してみせたいという思いもあります。
 
 (*Research into mechanized theorem proving began in the second half of the 20th century, and some of the earliest practical work involved Nqthm%~\cite{Nqthm}\index{Nqthm}%, the "Boyer-Moore Theorem Prover," which was used to prove such theorems as correctness of a complete hardware and software stack%~\cite{Piton}%.  ACL2%~\cite{CAR}\index{ACL2}%, Nqthm's successor, has seen significant industry adoption, for instance, by AMD to verify correctness of floating-point division units%~\cite{AMD}%.*)
-機械化された(*mechanized*)定理証明の研究は20世紀後半に始まりました. 
-最初期の実用的な成果(*work*)の一つに, 「Boyer-Moore定理証明器」Nqthm%~\cite{Nqthm}\index{Nqthm}%があります. 
-これはハードウェアとソフトウェア両方の層(*stack*)にわたる正しさを定理として証明する目的などに用いられました%~\cite{Piton}%. 
-Nqthmの後継であるACL2%~\cite{CAR}\index{ACL2}%は産業界で顕著に受けいれられ,  
-例えばAMDによって浮動小数除算の正しさを保証するために用いられました%~\cite{AMD}%. 
+
+機械化された定理証明（mechanized theorem proving）の研究は、20世紀後半に始まりました。
+最初期の実用的な成果のいくつかは、「Boyer-Moore定理証明器」Nqthm%~\cite{Nqthm}\index{Nqthm}%に関与するものでした。
+Boyer-Moore定理証明器は、ハードウェアとソフトウェアの全体に対する正しさのような定理を証明するために用いられたものです%~\cite{Piton}%。
+Nqthmの後継にあたるACL2%~\cite{CAR}\index{ACL2}%は、
+AMD社によって浮動小数除算ユニットの正しさの検証に用いられるなど、産業界で重用されています%~\cite{AMD}%。
 
 (*Around the beginning of the 21st century, the pace of progress in practical applications of interactive theorem proving accelerated significantly.  Several well-known formal developments have been carried out in Coq, the system that this book deals with.  In the realm of pure mathematics, Georges Gonthier built a machine-checked proof of the four-color theorem%~\cite{4C}%, a mathematical problem first posed more than a hundred years before, where the only previous proofs had required trusting ad-hoc software to do brute-force checking of key facts.  In the realm of program verification, Xavier Leroy led the CompCert project to produce a verified C compiler back-end%~\cite{CompCert}% robust enough to use with real embedded software.*)
-21世紀初頭に対話的定理証明の実用的用法は著しく加速しつつ発展しました. 
-幾つかのよく知られた形式的開発が, 本書の扱うシステムであるCoqを用いて行われました. 
-純粋数学の領域(*realm*)においては, Georges Gonthierが
-四色定理の機械的に検査された(*machine-checked*)証明を構築しました%~\cite{4C}%. 
-四色定理は百年以上前に提示された数学の問題で,
-これまでに得られていた証明は,
-鍵となる事実を総当たりで確かめるための
-場当たり的なソフトウェアを信用しなければならないものでした. 
-プログラム検証(*program verification*)の領域においては, 
-Xavier LeroyがCompCertプロジェクトを主導し, 
-本物の組み込みソフトウェアで使うのに十分な堅牢さを持つ, 
-検証された(*verified*)Cコンパイラバックエンドを
-作り上げ(*produce*)ました%~\cite{CompCert}%. 
+
+21世紀初頭になると、対話的な定理証明の応用が大きく加速しました。
+本書で説明するCoqを利用した形式的開発の事例がいくつも知られています。
+純粋数学の分野では、Georges Gonthierにより、四色定理に対する機械的に検査された証明（machine-checked proof）が構築されました%~\cite{4C}%。
+四色定理は百年以上前に提示された数学の問題です。
+四色定理に対してそれまでに得られていた唯一の証明では、
+鍵となる事実を総当たりで確かめるために使っていた場当たり的なソフトウェアの正しさを前提としていました。
+プログラム検証（program verification）の分野では、
+Xavier Leroyの主導によるCompCertプロジェクトにおいて、
+現実の組み込みソフトウェアでの利用に耐えるだけの堅牢性を備える
+検証されたCコンパイラのバックエンドが作り上げられました%~\cite{CompCert}%。
 
 (*Many other recent projects have attracted attention by proving important theorems using computer proof assistant software.  For instance, the L4.verified project%~\cite{seL4}% led by Gerwin Klein has given a mechanized proof of correctness for a realistic microkernel, using the Isabelle/HOL proof assistant%~\cite{Isabelle/HOL}\index{Isabelle/HOL}%.  The amount of ongoing work in the area is so large that I cannot hope to list all the recent successes, so from this point I will assume that the reader is convinced both that we ought to want machine-checked proofs and that they seem to be feasible to produce.  (To readers not yet convinced, I suggest a Web search for "machine-checked proof"!)*)
-他にも近頃多くのプロジェクトが, 計算機による証明支援系ソフトウェアを用いて
-重要な定理の証明を行い, 注目を集めています. 
-例えばGerwin Kleinが主導するL4.verifiedプロジェクト%~\cite{seL4}%は, 
-現実的なマイクロカーネルの正しさを,
-証明支援系Isabelle/HOL%~\cite{Isabelle/HOL}\index{Isabelle/HOL}%を用いて
-機械的に証明しました. 
-この分野における進行中の事業は数多くあり,
-最近の成功例を全てを挙げることはほぼ不可能です. 
-従ってこれ以降, 機械的に検査された証明を追求すべきであることと, 
-それを作り出すことがどうやら可能であるということについて,
-読者は納得したという仮定をすることにしたいと思います. 
-(まだ納得していない読者には, "machine-checked proof"でWebを検索することをお勧めします.)
+
+それ以外にも、重要な定理を計算機証明支援系ソフトウェアで証明することで注目を集めている最近のプロジェクトはたくさんあります。
+例えば、Gerwin Kleinが主導するL4.verifiedプロジェクト%~\cite{seL4}%では、
+証明支援系Isabelle/HOL%~\cite{Isabelle/HOL}\index{Isabelle/HOL}%を用いることで、
+現実的なマイクロカーネルの正しさを機械的に証明しました。
+機械的に検査された証明（machine-checked proof）に関しては、
+あまりにも多くのプロジェクトが進行中であり、
+最近の成功例をすべて挙げることはほぼ不可能です。
+ここでは、機械的に検査された証明があると嬉しいこと、
+そして、そのような証明を得ることが可能らしいことについて、
+読者に十分に納得してもらえたものとして先に進みます
+（まだ納得できない読者には、「machine-checked proof」でWebを検索することをお勧めします）。
 
 (*The idea of %\index{certified program}% _certified program_ features prominently in this book's title.  Here the word "certified" does _not_ refer to governmental rules for how the reliability of engineered systems may be demonstrated to sufficiently high standards.  Rather, this concept of certification, a standard one in the programming languages and formal methods communities, has to do with the idea of a _certificate_, or formal mathematical artifact proving that a program meets its specification.  Government certification procedures rarely provide strong mathematical guarantees, while certified programming provides guarantees about as strong as anything we could hope for.  We trust the definition of a foundational mathematical logic, we trust an implementation of that logic, and we trust that we have encoded our informal intent properly in formal specifications, but few other opportunities remain to certify incorrect software.  For compilers and other programs that run in batch mode, the notion of a %\index{certifying program}% _certifying_ program is also common, where each run of the program outputs both an answer and a proof that the answer is correct.  Any certifying program can be composed with a proof checker to produce a certified program, and this book focuses on the certified case, while also introducing principles and techniques of general interest for stating and proving theorems in Coq.*)
-本書のタイトルでは%\index{認証されたプログラム(certified program)}%＿認証されたプログラム＿という考えがはっきりと打ち出されています.
-「認証された」という語が意味するものは政府の規則＿ではありません＿. 
-つまり作り上げられた(*engineered*)システムの信頼性が十分厳しい規格に従うことを, 
-どのように実証する(*demonstrate*)か定めた規則のことを言うのではありません. 
-そうではなく, この認証(*certification*)という概念は,
-プログラミング言語や形式手法のコミュニティでは標準的に, 
-＿認証書＿(*certificate*)の考えと関連づけられます.
-認証書とは, 言いかえると形式的で数学的な産物であり,
-プログラムが仕様に合っていることを証明するものです. 
+
+_[認証されたプログラム]_（certified program%\index{認証されたプログラム}%）という考え方は、本書のタイトルにも明示されています。
+この「認証された」という語が意味しているのは、
+工学的なシステムの信頼性を示すために政府によって設定されるような規格に準拠するという話
+_[ではありません]_。
+ここでいう「認証された」という概念は、プログラミング言語や形式手法のコミュニティにおいては、
+むしろ「証明書」（certificate）という考え方に関係しています。
+つまり、プログラムが仕様に則していることを形式的で数学的に証明するものというわけです。
 (* ノート(才川): certified, certification, certificate, proveなどの
    訳語調整しないと何言ってるのかわかりにくくなっている.
    あるいは思いきった意訳が必要かも. *)
-政府の認証手続きが強い数学的な保証を与えることはほとんどありませんが,  
-認証されたプログラムを書くことは,
-われわれの望むような保証をほとんどいくらでも強く与えてくれます. 
-基礎的な数理論理学を信頼し, その論理の実装のどれかを信頼し,
-そしてわれわれが非形式的な意図を正しく形式的仕様にエンコードできたことを信頼するならば, 
-正しくないソフトウェアを認証してしまう可能性は他にほとんど残りません. 
-コンパイラや他のバッチ処理として走るプログラムについては,
-%\index{認証を伴うプログラム(certifying program)}%＿認証を伴う＿プログラムという
-概念
-(* ノート(才川): concept, notionを訳しわけるかどうか. とりあえずどちらも概念にした *)
-もよく知られており, これは実行すると, 回答と共に回答が正しいことの証明を出力します. 
-認証を伴うプログラムを証明検査器と組み合わせることで認証されたプログラムが得られますが, 
-本書では認証されたプログラムの方に焦点をあてることにします. 
-同時に, Coqで定理を述べて証明するための, 一般的興味を惹くような原理や技術も紹介します. 
+(* ここのcertificateは、一般には証明書と訳されてるもののことですね。英語のノリで説明しているので、訳語調整はあきらめて、文意を日本語として納得できる文にするのがいいと思います（しました）。
+それとは別に、「認証された」は訳語として微妙な気がします（とくにタイトルに使うとなると） -kshikano *)
+政府による認証では、強力な数学的保証はまず与えられません。
+一方、認証されたプログラムを書くことでは、望みうる限り最強の保証が与えられます。
+基礎となる数理論理学を信頼し、その論理の実装を信頼し、
+自分たちの非形式的な意図を正しく形式的仕様に落とし込めていることを信頼するならば、
+正しくないソフトウェアが認証されてしまう可能性はほとんど残りません。
+コンパイラをはじめ、バッチ処理として走るプログラムでは、
+_[認証を伴う]_プログラム（certifying program%\index{認証を伴うプログラム}%）という表現も一般によく使われます。
+この場合は、プログラムを実行するたびに解答と一緒にその解答が正しいことの証明が出力されることを指しています。
+証明検査器と組み合わせることで、認証されたプログラムが得られるように、認証を伴うプログラムを構成することもできます。
+本書で焦点を当てるのは、認証されたプログラムのほうです。
+同時に、Coqにおける定理の記述と証明にとって一般に必要となる興味深い原理や技術も紹介します。
 
 %\medskip%
 
 (*There are a good number of (though definitely not "many") tools that are in wide use today for building machine-checked mathematical proofs and machine-certified programs.  The following is my attempt at an exhaustive list of interactive "proof assistants" satisfying a few criteria.  First, the authors of each tool must intend for it to be put to use for software-related applications.  Second, there must have been enough engineering effort put into the tool that someone not doing research on the tool itself would feel his time was well spent using it.  A third criterion is more of an empirical validation of the second: the tool must have a significant user community outside of its own development team.*)
-今日では, 機械的に確かめられた数学の証明や機械的に認証されたプログラムを構築するために, 
-広く利用されているツールがいくつも（決して「沢山」というわけではありませんが）存在します. 
-いくつかの条件を満たす対話的な「証明支援系」を, 以下に列挙し尽くしてみようと思います. 
-条件の一つめとして, 作者がツールの用途として,
-ソフトウェアに関連した応用を意図していなければなりません. 
-二つめとして, ツール自体の研究者以外の利用者が有意義に利用できるよう,
-十分な工学的努力(*engineering effort*)がなされていなければなりません. 
-三つめの条件は二つめをより経験的に(*empirical, 具体的にのほうがよいか*)保証するものです. 
-すなわち, ツールの開発チーム以外のユーザコミュニティが
-ちゃんと存在していなければなりません. 
+機械的に検査された数学の証明を構築したり機械的に認証されたプログラムを構築したりするためのツールは、決して多くはないものの、現在では広く利用されているものがいくつかあります。
+以下に、いくつかの条件を満たす対話的な「証明支援系」を網羅してみました。
+条件の一つめは、ツールの作者がソフトウェアに関連した応用を意図して開発しているツールであることです。
+二つめは、そのツールを研究している当事者以外でも有意義に利用できるように十分な工学的努力がなされていることです。
+三つめは、二つめの条件が実証されていること、つまり、ツールの開発チーム以外のユーザコミュニティがちゃんと存在していることです。
 
 %
 \medskip
@@ -138,11 +133,10 @@ Xavier LeroyがCompCertプロジェクトを主導し,
 #
 
 (*Isabelle/HOL, implemented with the "proof assistant development framework" Isabelle%~\cite{Isabelle}%, is the most popular proof assistant for the HOL logic.  The other implementations of HOL can be considered equivalent for purposes of the discussion here.*)
-Isabelle/HOLは「証明支援系開発のフレームワーク」である
-Isabelle%~\cite{Isabelle}%を用いて実装されており,
-論理体系HOLのための証明支援系で最もよく利用されるものです. 
-ここで議論した目的のためには, HOLの他の実装も同様に利用できます. 
-(* ノート：「利用できる」はfor purposesに呼応させての意訳 *)
+Isabelle/HOLは、「証明支援系開発のフレームワーク」である
+Isabelle%~\cite{Isabelle}%を用いて実装されており、
+論理体系HOLのための証明支援系としては最もよく利用されているものです。
+HOLの他の実装は、ここでの議論においてはIsabelle/HOLと同列に考えてかまいません。
 
 *)
 
@@ -194,7 +188,7 @@ In contrast, %\index{PVS}%PVS's dependent types are much more general, but they 
 Dependent types are useful not only because they help you express correctness properties in types.  Dependent types also often let you write certified programs _without writing anything that looks like a proof_.  Even with subset types, which for many contexts can be used to express any relevant property with enough acrobatics, the human driving the proof assistant usually has to build some proofs explicitly.  Writing formal proofs is hard, so we want to avoid it as far as possible.  Dependent types are invaluable for this purpose.
 
 *)
-＿依存型＿を持つ言語は型の内部への言及を含むことができます．
+_[依存型]_を持つ言語は型の内部への言及を含むことができます．
 例えば，配列をあらわす型にはその配列のサイズを与えるプログラム式を含むことができるので，配列の範囲外アクセスがないことを静的に確かめることができるようになります．
 型の正しさを表す性質を効果的に捉えることで，依存型はさらに先まで行けます．
 例えば，この本で後ほど，正しく型付けされたソースプログラムから正しく型付けされたターゲットプログラムに変換することを保証する型をコンパイラに与える方法を見ます．
@@ -547,5 +541,4 @@ Proving in the Large & \texttt{Large.v} \\
 A Taste of Reasoning About Programming Language Syntax & \texttt{ProgLang.v} \\
 \hline
 \end{tabular} \end{center}
-
 % *)
