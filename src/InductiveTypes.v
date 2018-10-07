@@ -17,58 +17,161 @@ Set Asymmetric Patterns.
 (* end hide *)
 
 
-(** %\part{Basic Programming and Proving}
+(**
+(*
+%\part{Basic Programming and Proving}
 
-\chapter{Introducing Inductive Types}% *)
+\chapter{Introducing Inductive Types}%
+*)
+%\part{基本になるプログラミングと証明}
+ 
+\chapter{帰納型の導入}%
+*)
 
-(** The logical foundation of Coq is the Calculus of Inductive Constructions, or CIC.  In a sense, CIC is built from just two relatively straightforward features: function types and inductive types.  From this modest foundation, we can prove essentially all of the theorems of math and carry out effectively all program verifications, with enough effort expended.  This chapter introduces induction and recursion for functional programming in Coq.  Most of our examples reproduce functionality from the Coq standard library, and I have tried to copy the standard library's choices of identifiers, where possible, so many of the definitions here are already available in the default Coq environment.
+(** 
+(* The logical foundation of Coq is the Calculus of Inductive Constructions, or CIC.  In a sense, CIC is built from just two relatively straightforward features: function types and inductive types.  From this modest foundation, we can prove essentially all of the theorems of math and carry out effectively all program verifications, with enough effort expended.  This chapter introduces induction and recursion for functional programming in Coq.  Most of our examples reproduce functionality from the Coq standard library, and I have tried to copy the standard library's choices of identifiers, where possible, so many of the definitions here are already available in the default Coq environment.
+*)
+Coqが論理の基盤としているのはCIC(Calculus of Inductive Constructions)です．
+ある意味では，CICを構成するのは，関数型(function type)と帰納型(inductive type)という2つの簡単な機能だけです．
+この簡素な基盤から，本質的にはあらゆる数学の定理を証明できますし，
+それなりに手間をかければ，あらゆるプログラム検証を効果的に実行できます．
+本章ではCoqにおける関数プログラミングに関して，帰納と再帰の概念を導入します．
+またこの章の例は大部分は，Coqの標準ライブラリにある機能を再現するものです．
+それに，識別子は可能なかぎり標準ライブラリのものを使うようにしましたので，ここにある定義の多くは，デフォルトのCoq環境では使えるものです．
 
-The last chapter took a deep dive into some of the more advanced Coq features, to highlight the unusual approach that I advocate in this book.  However, from this point on, we will rewind and go back to basics, presenting the relevant features of Coq in a more bottom-up manner.  A useful first step is a discussion of the differences and relationships between proofs and programs in Coq. *)
+(*
+The last chapter took a deep dive into some of the more advanced Coq features, to highlight the unusual approach that I advocate in this book.  However, from this point on, we will rewind and go back to basics, presenting the relevant features of Coq in a more bottom-up manner.  A useful first step is a discussion of the differences and relationships between proofs and programs in Coq.
+*)
+最後の章でCoqの深淵に潜り，本書で主張している特異なアプローチに焦点をあてましたが，ここから先は基本に戻って関連のあるCoqの機能をボトムアップ示しましょう．
+はじめの一歩としては，証明とCoqのプログラムの違いと関連について議論するのがよいでしょう．
+*)
 
 
-(** * Proof Terms *)
+(**
+(* * Proof Terms *)
+* 証明項
+*)
 
-(** Mainstream presentations of mathematics treat proofs as objects that exist outside of the universe of mathematical objects.  However, for a variety of reasoning tasks, it is convenient to encode proofs, traditional mathematical objects, and programs within a single formal language.  Validity checks on mathematical objects are useful in any setting, to catch typos and other uninteresting errors.  The benefits of static typing for programs are widely recognized, and Coq brings those benefits to both mathematical objects and programs via a uniform mechanism.  In fact, from this point on, we will not bother to distinguish between programs and mathematical objects.  Many mathematical formalisms are most easily encoded in terms of programs.
+(** 
+(*
+Mainstream presentations of mathematics treat proofs as objects that exist outside of the universe of mathematical objects.  However, for a variety of reasoning tasks, it is convenient to encode proofs, traditional mathematical objects, and programs within a single formal language.  Validity checks on mathematical objects are useful in any setting, to catch typos and other uninteresting errors.  The benefits of static typing for programs are widely recognized, and Coq brings those benefits to both mathematical objects and programs via a uniform mechanism.  In fact, from this point on, we will not bother to distinguish between programs and mathematical objects.  Many mathematical formalisms are most easily encoded in terms of programs.
+*)
+数学では証明を数学の世界の外側にあるものとして扱うのが主流です．
+しかし，さまざまな論証作業を行うには，証明や伝統的な数学の対象，
+そしてプログラムを単一の形式的言語で符号化するのが便利です．
+数学の対象に関して正当性を検査すれば，書き間違いやつまらないミスを見つけるのに役立ちます．
+プログラムに静的型付けを行えば，有益であることは広く認知されていることです．
+Coqは数学の対象についてもプログラムに関しても同じ機構を使って役に立ってくれます．
+そういうわけで，これ以降はプログラムと数学の対象との区別に悩むことはやめします．
+多くの数学的形式は簡単にプログラムで符号化できます．
 
+(*
 Proofs are fundamentally different from programs, because any two proofs of a theorem are considered equivalent, from a formal standpoint if not from an engineering standpoint.  However, we can use the same type-checking technology to check proofs as we use to validate our programs.  This is the%\index{Curry-Howard correspondence}% _Curry-Howard correspondence_ %\cite{Curry,Howard}%, an approach for relating proofs and programs.  We represent mathematical theorems as types, such that a theorem's proofs are exactly those programs that type-check at the corresponding type.
+*)
+証明は基本的にはプログラムとは違うものです．
+工学的な見方ではなく正式な見方では，1つの定理に対する2つの証明は同じものだからです．
+そうはいうものの，証明を検査するにも，プログラムを検証するにも同じ型検査技術が使用できます．
+これは，%\index{Curry-Howard対応}% %\emph{Curry-Howard対応}% %\cite{Curry,Howard}%という証明とプログラムを関連付ける方法です．
+数学的定理を型として表現すると，その型をもつことが確認されたプログラムそのものが証明になります．
 
+(*
 The last chapter's example already snuck in an instance of Curry-Howard.  We used the token [->] to stand for both function types and logical implications.  One reasonable conclusion upon seeing this might be that some fancy overloading of notations is at work.  In fact, functions and implications are precisely identical according to Curry-Howard!  That is, they are just two ways of describing the same computational phenomenon.
+*)
+最終章の例にはCurry-Howardの具体例が隠れています．
+[->]という字句を関数型と論理含意との両方を表すのに使っています．
+これを見れば，記法を多重定義しているのだろうと考えるのが理にかないます．
 
-A short demonstration should explain how this can be.  The identity function over the natural numbers is certainly not a controversial program. *)
+(*
+A short demonstration should explain how this can be.  The identity function over the natural numbers is certainly not a controversial program.
+*)
+どのような仕組みかは簡単な例で示せるはずです．
+自然数上の恒等関数は自明なプログラムです．
+
+*)
 
 Check (fun x : nat => x).
 (** [: nat -> nat] *)
 
-(** %\smallskip{}%Consider this alternate program, which is almost identical to the last one. *)
+(**
+(*
+%\smallskip{}%Consider this alternate program, which is almost identical to the last one.
+*)
+%\smallskip{}%さきほどとほぼ同じ別の関数を考えましょう．
+*)
 
 Check (fun x : True => x).
 (** [: True -> True] *)
 
-(** %\smallskip{}%The identity program is interpreted as a proof that %\index{Gallina terms!True}%[True], the always-true proposition, implies itself!  What we see is that Curry-Howard interprets implications as functions, where an input is a proposition being assumed and an output is a proposition being deduced.  This intuition is not too far from a common one for informal theorem proving, where we might already think of an implication proof as a process for transforming a hypothesis into a conclusion.
+(**
+(* 
+%\smallskip{}%The identity program is interpreted as a proof that %\index{Gallina terms!True}%[True], the always-true proposition, implies itself!  What we see is that Curry-Howard interprets implications as functions, where an input is a proposition being assumed and an output is a proposition being deduced.  This intuition is not too far from a common one for informal theorem proving, where we might already think of an implication proof as a process for transforming a hypothesis into a conclusion.
+*)
+%\smallskip{}%この恒等プログラムは，%\index{Gallina terms!True}%[True]すなわち自分自身を含意する恒真命題の証明と解釈されます．
+これかから判ることは，Curry-Howard対応では含意を関数として解釈するということです．
+このときの関数への入力は仮定の命題であり，関数からの出力は演繹された命題になります．
+この直観は，非形式的におこなわれる定理証明に対する一般的な直観とかけはなれたものではありません．
+非形式的な定理証明においても，含意の証明を仮定から結論への変換過程と見なしていると考えられます．
 
-There are also more primitive proof forms available.  For instance, the term %\index{Gallina terms!I}%[I] is the single proof of [True], applicable in any context. *)
+(*
+There are also more primitive proof forms available.  For instance, the term %\index{Gallina terms!I}%[I] is the single proof of [True], applicable in any context.
+*)
+もっとプリミティブな形式を使えます．
+たとえば，%\index{Gallina terms!I}%[I]という項は[True]の唯一の証明で，あらゆる文脈で適用可能です．
+*)
 
 Check I.
 (** [: True] *)
 
-(** %\smallskip{}%With [I], we can prove another simple propositional theorem. *)
+(**
+(*
+%\smallskip{}%With [I], we can prove another simple propositional theorem.
+*)
+%\smallskip{}%[I]を使って，別の命題論理における定理が証明できます．
+*)
 
 Check (fun _ : False => I).
 (** [: False -> True] *)
 
-(** %\smallskip{}%No proofs of %\index{Gallina terms!False}%[False] exist in the top-level context, but the implication-as-function analogy gives us an easy way to, for example, show that [False] implies itself. *)
+(**
+(* %\smallskip{}%No proofs of %\index{Gallina terms!False}%[False] exist in the top-level context, but the implication-as-function analogy gives us an easy way to, for example, show that [False] implies itself.
+*)
+%\smallskip{}% %\index{Gallina terms!False}%[False]の証明はトップレベルの文脈には存在しません．
+しかし，「関数としての含意」という類推によれば，たとえば，[False]が自分自身を含意することは，簡単に示せます．
+*)
 
 Check (fun x : False => x).
 (** [: False -> False] *)
 
-(** %\smallskip{}%Every one of these example programs whose type looks like a logical formula is a%\index{proof term}% _proof term_.  We use that name for any Gallina term of a logical type, and we will elaborate shortly on what makes a type logical.
+(**
+(*
+%\smallskip{}%Every one of these example programs whose type looks like a logical formula is a%\index{proof term}% _proof term_.  We use that name for any Gallina term of a logical type, and we will elaborate shortly on what makes a type logical.
+*)
+%\smallskip{}%型が論理式のように見えるこれらのプログラム例は，どれも%\index{しょうめいこう@証明項}% %\emph{証明項}%です．
+この術語を論理型の任意のGallina項を表すのに使っています．
+型論理を構成するものについては，後で詳細に解説します．
 
-In the rest of this chapter, we will introduce different ways of defining types.  Every example type can be interpreted alternatively as a type of programs or proofs.
+本章の残りの部分では，型を定義する方法をいくつか導入します．
+例に挙げる型はそれぞれ別にプログラムあるいは証明の型として解釈できます．
 
-One of the first types we introduce will be [bool], with constructors [true] and [false].  Newcomers to Coq often wonder about the distinction between [True] and [true] and the distinction between [False] and [false].  One glib answer is that [True] and [False] are types, but [true] and [false] are not.  A more useful answer is that Coq's metatheory guarantees that any term of type [bool] _evaluates_ to either [true] or [false].  This means that we have an _algorithm_ for answering any question phrased as an expression of type [bool].  Conversely, most propositions do not evaluate to [True] or [False]; the language of inductively defined propositions is much richer than that.  We ought to be glad that we have no algorithm for deciding our formalized version of mathematical truth, since otherwise it would be clear that we could not formalize undecidable properties, like almost any interesting property of general-purpose programs. *)
+(*
+One of the first types we introduce will be [bool], with constructors [true] and [false].  Newcomers to Coq often wonder about the distinction between [True] and [true] and the distinction between [False] and [false].  One glib answer is that [True] and [False] are types, but [true] and [false] are not.  A more useful answer is that Coq's metatheory guarantees that any term of type [bool] _evaluates_ to either [true] or [false].  This means that we have an _algorithm_ for answering any question phrased as an expression of type [bool].  Conversely, most propositions do not evaluate to [True] or [False]; the language of inductively defined propositions is much richer than that.  We ought to be glad that we have no algorithm for deciding our formalized version of mathematical truth, since otherwise it would be clear that we could not formalize undecidable properties, like almost any interesting property of general-purpose programs.
+*)
+最初に導入する型は[bool]で，構成子[true]および[false]があります．
+Coqに初めて触れると[True]と[true]あるいは[False]と[false]の違いに戸惑うことがよくあります．
+表面的にいうなら，[True]と[False]は型であり，[true]と[false]は型ではないということです．
+もう少しましな答としては，Coqのメタ定理が[bool]型の任意の項は%\emph{評価する}%と[true]か[false]のどちらかになることを保証している，ということになります．
+その意味は，型が[bool]である式で表されたどのような問題に対しても，それに答える%\emph{アルゴリズム}%があるということです．
+逆にほとんどの命題は評価しても[True]あるいは[False]になることはないということです．
+帰納的に定義された命題の言語ではこれよりもずっと豊かな表現力があります．
+形式化された数学的真理を決定するアルゴリズムがないことは喜ぶべきことです．
+もし，そのようなアルゴリズムがあるとすれば，汎用プログラムの興味深い性質がそうであるような，決定不能な性質を形式化できないということになるからです．
+*)
 
 
-(** * Enumerations *)
+(** 
+(* * Enumerations *)
+* 列挙
+*)
 
 (** Coq inductive types generalize the %\index{algebraic datatypes}%algebraic datatypes found in %\index{Haskell}%Haskell and %\index{ML}%ML.  Confusingly enough, inductive types also generalize %\index{generalized algebraic datatypes}%generalized algebraic datatypes (GADTs), by adding the possibility for type dependency.  Even so, it is worth backing up from the examples of the last chapter and going over basic, algebraic-datatype uses of inductive datatypes, because the chance to prove things about the values of these types adds new wrinkles beyond usual practice in Haskell and ML.
 
