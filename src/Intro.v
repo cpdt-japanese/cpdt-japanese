@@ -221,7 +221,7 @@ subset typeでも、離れ業を駆使すれば、妥当な性質を表現でき
 (**
 (** ** An Easy-to-Check Kernel Proof Language *)
 *)
-(** ** 確認しやすいカーネル証明言語 *)
+(** ** 核となる証明言語が検査しやすい *)
 
 (**
 (**
@@ -364,12 +364,36 @@ AgdaやEpigramなどのツールには、そうした仕組みの実装の余地
 (** * 証明支援器を使ったエンジニアリング *)
 
 (**
+(**
 In comparisons with its competitors, Coq is often derided for promoting unreadable proofs.  It is very easy to write proof scripts that manipulate proof goals imperatively, with no structure to aid readers.  Such developments are nightmares to maintain, and they certainly do not manage to convey "why the theorem is true" to anyone but the original author.  One additional (and not insignificant) purpose of this book is to show why it is unfair and unproductive to dismiss Coq based on the existence of such developments.
 
 I will go out on a limb and guess that the reader is a fan of some programming language and may even have been involved in teaching that language to undergraduates.  I want to propose an analogy between two attitudes: coming to a negative conclusion about Coq after reading common Coq developments in the wild, and coming to a negative conclusion about Your Favorite Language after looking at the programs undergraduates write in it in the first week of class.  The pragmatics of mechanized proving and program verification have been under serious study for much less time than the pragmatics of programming have been.  The computer theorem proving community is still developing the key insights that correspond to those that programming texts and instructors impart to their students, to help those students get over that critical hump where using the language stops being more trouble than it is worth.  Most of the insights for Coq are barely even disseminated among the experts, let alone set down in a tutorial form.  I hope to use this book to go a long way towards remedying that.
 
 If I do that job well, then this book should be of interest even to people who have participated in classes or tutorials specifically about Coq.  The book should even be useful to people who have been using Coq for years but who are mystified when their Coq developments prove impenetrable by colleagues.  The crucial angle in this book is that there are "design patterns" for reliably avoiding the really grungy parts of theorem proving, and consistent use of these patterns can get you over the hump to the point where it is worth your while to use Coq to prove your theorems and certify your programs, even if formal verification is not your main concern in a project.  We will follow this theme by pursuing two main methods for replacing manual proofs with more understandable artifacts: dependently typed functions and custom Ltac decision procedures.
 *)
+*)
+
+Coqの証明は他のシステムに比べて読みにくいと言われることが少なくありません。
+証明を読みやすくするための構造を意識せずに、証明の帰結を操作する命令的なスクリプトとして証明を書くのは、とても簡単です。
+そのような形で開発された証明を保守するのは悪夢でしょう。
+それに、「なぜその定義が真になるのか」が証明を書いた本人以外の誰にも伝わらない証明になってしまいます。
+そんなふうに開発された証明があるからCoqは使えない、という主張がいかに不公平で非生産的であるかを示すことも、本書のささやかな目的のひとつです。
+
+読者の皆さんには好きなプログラミング言語があり、それを学生に教えたことがあるような人もいると思います。
+どこかでCoqにより開発されたものを読み、それでCoqに対して否定的な印象を抱くことは、あなたが好きな言語を教わった学生が最初の週にその言語を使って書いたプログラムを見て、あなたがその言語に否定的な印象を抱くようなものであると言えるのではないでしょうか。
+機械的な証明とプログラム検証の実践面には、プログラミングの実践面に比べて、まだまだ研究に費やされている年月が足りません。
+プログラミングの説明では、その言語を使うことに伴う大変さを凌駕する価値がどの辺りにあるのかを、教科書や講師が学生に伝えることができます。
+コンピュータによる定理証明のコミュニティは、そのような習得において鍵となる洞察をまだ模索しているところです。
+Coqに関しては、そのような洞察はまだまだ専門家の間で普及しているだけであり、チュートリアルのような形にもまとまっていません。
+本書がその状況を変える長い道のりの一歩になればと考えています。
+
+もしそれがうまくいったなら、本書は、Coqに特化した入門授業やチュートリアルに参加する人にとっても有意義なものになるでしょう。
+すでに何年間もCoqを使っているけれど、Coqで開発したものを同僚に理解してもらえないような人にも、本書は有益なはずです。
+定理証明には、泥臭い部分を安全に回避するための「デザインパターン」があります。
+そのパターンをきちんと活用すれば、形式的なプログラム検証が主目的でないプロジェクトであっても、少しだけ時間を割いてCoqにより定理を証明し自分のプログラムを認証する意味があるような部分を見極められるようになるでしょう。
+これが本書における極めて重要な考え方です。
+その主題にのっとり、手動による証明を置き換えてより理解しやすい形にするための2つの方法として、
+依存型を持つ関数と独自のLtac決定手続きを駆使します。
 
 
 (**
