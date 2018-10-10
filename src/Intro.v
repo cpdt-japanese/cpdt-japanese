@@ -15,9 +15,6 @@
 (** 
 (* * Whence This Book? *)
 * 本書の生い立ち
-*)
-
-(**
 
 (*We would all like to have programs check that our programs are correct.  Due in no small part to some bold but unfulfilled promises in the history of computer science, today most people who write software, practitioners and academics alike, assume that the costs of formal program verification outweigh the benefits.  The purpose of this book is to convince you that the technology of program verification is mature enough today that it makes sense to use it in a support role in many kinds of research projects in computer science.  Beyond the convincing, I also want to provide a handbook on practical engineering of certified programs with the Coq proof assistant.  Almost every subject covered is also relevant to interactive computer theorem-proving in general, such as for traditional mathematical theorems.  In fact, I hope to demonstrate how verified programs are useful as building blocks in all sorts of formalizations.*)
 
@@ -137,36 +134,25 @@ Isabelle/HOLは、「証明支援器開発のフレームワーク」である
 Isabelle%~\cite{Isabelle}%を用いて実装されており、
 論理体系HOLのための証明支援器としては最もよく利用されているものです。
 HOLの他の実装は、ここでの議論においてはIsabelle/HOLと同列に考えてかまいません。
-
 *)
 
 (** 
 (* * Why Coq? *)
 * どうしてCoqを使うのか
-*)
 
-(**
-(**
-This book is going to be about certified programming using Coq, and I am convinced that it is the best tool for the job.  Coq has a number of very attractive properties, which I will summarize here, mentioning which of the other candidate tools lack which properties.
-*)
+(*This book is going to be about certified programming using Coq, and I am convinced that it is the best tool for the job.  Coq has a number of very attractive properties, which I will summarize here, mentioning which of the other candidate tools lack which properties.*)
 本書では、認証を伴うプログラミングについて、Coqを使って解説していきます。
 筆者は本書の目的にとってCoqが最適なツールだと確信しています。
 Coqにはとても魅力的な性質が多く備わっています。
 ここでは、上記で紹介したCoq以外のツールに欠けている性質にも言及しつつ、それらを要約します。
-*)
 
+(* ** Based on a Higher-Order Functional Programming Language *)
+** 高階の関数型プログラミング言語に基づいている
 
-(**
-(** ** Based on a Higher-Order Functional Programming Language *)
-*)
-(** ** 高階の関数型プログラミング言語に基づいている *)
+(*%\index{higher-order vs. first-order languages}%There is no reason to give up the familiar comforts of functional programming when you start writing certified programs.  All of the tools I listed are based on functional programming languages, which means you can use them without their proof-related features to write and run regular programs.
 
-(**
-(**
-%\index{higher-order vs. first-order languages}%There is no reason to give up the familiar comforts of functional programming when you start writing certified programs.  All of the tools I listed are based on functional programming languages, which means you can use them without their proof-related features to write and run regular programs.
+%\index{ACL2}%ACL2 is notable in this field for having only a _first-order_ language at its foundation.  That is, you cannot work with functions over functions and all those other treats of functional programming.  By giving up this facility, ACL2 can make broader assumptions about how well its proof automation will work, but we can generally recover the same advantages in other proof assistants when we happen to be programming in first-order fragments.*)
 
-%\index{ACL2}%ACL2 is notable in this field for having only a _first-order_ language at its foundation.  That is, you cannot work with functions over functions and all those other treats of functional programming.  By giving up this facility, ACL2 can make broader assumptions about how well its proof automation will work, but we can generally recover the same advantages in other proof assistants when we happen to be programming in first-order fragments.
-*)
 認証を伴うプログラムを書くからといって、関数型プログラミング言語の快適さを諦める必要はありません。
 先に挙げたツールは、いずれも関数型プログラミング言語に基づいており、証明に関係する機能抜きでも普通のプログラムを書くのに使えます。
 
@@ -174,25 +160,18 @@ ACL2は、_[一階]_の言語のみを基礎とするので注意が必要です
 具体的には、関数上の関数といった、関数型プログラミングの便利な仕掛けが使えません。
 ACL2では、その便利さを代償にすることで、自動証明の動作に対して広範な前提を置くことを可能にしています。
 しかし他の証明支援器でも、一階の部分だけでプログラムを書くことなら、一般には同様のことが再現可能です。
-*)
 
+(* ** Dependent Types *)
+** 依存型
 
-(**
-(** ** Dependent Types *)
-*)
-(** ** 依存型 *)
-
-(**
-(**
-A language with _dependent types_ may include references to programs inside of types.  For instance, the type of an array might include a program expression giving the size of the array, making it possible to verify absence of out-of-bounds accesses statically.  Dependent types can go even further than this, effectively capturing any correctness property in a type.  For instance, later in this book, we will see how to give a compiler a type that guarantees that it maps well-typed source programs to well-typed target programs.
+(*A language with _dependent types_ may include references to programs inside of types.  For instance, the type of an array might include a program expression giving the size of the array, making it possible to verify absence of out-of-bounds accesses statically.  Dependent types can go even further than this, effectively capturing any correctness property in a type.  For instance, later in this book, we will see how to give a compiler a type that guarantees that it maps well-typed source programs to well-typed target programs.
 
 %\index{ACL2}%ACL2 and %\index{HOL}%HOL lack dependent types outright.  Each of %\index{PVS}%PVS and %\index{Twelf}%Twelf supports a different strict subset of Coq's dependent type language.  Twelf's type language is restricted to a bare-bones, monomorphic lambda calculus, which places serious restrictions on how complicated _computations inside types_ can be.  This restriction is important for the soundness argument behind Twelf's approach to representing and checking proofs.
 
 In contrast, %\index{PVS}%PVS's dependent types are much more general, but they are squeezed inside the single mechanism of _subset types_, where a normal type is refined by attaching a predicate over its elements.  Each member of the subset type is an element of the base type that satisfies the predicate.  Chapter 6 of this book introduces that style of programming in Coq, while the remaining chapters of Part II deal with features of dependent typing in Coq that go beyond what PVS supports.
 
-Dependent types are useful not only because they help you express correctness properties in types.  Dependent types also often let you write certified programs _without writing anything that looks like a proof_.  Even with subset types, which for many contexts can be used to express any relevant property with enough acrobatics, the human driving the proof assistant usually has to build some proofs explicitly.  Writing formal proofs is hard, so we want to avoid it as far as possible.  Dependent types are invaluable for this purpose.
+Dependent types are useful not only because they help you express correctness properties in types.  Dependent types also often let you write certified programs _without writing anything that looks like a proof_.  Even with subset types, which for many contexts can be used to express any relevant property with enough acrobatics, the human driving the proof assistant usually has to build some proofs explicitly.  Writing formal proofs is hard, so we want to avoid it as far as possible.  Dependent types are invaluable for this purpose.*)
 
-*)
 _[依存型]_を持つ言語では、型の内部にプログラムに対する言及を含められます。
 例えば、配列を表す型に、その配列の長さを与えるプログラム式を含めることで、配列の範囲外アクセスがないかどうかを静的に検査できます。
 依存型の利用例はそれだけではありません。
@@ -216,19 +195,13 @@ subset typeでも、離れ業を駆使すれば、妥当な性質を表現でき
 しかしsubset typeが使えたとしても、ある種の証明については、証明支援器を利用する人間が明示的に証明を構築するしかありません。
 形式的な証明を書くのは大変なので、なるべく避けたいものです。
 その目的にとって依存型には計り知れない価値があります。
-*)
 
-(**
-(** ** An Easy-to-Check Kernel Proof Language *)
-*)
-(** ** 核となる証明言語が検査しやすい *)
+(* ** An Easy-to-Check Kernel Proof Language *)
+** 核となる証明言語が検査しやすい
 
-(**
-(**
-%\index{de Bruijn criterion}%Scores of automated decision procedures are useful in practical theorem proving, but it is unfortunate to have to trust in the correct implementation of each procedure.  Proof assistants satisfy the "de Bruijn criterion" when they produce _proof terms_ in small kernel languages, even when they use complicated and extensible procedures to seek out proofs in the first place.  These core languages have feature complexity on par with what you find in proposals for formal foundations for mathematics (e.g., ZF set theory).  To believe a proof, we can ignore the possibility of bugs during _search_ and just rely on a (relatively small) proof-checking kernel that we apply to the _result_ of the search.
+(*%\index{de Bruijn criterion}%Scores of automated decision procedures are useful in practical theorem proving, but it is unfortunate to have to trust in the correct implementation of each procedure.  Proof assistants satisfy the "de Bruijn criterion" when they produce _proof terms_ in small kernel languages, even when they use complicated and extensible procedures to seek out proofs in the first place.  These core languages have feature complexity on par with what you find in proposals for formal foundations for mathematics (e.g., ZF set theory).  To believe a proof, we can ignore the possibility of bugs during _search_ and just rely on a (relatively small) proof-checking kernel that we apply to the _result_ of the search.
 
-Coq meets the de Bruijn criterion, while %\index{ACL2}%ACL2 does not, as it employs fancy decision procedures that produce no "evidence trails" justifying their results.  %\index{PVS}%PVS supports _strategies_ that implement fancier proof procedures in terms of a set of primitive proof steps, where the primitive steps are less primitive than in Coq.  For instance, a propositional tautology solver is included as a primitive, so it is a question of taste whether such a system meets the de Bruijn criterion.  The HOL implementations meet the de Bruijn criterion more manifestly; for Twelf, the situation is murkier.
-*)
+Coq meets the de Bruijn criterion, while %\index{ACL2}%ACL2 does not, as it employs fancy decision procedures that produce no "evidence trails" justifying their results.  %\index{PVS}%PVS supports _strategies_ that implement fancier proof procedures in terms of a set of primitive proof steps, where the primitive steps are less primitive than in Coq.  For instance, a propositional tautology solver is included as a primitive, so it is a question of taste whether such a system meets the de Bruijn criterion.  The HOL implementations meet the de Bruijn criterion more manifestly; for Twelf, the situation is murkier.*)
 
 実践的な定理証明においては、たくさんの自動化された決定手続き（automated decision procedures）を便利に使います。
 しかし、それぞれの決定手続きについて、その実装が正しいかどうかは信頼するしかない、というのでは困ります。
@@ -245,24 +218,17 @@ PVS%\index{PVS}%では、さらに独特な証明手続きを原始的な証明�
 例えばPVSでは、命題論理の恒真式ソルバが原始的な証明ステップとされているので、PVSがde Bruijn criterionを満たすかどうかは人によって意見が分かれます。
 HOLの各実装については、もう少しはっきりとde Bruijn criterionに適合するといえます。
 Twelfについては、それほどはっきりとは言い切れません。
-*)
 
-(**
-(** ** Convenient Programmable Proof Automation *)
-*)
+(* ** Convenient Programmable Proof Automation *)
+** プログラム可能な証明自動化の利便性
 
-(** ** プログラム可能な証明自動化の利便性 *)
-
-(**
-(**
-A commitment to a kernel proof language opens up wide possibilities for user extension of proof automation systems, without allowing user mistakes to trick the overall system into accepting invalid proofs.  Almost any interesting verification problem is undecidable, so it is important to help users build their own procedures for solving the restricted problems that they encounter in particular theorems.
+(*A commitment to a kernel proof language opens up wide possibilities for user extension of proof automation systems, without allowing user mistakes to trick the overall system into accepting invalid proofs.  Almost any interesting verification problem is undecidable, so it is important to help users build their own procedures for solving the restricted problems that they encounter in particular theorems.
 
 %\index{Twelf}%Twelf features no proof automation marked as a bona fide part of the latest release; there is some automation code included for testing purposes.  The Twelf style is based on writing out all proofs in full detail.  Because Twelf is specialized to the domain of syntactic metatheory proofs about programming languages and logics, it is feasible to use it to write those kinds of proofs manually.  Outside that domain, the lack of automation can be a serious obstacle to productivity.  Most kinds of program verification fall outside Twelf's forte.
 
 Of the remaining tools, all can support user extension with new decision procedures by hacking directly in the tool's implementation language (such as OCaml for Coq).  Since %\index{ACL2}%ACL2 and %\index{PVS}%PVS do not satisfy the de Bruijn criterion, overall correctness is at the mercy of the authors of new procedures.
 
-%\index{Isabelle/HOL}%Isabelle/HOL and Coq both support coding new proof manipulations in ML in ways that cannot lead to the acceptance of invalid proofs.  Additionally, Coq includes a domain-specific language for coding decision procedures in normal Coq source code, with no need to break out into ML.  This language is called %\index{Ltac}%Ltac, and I think of it as the unsung hero of the proof assistant world.  Not only does Ltac prevent you from making fatal mistakes, it also includes a number of novel programming constructs which combine to make a "proof by decision procedure" style very pleasant.  We will meet these features in the chapters to come.
-*)
+%\index{Isabelle/HOL}%Isabelle/HOL and Coq both support coding new proof manipulations in ML in ways that cannot lead to the acceptance of invalid proofs.  Additionally, Coq includes a domain-specific language for coding decision procedures in normal Coq source code, with no need to break out into ML.  This language is called %\index{Ltac}%Ltac, and I think of it as the unsung hero of the proof assistant world.  Not only does Ltac prevent you from making fatal mistakes, it also includes a number of novel programming constructs which combine to make a "proof by decision procedure" style very pleasant.  We will meet these features in the chapters to come.*)
 
 証明自動化のシステムにおいて、利用者が証明言語の核となる部分に手を入れられるようになっていれば、さまざまな拡張の可能性が生まれます。
 もちろん、利用者のミスによりシステム全体がおかしなことになって不正な証明が受け入れられないようにする必要はあります。
@@ -286,23 +252,14 @@ ISabelle/HOL%\index{Isabelle/HOL}%とCoqは、どちらもMLを使って新た�
 Ltacによって利用者による深刻な間違いが防止されるだけではありません。
 Ltacには斬新なプログラミングの構成要素がいくつも含まれており、それらを組み合わせることで「決定手続きによる証明」が快適にできるようになります。
 こうしたLtacの機能は以降の各章で見ていきます。
-*)
 
-(**
-(** ** Proof by Reflection *)
-*)
+(* ** Proof by Reflection *)
+** リフレクションによる証明
 
-(** ** リフレクションによる証明 *)
+(*%\index{reflection}\index{proof by reflection}%A surprising wealth of benefits follows from choosing a proof language that integrates a rich notion of computation.  Coq includes programs and proof terms in the same syntactic class.  This makes it easy to write programs that compute proofs.  With rich enough dependent types, such programs are _certified decision procedures_.  In such cases, these certified procedures can be put to good use _without ever running them_!  Their types guarantee that, if we did bother to run them, we would receive proper "ground" proofs.
 
-(**
-(**
-%\index{reflection}\index{proof by reflection}%A surprising wealth of benefits follows from choosing a proof language that integrates a rich notion of computation.  Coq includes programs and proof terms in the same syntactic class.  This makes it easy to write programs that compute proofs.  With rich enough dependent types, such programs are _certified decision procedures_.  In such cases, these certified procedures can be put to good use _without ever running them_!  Their types guarantee that, if we did bother to run them, we would receive proper "ground" proofs.
+The critical ingredient for this technique, many of whose instances are referred to as _proof by reflection_, is a way of inducing non-trivial computation inside of logical propositions during proof checking.  Further, most of these instances require dependent types to make it possible to state the appropriate theorems.  Of the proof assistants I listed, only Coq really provides support for the type-level computation style of reflection, though PVS supports very similar functionality via refinement types.*)
 
-The critical ingredient for this technique, many of whose instances are referred to as _proof by reflection_, is a way of inducing non-trivial computation inside of logical propositions during proof checking.  Further, most of these instances require dependent types to make it possible to state the appropriate theorems.  Of the proof assistants I listed, only Coq really provides support for the type-level computation style of reflection, though PVS supports very similar functionality via refinement types.
-*)
-*)
-
-(**
 証明言語として、計算に関する多様な概念を利用できるものを選べば、嬉しいことがたくさんあります。
 Coqでは、プログラムと証明項を同じ階層の構文で表現できます。
 そのおかげで、証明を計算するプログラムが簡単に書けます。
@@ -315,23 +272,17 @@ Coqでは、プログラムと証明項を同じ階層の構文で表現でき�
 さらにその大半は、適切な定理の表現を可能とするために依存型を必要とします。
 先に挙げた証明支援器のうち、型レベル計算という方法でリフレクションに対応しているのはCoqだけです。
 なお、PVSは、これによく似たrefinement typeという機能に対応しています。
-
 *)
 
 (**
-(** * Why Not a Different Dependently Typed Language? *)
-*)
-(** * 他の依存型の言語ではだめなのか *)
+(* * Why Not a Different Dependently Typed Language? *)
+* 他の依存型の言語ではだめなのか
 
-(**
-(**
-The logic and programming language behind Coq belongs to a type-theory ecosystem with a good number of other thriving members.  %\index{Agda}%{{http://appserv.cs.chalmers.se/users/ulfn/wiki/agda.php}Agda} and %\index{Epigram}%{{https://code.google.com/p/epigram/}Epigram} are the most developed tools among the alternatives to Coq, and there are others that are earlier in their lifecycles.  All of the languages in this family feel sort of like different historical offshoots of Latin.  The hardest conceptual epiphanies are, for the most part, portable among all the languages.  Given this, why choose Coq for certified programming?
+(*The logic and programming language behind Coq belongs to a type-theory ecosystem with a good number of other thriving members.  %\index{Agda}%{{http://appserv.cs.chalmers.se/users/ulfn/wiki/agda.php}Agda} and %\index{Epigram}%{{https://code.google.com/p/epigram/}Epigram} are the most developed tools among the alternatives to Coq, and there are others that are earlier in their lifecycles.  All of the languages in this family feel sort of like different historical offshoots of Latin.  The hardest conceptual epiphanies are, for the most part, portable among all the languages.  Given this, why choose Coq for certified programming?
 
 I think the answer is simple.  None of the competition has well-developed systems for tactic-based theorem proving.  Agda and Epigram are designed and marketed more as programming languages than proof assistants.  Dependent types are great, because they often help you prove deep theorems without doing anything that feels like proving.  Nonetheless, almost any interesting certified programming project will benefit from some activity that deserves to be called proving, and many interesting projects absolutely require semi-automated proving, to protect the sanity of the programmer.  Informally, proving is unavoidable when any correctness proof for a program has a structure that does not mirror the structure of the program itself.  An example is a compiler correctness proof, which probably proceeds by induction on program execution traces, which have no simple relationship with the structure of the compiler or the structure of the programs it compiles.  In building such proofs, a mature system for scripted proof automation is invaluable.
 
-On the other hand, Agda, Epigram, and similar tools have less implementation baggage associated with them, and so they tend to be the default first homes of innovations in practical type theory.  Some significant kinds of dependently typed programs are much easier to write in Agda and Epigram than in Coq.  The former tools may very well be superior choices for projects that do not involve any "proving."  Anecdotally, I have gotten the impression that manual proving is orders of magnitudes more costly than manual coping with Coq's lack of programming bells and whistles.  In this book, I will devote significant space to patterns for programming with dependent types in Coq as it is today.  We can hope that the type theory community is tending towards convergence on the right set of features for practical programming with dependent types, and that we will eventually have a single tool embodying those features.
-*)
-*)
+On the other hand, Agda, Epigram, and similar tools have less implementation baggage associated with them, and so they tend to be the default first homes of innovations in practical type theory.  Some significant kinds of dependently typed programs are much easier to write in Agda and Epigram than in Coq.  The former tools may very well be superior choices for projects that do not involve any "proving."  Anecdotally, I have gotten the impression that manual proving is orders of magnitudes more costly than manual coping with Coq's lack of programming bells and whistles.  In this book, I will devote significant space to patterns for programming with dependent types in Coq as it is today.  We can hope that the type theory community is tending towards convergence on the right set of features for practical programming with dependent types, and that we will eventually have a single tool embodying those features.*)
 
 Coqの論理とプログラミング言語の拠り所となっている型理論の枠組みは、他の技術でも利用されています。
 Coqの代替として考えられるツールのうち、特に成熟したものとしては、
@@ -358,20 +309,17 @@ AgdaやEpigramなどのツールには、そうした仕組みの実装の余地
 本書では、現在のCoqにおける依存型を使ったプログラミングのパターンについて、かなりの紙面を割いて説明する予定です。
 依存型を使った実践的なプログラミングにとって必要となる機能について型理論のコミュニティの見解が収斂しつつあり、将来的にはそれらの機能を包含した単一のツールが登場することに期待しましょう。
 
-(**
-(** * Engineering with a Proof Assistant *)
 *)
-(** * 証明支援器を使ったエンジニアリング *)
 
 (**
-(**
-In comparisons with its competitors, Coq is often derided for promoting unreadable proofs.  It is very easy to write proof scripts that manipulate proof goals imperatively, with no structure to aid readers.  Such developments are nightmares to maintain, and they certainly do not manage to convey "why the theorem is true" to anyone but the original author.  One additional (and not insignificant) purpose of this book is to show why it is unfair and unproductive to dismiss Coq based on the existence of such developments.
+(* * Engineering with a Proof Assistant *)
+* 証明支援器を使ったエンジニアリング
+
+(*In comparisons with its competitors, Coq is often derided for promoting unreadable proofs.  It is very easy to write proof scripts that manipulate proof goals imperatively, with no structure to aid readers.  Such developments are nightmares to maintain, and they certainly do not manage to convey "why the theorem is true" to anyone but the original author.  One additional (and not insignificant) purpose of this book is to show why it is unfair and unproductive to dismiss Coq based on the existence of such developments.
 
 I will go out on a limb and guess that the reader is a fan of some programming language and may even have been involved in teaching that language to undergraduates.  I want to propose an analogy between two attitudes: coming to a negative conclusion about Coq after reading common Coq developments in the wild, and coming to a negative conclusion about Your Favorite Language after looking at the programs undergraduates write in it in the first week of class.  The pragmatics of mechanized proving and program verification have been under serious study for much less time than the pragmatics of programming have been.  The computer theorem proving community is still developing the key insights that correspond to those that programming texts and instructors impart to their students, to help those students get over that critical hump where using the language stops being more trouble than it is worth.  Most of the insights for Coq are barely even disseminated among the experts, let alone set down in a tutorial form.  I hope to use this book to go a long way towards remedying that.
 
-If I do that job well, then this book should be of interest even to people who have participated in classes or tutorials specifically about Coq.  The book should even be useful to people who have been using Coq for years but who are mystified when their Coq developments prove impenetrable by colleagues.  The crucial angle in this book is that there are "design patterns" for reliably avoiding the really grungy parts of theorem proving, and consistent use of these patterns can get you over the hump to the point where it is worth your while to use Coq to prove your theorems and certify your programs, even if formal verification is not your main concern in a project.  We will follow this theme by pursuing two main methods for replacing manual proofs with more understandable artifacts: dependently typed functions and custom Ltac decision procedures.
-*)
-*)
+If I do that job well, then this book should be of interest even to people who have participated in classes or tutorials specifically about Coq.  The book should even be useful to people who have been using Coq for years but who are mystified when their Coq developments prove impenetrable by colleagues.  The crucial angle in this book is that there are "design patterns" for reliably avoiding the really grungy parts of theorem proving, and consistent use of these patterns can get you over the hump to the point where it is worth your while to use Coq to prove your theorems and certify your programs, even if formal verification is not your main concern in a project.  We will follow this theme by pursuing two main methods for replacing manual proofs with more understandable artifacts: dependently typed functions and custom Ltac decision procedures.*)
 
 Coqの証明は他のシステムに比べて読みにくいと言われることが少なくありません。
 証明を読みやすくするための構造を意識せずに、証明の帰結を操作する命令的なスクリプトとして証明を書くのは、とても簡単です。
