@@ -394,36 +394,30 @@ Coqに関しては、そのような洞察はまだまだ専門家の間で普�
 これが本書における極めて重要な考え方です。
 その主題にのっとり、手動による証明を置き換えてより理解しやすい形にするための2つの方法として、
 依存型を持つ関数と独自のLtac決定手続きを駆使します。
-
-
-(**
-(** * Prerequisites *)
-*)
-(** * 前提知識 *)
-
-(**
-(**
-I try to keep the required background knowledge to a minimum in this book.  I will assume familiarity with the material from usual discrete math and logic courses taken by undergraduate computer science majors, and I will assume that readers have significant experience programming in one of the ML dialects, in Haskell, or in some other, closely related language.  Experience with only dynamically typed functional languages might lead to befuddlement in some places, but a reader who has come to understand Scheme deeply will probably be fine.
-
-My background is in programming languages, formal semantics, and program verification.  I sometimes use examples from that domain.  As a reference on these topics, I recommend _Types and Programming Languages_ %\cite{TAPL}%, by Benjamin C. Pierce; however, I have tried to choose examples so that they may be understood without background in semantics.
-*)
-*)
-(**
-私はこの本を読む上で必要な背景知識を最小限に抑えようとしています。
-私は、情報科学専攻の学部生が習う通常の離散数学と論理学を理解していること、そしてMLの方言かHaskellかその他の関連言語についてのプログラミング経験があることを仮定します。
-動的型付きの関数型言語の経験だけでは理解出来なくて困る部分もあるかもしれません。Schemeについての深い理解があればおそらく大丈夫です。
-
-私のバックグラウンドはプログラミング言語、形式意味論、そしてプログラム検証です。
-それらの分野からの例を使うことがあります。
-参考文献として _Type and Programming Languages_ %\cite{TAPL}% (訳注:和訳は「型システム入門 オーム社」)をお勧めします。しかし、なるべく意味論の背景なしに理解できるように例を選んでいます。
 *)
 
-
-(** * Using This Book *)
-
 (**
-(**
-This book is generated automatically from Coq source files using the wonderful coqdoc program.  The latest PDF version, with hyperlinks from identifier uses to the corresponding definitions, is available at:
+(* * Prerequisites *)
+* 前提知識
+
+(*I try to keep the required background knowledge to a minimum in this book.  I will assume familiarity with the material from usual discrete math and logic courses taken by undergraduate computer science majors, and I will assume that readers have significant experience programming in one of the ML dialects, in Haskell, or in some other, closely related language.  Experience with only dynamically typed functional languages might lead to befuddlement in some places, but a reader who has come to understand Scheme deeply will probably be fine.
+
+My background is in programming languages, formal semantics, and program verification.  I sometimes use examples from that domain.  As a reference on these topics, I recommend _Types and Programming Languages_ %\cite{TAPL}%, by Benjamin C. Pierce; however, I have tried to choose examples so that they may be understood without background in semantics.*)
+
+本書では、必要な背景知識が最小限になるように心がけます。
+前提とするのは、情報科学専攻の学部で履修する一般的な離散数学と論理学に馴染みがあり、
+MLの方言かHaskell、もしくはそれらに類する言語によるプログラミングをそれなりに経験していることです。
+動的型付きの関数型言語しか使った経験がないと、理解できずに戸惑う箇所があるかもしれませんが、
+Schemeに対する深い理解がある読者であれば、おそらく大丈夫でしょう。
+
+筆者の専門は、プログラミング言語、形式意味論、そしてプログラム検証です。
+これらの分野における話題を例として使用する場合があります。
+そうした話題についての参考文献としては、_[Types and Programming Languages]_ %\cite{TAPL}%をお勧めします。とはいえ、できるだけ背景の意味を知らなくても理解できるような例を選んだつもりです。
+
+(* * Using This Book *)
+* 本書の使い方
+
+(*This book is generated automatically from Coq source files using the wonderful coqdoc program.  The latest PDF version, with hyperlinks from identifier uses to the corresponding definitions, is available at:
 %\begin{center}\url{http://adam.chlipala.net/cpdt/cpdt.pdf}\end{center}%#<blockquote><tt><a href="http://adam.chlipala.net/cpdt/cpdt.pdf">http://adam.chlipala.net/cpdt/cpdt.pdf</a></tt></blockquote>#
 There is also an online HTML version available, which of course also provides hyperlinks:
 %\begin{center}\url{http://adam.chlipala.net/cpdt/html/toc.html}\end{center}%#<blockquote><tt><a href="http://adam.chlipala.net/cpdt/html/toc.html">http://adam.chlipala.net/cpdt/html/toc.html</a></tt></blockquote>#
@@ -434,29 +428,40 @@ There, you can find all of the code appearing in this book, with prose intersper
 
 A traditional printed version of the book is slated to appear from MIT Press in the future.  The online versions will remain available at no cost even after the printed book is released, and I intend to keep the source code up-to-date with bug fixes and compatibility changes to track new Coq releases.
 
-%\index{graphical interfaces to Coq}%I believe that a good graphical interface to Coq is crucial for using it productively.  I use the %\index{Proof General}%{{http://proofgeneral.inf.ed.ac.uk/}Proof General} mode for Emacs, which supports a number of other proof assistants besides Coq.  There is also the standalone %\index{CoqIDE}%CoqIDE program developed by the Coq team.  I like being able to combine certified programming and proving with other kinds of work inside the same full-featured editor.  In the initial part of this book, I will reference Proof General procedures explicitly, in introducing how to use Coq, but most of the book will be interface-agnostic, so feel free to use CoqIDE if you prefer it.  The one issue with CoqIDE before version 8.4, regarding running through the book source, is that I will sometimes begin a proof attempt but cancel it with the Coq [Abort] or #<span class="inlinecode"><span class="id" type="keyword">#%\coqdockw{%Restart%}%#</span></span># commands, which CoqIDE did not support until recently.  It would be bad form to leave such commands lying around in a real, finished development, but I find these commands helpful in writing single source files that trace a user's thought process in designing a proof.
-*)
-*)
-(**
-本書はcoqdocというプログラムを使ってCoqのソースファイルから自動的に生成されています。識別子から対応する定義にハイパーリンクの貼られたPDFバージョンは以下で利用できます：
+%\index{graphical interfaces to Coq}%I believe that a good graphical interface to Coq is crucial for using it productively.  I use the %\index{Proof General}%{{http://proofgeneral.inf.ed.ac.uk/}Proof General} mode for Emacs, which supports a number of other proof assistants besides Coq.  There is also the standalone %\index{CoqIDE}%CoqIDE program developed by the Coq team.  I like being able to combine certified programming and proving with other kinds of work inside the same full-featured editor.  In the initial part of this book, I will reference Proof General procedures explicitly, in introducing how to use Coq, but most of the book will be interface-agnostic, so feel free to use CoqIDE if you prefer it.  The one issue with CoqIDE before version 8.4, regarding running through the book source, is that I will sometimes begin a proof attempt but cancel it with the Coq [Abort] or #<span class="inlinecode"><span class="id" type="keyword">#%\coqdockw{%Restart%}%#</span></span># commands, which CoqIDE did not support until recently.  It would be bad form to leave such commands lying around in a real, finished development, but I find these commands helpful in writing single source files that trace a user's thought process in designing a proof.*)
+
+本書は、Coqのソースファイルから、coqdocという素晴らしいプログラムを使って自動的に生成されています。
+最新のPDFは、識別子から対応する定義へとハイパーリンクが貼られた状態で、以下から入手できます。
 %\begin{center}\url{http://adam.chlipala.net/cpdt/cpdt.pdf}\end{center}%#<blockquote><tt><a href="http://adam.chlipala.net/cpdt/cpdt.pdf">http://adam.chlipala.net/cpdt/cpdt.pdf</a></tt></blockquote>#
-オンラインのHTMLバージョンも利用できます。もちろんこちらでもハイパーリンクが付いています：
+オンラインのHTML版も利用できます。もちろんこちらにもハイパーリンクが付いています。
 %\begin{center}\url{http://adam.chlipala.net/cpdt/html/toc.html}\end{center}%#<blockquote><tt><a href="http://adam.chlipala.net/cpdt/html/toc.html">http://adam.chlipala.net/cpdt/html/toc.html</a></tt></blockquote>#
-本書のソースファイルも無料で利用できます：
+本書のソースファイルも無料で利用できます。
 %\begin{center}\url{http://adam.chlipala.net/cpdt/cpdt.tgz}\end{center}%#<blockquote><tt><a href="http://adam.chlipala.net/cpdt/cpdt.tgz">http://adam.chlipala.net/cpdt/cpdt.tgz</a></tt></blockquote>#
 
-ソースファイルでは本書に載っているすべてのコードがあり、コメントの中に本書と同じ順番で説明がつけられています。後述するCoqのグラフィカルインターフェースを使えばコードを1ステップずつ対話的に読み進めめられます。The code also has special comments indicating which parts of the chapters make suitable starting points for interactive class sessions, where the class works together to construct the programs and proofs.  The included Makefile has a target <<templates>> for building a fresh set of class template files automatically from the book source.
+ソースファイルには、文章によるコメントが随所に付された状態で、
+本書に掲載されているすべてのコードが本書に登場するのと同じ順番で含まれています。
+お好きなCoqのGUIを使って、そのコードを1ステップずつ対話的に実行していけます。
+対話的なセッションにおいて、プログラムと証明の構成にクラスを利用する場合には、どの章から始めればいいのかを示す特別なコメントも挿入してあります。
+Makefileの<<templates>>というターゲットを使うことで、クラスのテンプレートとなるファイルを書籍のソースから自動で新規に構築できるようになっています。
 
-(* A traditional printed version of the book is slated to appear from MIT Press in the future.  The online versions will remain available at no cost even after the printed book is released, and I intend to keep the source code up-to-date with bug fixes and compatibility changes to track new Coq releases. *)
+印刷された従来型の書籍は、MIT Pressから発行されます。
+印刷された本が出た後も、オンライン版は無償で利用可能な状態のままとします。
+ソースコードに対するバグ修正や新しいバージョンのCoqのリリースに伴う変更にも追随していく予定です。
 
-%\index{graphical interfaces to Coq}%Coqを生産的に使うには優れたグラフィカルインターフェースが必要不可欠でしょう。筆者はEmacsの%\index{Proof General}%{{http://proofgeneral.inf.ed.ac.uk/}Proof General}モードを使っています。Proof GeneralはCoqの他にもいくつかの証明支援系をサポートしています。Coqチームによって開発されているスタンドアローンの%\index{CoqIDE}%CoqIDEプログラムもあります。著者は同じエディタの中で認証付きプログラミングと証明を他の作業を両方行えることを好みます。本書の最初でCoqの使い方を紹介する際にはProof Generalの手順を明示的に参照しますが、本書のほとんどはインターフェースに依存しないので、もしCoqIDEを使いたければそちらを使っても構いません。CoqIDEのバージョン8.4以下で本書のソースを実行する際に生じる一つの問題は、始めた証明をキャンセルするときに用いるCoqの[Abort]や#<span class="inlinecode"><span class="id" type="keyword">#%\coqdockw{%Restart%}%#</span></span>#コマンドがサポートされていないことです。これらのコマンドを現実の、完了した開発に残すのは良くないでしょうが、著者はこれらのコマンドを証明を設計するときのユーザの思考プロセスをたどるソースコードを書くのに役立つと考えます。
-*)
+Coqを生産的に使うには優れたGUIが必要不可欠でしょう%\index{graphical interfaces to Coq}%。
+筆者はEmacsの%\index{Proof General}%{{http://proofgeneral.inf.ed.ac.uk/}Proof General}モードを使っています。
+Proof Generalは、Coqだけでなく、いくつもの証明支援系に対応しています。
+Coqの開発チームが用意しているスタンドアローンのCoqIDE%\index{CoqIDE}%というプログラムもあります。
+著者自身は、認証付きプログラムと証明の開発を、他のさまざまな作業と一緒に同じエディタ上で進めるのが好きです。
+本書では、最初にCoqの使い方を紹介する際にはProof Generalでの操作を示しますが、
+ほとんどの内容はGUIに依存しないのでCoqIDEを使ってもかまいません。
+ただし、本書のソースにはCoqの[Abort]もしくは#<span class="inlinecode"><span class="id" type="keyword">#%\coqdockw{%Restart%}%#</span></span>#コマンドを使って証明を途中でキャンセルしている箇所があり、CoqIDEでは最近までこれらの対応していないので、バージョン8.4以下のCoqIDEでソースを実行する場合には問題があります。
+これらのコマンドは、開発が終わった後のソースファイルには残しておかないほうがいいのでしょうが、証明を設計している人間の思考プロセスをソースファイルだけでたどる手助けになると思うので、本書のソースには残してあります。
 
-(** ** Reading This Book *)
+(* ** Reading This Book *)
+** 本書の読み方
 
-(**
-(**
-For experts in functional programming or formal methods, learning to use Coq is not hard, in a sense.  The Coq manual%~\cite{CoqManual}%, the textbook by Bertot and Cast%\'%eran%~\cite{CoqArt}%, and Pierce et al.'s %\emph{%Software Foundations%}\footnote{\url{http://www.cis.upenn.edu/~bcpierce/sf/}}% have helped many people become productive Coq users.  However, I believe that the best ways to manage significant Coq developments are far from settled.  In this book, I mean to propose my own techniques, and, rather than treating them as advanced material for a final chapter or two, I employ them from the very beginning.  After a first chapter showing off what can be done with dependent types, I retreat into simpler programming styles for the first part of the book.  I adopt the other main thrust of the book, Ltac proof automation, more or less from the very start of the technical exposition.
+(*For experts in functional programming or formal methods, learning to use Coq is not hard, in a sense.  The Coq manual%~\cite{CoqManual}%, the textbook by Bertot and Cast%\'%eran%~\cite{CoqArt}%, and Pierce et al.'s %\emph{%Software Foundations%}\footnote{\url{http://www.cis.upenn.edu/~bcpierce/sf/}}% have helped many people become productive Coq users.  However, I believe that the best ways to manage significant Coq developments are far from settled.  In this book, I mean to propose my own techniques, and, rather than treating them as advanced material for a final chapter or two, I employ them from the very beginning.  After a first chapter showing off what can be done with dependent types, I retreat into simpler programming styles for the first part of the book.  I adopt the other main thrust of the book, Ltac proof automation, more or less from the very start of the technical exposition.
 
 Some readers have suggested that I give multiple recommended reading orders in this introduction, targeted at people with different levels of Coq expertise.  It is certainly true that Part I of the book devotes significant space to basic concepts that most Coq users already know quite well.  However, as I am introducing these concepts, I am also developing my preferred automated proof style, so I think even the chapters on basics are worth reading for experienced Coq hackers.
 
@@ -465,39 +470,57 @@ Readers with no prior Coq experience can ignore the preceding discussion!  I hop
 Coq is a very complex system, with many different commands driven more by pragmatic concerns than by any overarching aesthetic principle.  When I use some construct for the first time, I try to give a one-sentence intuition for what it accomplishes, but I leave the details to the Coq reference manual%~\cite{CoqManual}%.  I expect that readers interested in complete understanding will be consulting that manual frequently; in that sense, this book is not meant to be completely standalone.  I often use constructs in code snippets without first introducing them at all, but explanations should always follow in the prose paragraphs immediately after the offending snippets.
 
 Previous versions of the book included some suggested exercises at the ends of chapters.  Since then, I have decided to remove the exercises and focus on the main book exposition.  A database of exercises proposed by various readers of the book is #<a href="http://adam.chlipala.net/cpdt/ex/">#available on the Web#</a>#%\footnote{\url{http://adam.chlipala.net/cpdt/ex/}}%.  I do want to suggest, though, that the best way to learn Coq is to get started applying it in a real project, rather than focusing on artificial exercises. *)
-*)
-(**
-関数型プログラミングか形式手法の熟練者には、ある意味でCoqの使い方を学ぶことは難しくありません。Coqのマニュアル%~\cite{CoqManual}%やBertot and Cast%\'%eran%~\cite{CoqArt}%、Pierceらの %\emph{%Software Foundations%}\footnote{\url{http://www.cis.upenn.edu/~bcpierce/sf/}}%は生産的にCoqを使うのに役立ちます。しかし、著者は重大なCoq開発をなし遂げる最良の方法は慣れることでは決してないと考えます。本書では、著者のテクニックを提示し、それらを最後の一、二章の発展的な道具として扱うのではなく、始めからそれらを使うつもりです。最初の章で依存型で何ができるかを見せた後、本書の第一部に対してよりシンプルなプログラミングスタイルへ方向転換します。また、本書の他の主眼として、Ltacによる証明の自動化をほとんど初歩から技術的に説明します。
 
-読者は著者がCoqの異なる熟練度の人々に合わせて読む順番を与えることを提案しているかもしれません。本書の第一部ではほとんどのCoqユーザは既によく知っている基礎概念に多くの説明を捧げているのは事実です。しかし、それらの概念を導入するにあたって著者の好む自動化された証明のスタイルを展開するので、基礎の章も経験のあるCoqハッカーにとって価値があると思います。
+関数プログラミングや形式手法の熟練者にとって、Coqの使い方を習得する際の困難は何もないと言えます。
+Coqのマニュアル%~\cite{CoqManual}%や、BertotとCastによる教科書%\'%eran%~\cite{CoqArt}%、Pierceらによる%``\emph{%Software Foundations%''}\footnote{\url{http://www.cis.upenn.edu/~bcpierce/sf/}}%によりCoqを使いこなせるようになった人は数多くいます。
+とはいえ、それなりの規模でCoqによる開発をうまくやる最善の方法は、まだまだ確立には程遠いというのが筆者の考えです。
+筆者は、本書で自分自身が持つテクニックを示すつもりです。
+しかもそれらのテクニックを、最後の数章で発展的な話題として扱うのではなく、冒頭から導入していきます。
+第1章では、依存型で何ができるかをお見せします。
+そのあとの第1部では、よりシンプルなスタイルのプログラミングに戻します。
+本書のもう1つの主眼であるLtacによる証明の自動化についても、ほぼ冒頭から技術的な説明を導入していきます。
 
-Coqの経験がない読者は前述の議論を無視して構いません！　読者がなぜ他がマニュアル的に証明のステップの列を入力するのに多くの時間を費すのか疑問を持つくらいに、著者の早くからの証明の自動化への強い信頼が最も自然な方法と思えることを望みます。
+何人かの方々からは、各章を読む順番について、Coqの熟練度に応じたお勧めをイントロダクションで示してはどうかという提案をしていただきました。
+確かに、本書の第1部ではCoqを利用している大部分の人がよく知っている基本的な概念の説明に紙面の多くを割いています。
+しかし、そうした概念を提示する際には筆者が好ましいと考える証明自動化のスタイルも明らかにしていくので、たとえ基礎的な章であっても、経験豊富なCoqハッカーにとって読む価値があるものと考えています。
 
-Coqはとえも複雑なシステムで、美しい原理を追求することより実用的な懸念から導出されたコマンドがたくさんあります。何か構造物(* construct *)を始めて使うときは、それが何を成し遂げるかの一文での直感的説明を与えますが、詳細はCoqのリファレンスマニュアル%~\cite{CoqManual}%に譲ります。完璧な理解を求める読者はリファレンスマニュアルを頻繁に参照することでしょう。この意味では、本書は完全にはスタンドアローンになるようには書かれていません。しばしばコードの中で構造物を先に説明することなしに使うことがありますが、説明はいつもそのコードの直後の段落に置かれるでしょう。
+これまでCoqを使ったことがない読者には関係ない話でしたね！
+証明の各ステップを時間をかけて手動で入力する人のことが不思議に見えるくらい、最初から筆者が証明の自動化を当てにしていることを当然に感じてもらえればと思います。
 
-本書の前のバージョンでは章の終わりに演習問題が含まれていました。それから、演習問題をなくして解説に焦点を当てることに決めました。本書のさまざまな読者に向けた演習問題のデータベースは#<a href="http://adam.chlipala.net/cpdt/ex/">#Webで利用できます#</a>#%\footnote{\url{http://adam.chlipala.net/cpdt/ex/}}%。しかし、Coqを学ぶための最良の方法は、人工的な演習問題を解くことよりもCoqを実際のプロジェクトに応用し始めることだと著者は提案します。
-*)
+Coqはとても複雑なシステムです。何か重要で審美的な原理でなく、もっと実用的な観点で必要になるコマンドがたくさん用意されています。
+本書では、はじめて登場する構成概念については、それが何を実現するものなのか、短文で直観的な説明を与えます。しかし、詳細な説明はCoqのリファレンスマニュアル%~\cite{CoqManual}%に譲ります。
+完璧な理解を求める読者は、リファレンスマニュアルを頻繁に参照することになるでしょう。
+その意味で本書は完全にスタンドアローンになるようには書かれていません。
+コード中には、まだ説明していない構成概念が出てくることもありますが、これらは常にコードの直後の段落で説明していきます。
 
-(** ** On the Tactic Library *)
+以前は各章の終わりに演習問題を付けていましたが、演習問題はなくして解説に注力することにしました。
+#<a href="http://adam.chlipala.net/cpdt/ex/">#Webでは、さまざまな本書の読者向けの演習問題のデータベースが利用できます#</a>#%\footnote{\url{http://adam.chlipala.net/cpdt/ex/}}%。
+ただ筆者としては、人工的な演習問題を解くよりも、Coqを実際のプロジェクトに応用し始めることがCoqを学ぶ最良の方法であると言いたいところです。
 
-(**
-(**
-To make it possible to start from fancy proof automation, rather than working up to it, I have included with the book source a library of _tactics_, or programs that find proofs, since the built-in Coq tactics do not support a high enough level of automation.  I use these tactics even from the first chapter with code examples.
+(* ** On the Tactic Library *)
+** タクティクライブラリについて
 
-Some readers have asked about the pragmatics of using this tactic library in their own developments.  My position there is that this tactic library was designed with the specific examples of the book in mind; I do not recommend using it in other settings.  Part III should impart the necessary skills to reimplement these tactics and beyond.  One generally deals with undecidable problems in interactive theorem proving, so there can be no tactic that solves all goals, though the %\index{tactics!crush}%[crush] tactic that we will meet soon may sometimes feel like that!  There are still very useful tricks found in the implementations of [crush] and its cousins, so it may be useful to examine the commented source file <<CpdtTactics.v>>.  I implement a new tactic library for each new project, since each project involves a different mix of undecidable theories where a different set of heuristics turns out to work well; and that is what I recommend others do, too.
-*)
-*)
-(**
-Coqにあらかじめあるタクティクは十分高レベルな自動化をサポートしていないので、高機能な自動証明から始めるために、それらに取り組むよりも(* this can be more natural *)、本書のソースに証明を探すプログラムである＿タクティク＿のライブラリを含めました。これらのタクティクは最初の章からすでにコード例と共に用います。
+(*To make it possible to start from fancy proof automation, rather than working up to it, I have included with the book source a library of _tactics_, or programs that find proofs, since the built-in Coq tactics do not support a high enough level of automation.  I use these tactics even from the first chapter with code examples.
 
-このタクティクライブラリを開発で使うことについて何人かの読者に尋ねられたことがあります。著者としては、このタクティクライブラリは本書の特定の例と共に設計したつもりなので、他の場面で使うことは推奨しません。第三部でこれらのタクティクを再実装し、またそれを越えるのに十分な技術について添えます。一般に対話的定理証明では決定不可能な問題も扱われるので、すべてのゴールを解くようなタクティクはないかもしれません。(すぐに出てくる%\index{tactics!crush}%[crush]タクティクは時々そのようなものだと感じるかもしれませんが！)[crush]やその兄弟のタクティクの実装にはとても便利な秘訣があるので、コメント付きのソースファイル<<CpdtTactics.v>>を調べてみるのも有益かもしれません。著者は新しいプロジェクトごとに新しいタクティクライブラリを実装しています。各プロジェクトは異なる決定不可能な理論の組み合わせを含んでいて、異なる種類のヒューリスティクスがうまくいくからです。そして皆さんにもそれを勧めます。
-*)
+Some readers have asked about the pragmatics of using this tactic library in their own developments.  My position there is that this tactic library was designed with the specific examples of the book in mind; I do not recommend using it in other settings.  Part III should impart the necessary skills to reimplement these tactics and beyond.  One generally deals with undecidable problems in interactive theorem proving, so there can be no tactic that solves all goals, though the %\index{tactics!crush}%[crush] tactic that we will meet soon may sometimes feel like that!  There are still very useful tricks found in the implementations of [crush] and its cousins, so it may be useful to examine the commented source file <<CpdtTactics.v>>.  I implement a new tactic library for each new project, since each project involves a different mix of undecidable theories where a different set of heuristics turns out to work well; and that is what I recommend others do, too.*)
 
-(** ** Installation and Emacs Set-Up *)
+徐々に手の込んだ自動証明へ進むのではなく、いきなり実践したいので、本書のソースにはそのための_[タクティク]_のライブラリを含めてあります。
+タクティクとは証明を探すプログラムのことです。
+あらかじめCoqにも組み込まれていますが、高級な自動証明には対応していないので、本書専用のタクティクライブラリを用意しました。
+このタクティクライブラリは、本書の最初の章のコード例から使っています。
 
-(**
-(**
-At the start of the next chapter, I assume that you have installed Coq and Proof General.  The code in this book is tested with Coq versions 8.4pl6, 8.5pl3, and 8.6.  Though parts may work with other versions, it is expected that the book source will fail to build with _earlier_ versions.
+この本書専用のタクティクライブラリを自分の開発に使いたいという声をいただくこともあります。
+著者としては、本書の特定の例を念頭に置いて設計したタクティクライブラリなので、他の場面での使用は推奨しません。
+これらのタクティクを再実装したり、その先に進むために必要な技術については、第三部で扱います。
+対話的な定理証明では決定不可能な問題を扱うことも多いので、すべてのゴールを解くようなタクティクはありえないでしょう。
+ただ、すぐに後で登場する[crush]%\index{tactics!crush}%タクティクは、そのような万能のタクティクに感じられるかもしれません。
+[crush]に類するタクティクの実装では、とても便利なトリックを使っているので、コメント付きのソースファイル<<CpdtTactics.v>>を調べてみると有益かもしれません。
+どんな決定不可能な定理が関係してくるかはプロジェクトによって異なり、それに応じて有効なヒューリスティクスも変わってくるので、著者は新しいプロジェクトごとに新しいタクティクライブラリを実装しています。皆さんにもそれを勧めます。
+
+(* ** Installation and Emacs Set-Up *)
+** インストールとEmacsの設定
+
+(*At the start of the next chapter, I assume that you have installed Coq and Proof General.  The code in this book is tested with Coq versions 8.4pl6, 8.5pl3, and 8.6.  Though parts may work with other versions, it is expected that the book source will fail to build with _earlier_ versions.
 
 %\index{Proof General|(}%To set up your Proof General environment to process the source to the next chapter, a few simple steps are required.
 
@@ -532,11 +555,12 @@ Every chapter of this book is generated from a commented Coq source file.  You c
 
 With Proof General, the portion of a buffer that Coq has processed is highlighted in some way, like being given a blue background.  You step through Coq source files by positioning the point at the position you want Coq to run to and pressing C-C C-RET.  This can be used both for normal step-by-step coding, by placing the point inside some command past the end of the highlighted region; and for undoing, by placing the point inside the highlighted region.
 %\index{Proof General|)}% *)
-*)
-(**
-次の章の最初では、皆さんがCoqとProof Generalをインストールした状態であることを仮定します。本書のコードはCoqバージョン8.4pl6、8.5pl3、8.6でテストされています。部分的には他のバージョンで動くかもしれませんが、本書のソースはより以前のバージョンではビルドに失敗すると予想されます。
 
-%\index{Proof General|(}%次の章でソースを処理するためにProof Generalの設定をするには、以下のシンプルなステップが必要です。
+次章ではCoqとProof Generalがインストールされているものとして説明を始めます。
+本書のコードは、Coqのバージョン8.4pl6、8.5pl3、8.6でテスト済みです。
+他のバージョンで動く部分もあると思いますが、これら_[以前]_のバージョンだと、本書のソースのビルドには失敗するでしょう。
+
+次章でソースを処理できるようにProof Generalを設定するには、いくつか簡単な段階を踏む必要があります。%\index{Proof General|(}%
 
 %\begin{enumerate}%#<ol>#
 
@@ -545,9 +569,9 @@ With Proof General, the portion of a buffer that Coq has processed is highlighte
 
 %\item %#<li>#tarballをディレクトリ<<DIR>>に展開#</li>#
 
-%\item %#<li>#<<DIR>>内で<<make>>を実行 (マルチコアがあるなら、それを使うために<<-j>>フラグを付けることが望まれます)#</li>#
+%\item %#<li>#<<DIR>>内で<<make>>を実行（マルチコアのマシンでは<<-j>>フラグを指定してください）#</li>#
 
-%\item %#<li>#Coqの対話的トップレベルを与える<<coqtop>>プログラムのコマンドライン引数をProof Generalに渡す際にはいくつか小さい困った問題があります。たくさんのソースファイルに共有されるであろう設定を追加する方法の一つは、custom variable settingを%\index{.emacs file@\texttt{.emacs} file}%<<.emacs>>ファイルに以下のように追加することです：
+%\item %#<li>#Coqの対話的な仕組みのトップレベルを提供する<<coqtop>>というプログラムがあり、そのコマンドライン引数をProof Generalに渡すのですが、これには本質的でない部分で少し面倒があります。複数のソースファイルで同じ設定を共有する方法としては、以下のように独自の変数を<<.emacs>>ファイルに追加設定する方法があります%\index{.emacs file@\texttt{.emacs} file}%。
 <<
 (custom-set-variables
   ...
@@ -555,10 +579,13 @@ With Proof General, the portion of a buffer that Coq has processed is highlighte
   ...
 )
 >>
+上記に提示しているのは、本書のコードを動かすための設定です。
+省略した部分には、Emacsの他のカスタマイズのために設定されている変数があれば、それが入ります。<<.emacs>>ファイルの<<custom-set-variables>>ブロックには複数の設定を書いて保存しておき、適宜必要なもの以外をコメントアウトして使うとよいでしょう。
 
-ここで見せた特別な引数は本書のコードのための選択です。省略されているのは皆さんが既に設定しているかもしれないEmacsカスタマイズです。<<.emacs>>ファイルに、一つを除いて<<custom-set-variables>>ブロックにコメントアウトした複数の代替のフラグを保存しておくと便利かもしれません。
-
-あるいは、設定を適用したいソースファイルのディレクトリ内の%\index{.dir-locals.el file@\texttt{.dir-locals.el} file}%<<.dir-locals.el>>ファイルを使うことで、Proof Generalの設定はディレクトリごとに指定できます。以下が本書のソースに使えるような設定ファイルの例です。CoqをEmacsサポートモードで開始するための引数を含める必要があることに注意してください。
+Proof Generalの設定をディレクトリごとに指定することも可能です。
+それには、設定を適用したいソースファイルのディレクトリ内に<<.dir-locals.el>>ファイルを配置します%\index{.dir-locals.el file@\texttt{.dir-locals.el} file}%。
+本書のソース向けの設定ファイルの例を以下に示します。
+EmacsサポートモードでCoqを開始するための引数を含める必要がある点に注意してください。
 <<
 ((coq-mode . ((coq-prog-args . ("-emacs-U" "-R" "DIR/src" "Cpdt")))))
 >>
@@ -566,13 +593,20 @@ With Proof General, the portion of a buffer that Coq has processed is highlighte
 
 #</ol>#%\end{enumerate}%
 
-本書の各章はコメント付きのCoqソースファイルから生成されています。Proof Generalでそれらをロードしてステップ毎に実行できます。Coqバイナリ<<coqtop>>をコマンドライン引数<<-R DIR/src Cpdt>>を必ずつけて実行してください。Proof Generalを正しくインストールしたならば、CoqモードはEmacs内で<<.v>>バッファに入ったときに自動で始まり、<<.emacs>>設定の上記のアドバイスは<<coqtop>>に適切な引数がEmacsにより渡されることを保証するでしょう。
+本書の各章はコメント付きのCoqソースファイルから生成されています。
+Proof Generalでそれらをロードして1ステップずつ実行できます。
+Coqのバイナリ<<coqtop>>は、必ずコマンドライン引数<<-R DIR/src Cpdt>>を指定して実行してください。
+Proof Generalが適切にインストールされていれば、Emacs内で<<.v>>バッファに入ったときに自動でCoqモードが立ち上がるはずです。
+そして、上記のように<<.emacs>>を設定してあれば、適切な引数がEmacsから<<coqtop>>に渡されるでしょう。
 
-Proof Generalでは、Coqが実行されたバッファの一部は青の背景などでハイライトされます。Coqのソースファイルをステップ毎に実行するには、実行したい場所にカーソルを置いて C-C C-RET を押します。これは、ハイライトされた領域の外側でも内側でも、通常のステップ毎のコーディングのために使えます。
+Proof Generalでは、バッファのうちCoqが実行した部分の背景がハイライトされ、青色などで表示されます。
+実行したい場所にカーソルを置いて<<C-C C-RET>>を押すと、その位置までCoqのソースファイルをステップごとに実行できます。
+<<C-C C-RET>>は、ハイライト済みの領域より後ろにカーソルを置いてステップごとに実行するときだけでなく、ハイライトされた領域内にカーソルを置くことで、そこまで実行を巻き戻すときにも使えます。
+
 %\index{Proof General|)}% *)
 
-(** %\section{Chapter Source Files}
-
+(** (*%\section{Chapter Source Files}*)
+%\section{各章のソースファイル}
 \begin{center} \begin{tabular}{|r|l|}
 \hline
 \textbf{Chapter} & \textbf{Source} \\
@@ -610,4 +644,4 @@ Proving in the Large & \texttt{Large.v} \\
 A Taste of Reasoning About Programming Language Syntax & \texttt{ProgLang.v} \\
 \hline
 \end{tabular} \end{center}
-% *)
+%*)
