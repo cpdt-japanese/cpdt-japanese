@@ -442,7 +442,7 @@ The first subgoal follows by Coq's rules of computation, so we can dispatch it e
 Likewise for the second subgoal, so we can restart the proof and give a very compact justification.%\index{Vernacular commands}%
 *)
 2つめのサブゴールについても同様です．
-証明を再開すれば極めてコンパクトに正当化できます．%\index{Vernacularこまんど@Vernacularコマンド!Restart}%
+証明を再開すればきわめてコンパクトに正当化できます．%\index{Vernacularこまんど@Vernacularコマンド!Restart}%
 *)
 
 Restart.
@@ -689,7 +689,7 @@ The [injection] tactic refers to a premise by number, adding new equalities betw
 (*
 There is also a very useful tactic called %\index{tactics!congruence}%[congruence] that can prove this theorem immediately.  The [congruence] tactic generalizes [discriminate] and [injection], and it also adds reasoning about the general properties of equality, such as that a function returns equal results on equal arguments.  That is, [congruence] is a%\index{theory of equality and uninterpreted functions}% _complete decision procedure for the theory of equality and uninterpreted functions_, plus some smarts about inductive types.
 *)
-この定理を一発で証明できる%\index{たくてぃくす@タクティクス!congruence}%[congruence]という極めて役に立つタクティックもあります．
+この定理を一発で証明できる%\index{たくてぃくす@タクティクス!congruence}%[congruence]というきわめて役に立つタクティックもあります．
 [congruence]タクティックは[discriminate]および[injection]を一般化したもので，関数は等しい引数について等しい結果を返すという同等性に関する一般的な性質の論証を追加します．
 すなわち，[congruence]は%\index{みかいしゃくかんすうのどうとうせいりろん@未解釈関数の同等性理論}%%\emph{未解釈関数の同等性理論に対する完全決定手続}%であり，帰納型に関してもスマートなタクティックです．
 (* the theory of equality and uninterpreted functions は何のことか？-nobsun *)
@@ -729,7 +729,7 @@ Fixpoint napp (ls1 ls2 : nat_list) : nat_list :=
 (*
 Inductive theorem proving can again be automated quite effectively.
 *)
-帰納的定理の証明は極めて効率的に自動化可能です．
+帰納的定理の証明はきわめて効率的に自動化可能です．
 *)
 
 Theorem nlength_napp : forall ls1 ls2 : nat_list, nlength (napp ls1 ls2)
@@ -819,9 +819,21 @@ We have the usual two cases, one for each constructor of [nat_btree].
 通常の場合分けは2通りで，それぞれ[nat_btree]の構成子に対応しています．
 *)
 
-(** * Parameterized Types *)
+(**
+(*
+* Parameterized Types
+*)
+* パラメタライズド型
+(* parameterized type の定訳は？-nobsun *)
+*)
 
-(** We can also define %\index{polymorphism}%polymorphic inductive types, as with algebraic datatypes in Haskell and ML.%\index{Gallina terms!list}\index{Gallina terms!Nil}\index{Gallina terms!Cons}\index{Gallina terms!length}\index{Gallina terms!app}% *)
+(**
+(*
+We can also define %\index{polymorphism}%polymorphic inductive types, as with algebraic datatypes in Haskell and ML.%\index{Gallina terms!list}\index{Gallina terms!Nil}\index{Gallina terms!Cons}\index{Gallina terms!length}\index{Gallina terms!app}% 
+*)
+HaskellやMLにおける代数データ型のように%\index{たそうせい@多相性}%多相帰納型を定義できます．
+%\index{Gallinaこう@Gallina項!list}\index{Gallinaこう@Gallina項!Nil}\index{Gallinaこう@Gallina項!Cons}\index{Gallinaこう@Gallina項!length}\index{Gallinaこう@Gallina項!app}% 
+*)
 
 Inductive list (T : Set) : Set :=
 | Nil : list T
@@ -846,7 +858,13 @@ Theorem length_app : forall T (ls1 ls2 : list T), length (app ls1 ls2)
 Qed.
 (* end thide *)
 
-(** There is a useful shorthand for writing many definitions that share the same parameter, based on Coq's%\index{sections}\index{Vernacular commands!Section}\index{Vernacular commands!Variable}% _section_ mechanism.  The following block of code is equivalent to the above: *)
+(**
+(*
+There is a useful shorthand for writing many definitions that share the same parameter, based on Coq's%\index{sections}\index{Vernacular commands!Section}\index{Vernacular commands!Variable}% _section_ mechanism.  The following block of code is equivalent to the above:
+*)
+同じパラメータを共有する多くの定義を書くための便利な省略形があります．
+これらはCoqの%\index{せくしょん@セクション}\index{Vernacularこんまんど@Vernacularコマンド!Section}\index{Vernacularこまんど@Vernacularコマンド!Variable}\emph{セクション}%機構に基づくものです．
+*)
 
 (* begin hide *)
 Reset list.
@@ -881,7 +899,17 @@ End list.
 
 Implicit Arguments Nil [T].
 
-(** After we end the section, the [Variable]s we used are added as extra function parameters for each defined identifier, as needed.  With an [Implicit Arguments]%~\index{Vernacular commands!Implicit Arguments}% command, we ask that [T] be inferred when we use [Nil]; Coq's heuristics already decided to apply a similar policy to [Cons], because of the [Set Implicit Arguments]%~\index{Vernacular commands!Set Implicit Arguments}% command elided at the beginning of this chapter.  We verify that our definitions have been saved properly using the [Print] command, a cousin of [Check] which shows the definition of a symbol, rather than just its type. *)
+(**
+(*
+After we end the section, the [Variable]s we used are added as extra function parameters for each defined identifier, as needed.  With an [Implicit Arguments]%~\index{Vernacular commands!Implicit Arguments}% command, we ask that [T] be inferred when we use [Nil]; Coq's heuristics already decided to apply a similar policy to [Cons], because of the [Set Implicit Arguments]%~\index{Vernacular commands!Set Implicit Arguments}% command elided at the beginning of this chapter.  We verify that our definitions have been saved properly using the [Print] command, a cousin of [Check] which shows the definition of a symbol, rather than just its type.
+*)
+このセクションを終端すると，使用した[Variable]は定義された各識別子に対し，必要に応じて，追加の関数パラメータとして付加されます．
+[Implicit Arguments]%~\index{Vernacularこまんど@Vernacularコマンド!Implicit Arguments}%コマンドを使うと，[Nil]を使用したときに[T]が推論されるようにできます．
+Coqのヒューリスティックは，似た方針を[Cons]に適用することを決定ずみです．
+それは，この章の冒頭で[Set Implicit Aruguments]%~\index{Vernacularこまんど@Vernacularコマンド!Set Implicit Arguments}%コマンドを省略したからです．
+[Print]コマンドを使って，定義が適切に保存されたかどうかを確認します．
+[Check]コマンドはシンボルの型だけではなく定義も表示します．
+*)
 
 Print list.
 (** %\vspace{-.15in}% [[
@@ -889,7 +917,13 @@ Print list.
     Nil : list T | Cons : T -> list T -> list T
 ]]
 
-The final definition is the same as what we wrote manually before.  The other elements of the section are altered similarly, turning out exactly as they were before, though we managed to write their definitions more succinctly. *)
+(*
+The final definition is the same as what we wrote manually before.  The other elements of the section are altered similarly, turning out exactly as they were before, though we managed to write their definitions more succinctly.
+*)
+最終的な定義は以前に手書きしたものと同じです．
+セクションの他の要素も同様に変更されています．
+しかし，定義をより簡潔に記述したにもかかわらず，以前のものとぴったり同じになっています．
+*)
 
 Check length.
 (** %\vspace{-.15in}% [[
@@ -897,7 +931,11 @@ Check length.
      : forall T : Set, list T -> nat
 ]]
 
-The parameter [T] is treated as a new argument to the induction principle, too. *)
+(*
+The parameter [T] is treated as a new argument to the induction principle, too.
+*)
+パラメータ[T]は帰納法原理の新しい引数としても扱われます．
+*)
 
 Check list_ind.
 (** %\vspace{-.15in}% [[
@@ -908,7 +946,12 @@ Check list_ind.
        forall l : list T, P l
 ]]
 
-Thus, despite a very real sense in which the type [T] is an argument to the constructor [Cons], the inductive case in the type of [list_ind] (i.e., the third line of the type) includes no quantifier for [T], even though all of the other arguments are quantified explicitly.  Parameters in other inductive definitions are treated similarly in stating induction principles. *)
+(*
+Thus, despite a very real sense in which the type [T] is an argument to the constructor [Cons], the inductive case in the type of [list_ind] (i.e., the third line of the type) includes no quantifier for [T], even though all of the other arguments are quantified explicitly.  Parameters in other inductive definitions are treated similarly in stating induction principles.
+*)
+このように，型[T]が構成子[Cons]への引数になっているというきわめて現実的な意味があるにもかかわらず，さらに他の引数はどれも明示的に限量化修飾されているにもかかわらず，[list_ind]の型の場合分けにおける帰納部（たとえば上の3行目）には，[T]への限量子がありません．
+他の帰納的定義におけるパラメータは帰納法原理で表明されているとおりの扱いを受けます．
+*)
 
 
 (** * Mutually Inductive Types *)
