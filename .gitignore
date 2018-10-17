@@ -1,5 +1,8 @@
+Makefile.coq
 *.aux
 *.glob
 *.v.tex
 *.v.d
 *.vo
+#*
+*~
