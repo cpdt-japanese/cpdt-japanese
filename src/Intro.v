@@ -179,7 +179,7 @@ In contrast, %\index{PVS}%PVS's dependent types are much more general, but they 
 Dependent types are useful not only because they help you express correctness properties in types.  Dependent types also often let you write certified programs _without writing anything that looks like a proof_.  Even with subset types, which for many contexts can be used to express any relevant property with enough acrobatics, the human driving the proof assistant usually has to build some proofs explicitly.  Writing formal proofs is hard, so we want to avoid it as far as possible.  Dependent types are invaluable for this purpose.*)
 
 _[依存型]_を持つ言語では、型の内部にプログラムに対する言及を含められます。
-例えば、配列の型にその配列の長さを指定するプログラム式を含ませられ、それによって配列の範囲外アクセスがないかどうかを静的に検査できます。
+例えば、配列の型にその配列の長さを指定するプログラム式を含められ、それによって配列の範囲外アクセスがないかどうかを静的に検査できます。
 (* 池渕: 「配列を表す型」は依存型の文脈だと「配列の型」とは別物と解釈できてしまいそう。
  *「型の内部にプログラムに対する言及を含められ」ることへの「例えば」なので、まず「配列の型にその長さを指定するプログラム式を含ませられる」ことをはっきりと主張したほうがいいと思った。
  *「指定する」は意訳だけど、そっちのほうが分かりやすいと思う。 *)
