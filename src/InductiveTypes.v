@@ -1366,7 +1366,7 @@ Nonetheless, the basic insight of HOAS is a very useful one, and there are ways 
 (*
 * An Interlude on Induction Principles
 *)
-帰納法原理についての間奏曲
+* 帰納法原理についての間奏曲
 *)
 
 (**
