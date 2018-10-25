@@ -1663,16 +1663,38 @@ It is apparent that induction principle implementations involve some tedium but 
 *)
 
 
-(** * Nested Inductive Types *)
+(**
+(*
+* Nested Inductive Types
+*)
+* ネストした帰納型
+*)
 
-(** Suppose we want to extend our earlier type of binary trees to trees with arbitrary finite branching.  We can use lists to give a simple definition. *)
+(**
+(*
+Suppose we want to extend our earlier type of binary trees to trees with arbitrary finite branching.  We can use lists to give a simple definition.
+*)
+以前に見た二分木の型を有限分岐の多分木の型に拡張したいとしましょう．
+リストを使って以下のように単純に定義できます．
+*)
 
 Inductive nat_tree : Set :=
 | NNode' : nat -> list nat_tree -> nat_tree.
 
-(** This is an example of a%\index{nested inductive type}% _nested_ inductive type definition, because we use the type we are defining as an argument to a parameterized type family.  Coq will not allow all such definitions; it effectively pretends that we are defining [nat_tree] mutually with a version of [list] specialized to [nat_tree], checking that the resulting expanded definition satisfies the usual rules.  For instance, if we replaced [list] with a type family that used its parameter as a function argument, then the definition would be rejected as violating the positivity restriction.
+(**
+(*
+This is an example of a%\index{nested inductive type}% _nested_ inductive type definition, because we use the type we are defining as an argument to a parameterized type family.  Coq will not allow all such definitions; it effectively pretends that we are defining [nat_tree] mutually with a version of [list] specialized to [nat_tree], checking that the resulting expanded definition satisfies the usual rules.  For instance, if we replaced [list] with a type family that used its parameter as a function argument, then the definition would be rejected as violating the positivity restriction.
+*)
+これは，定義しようとして型をパラメタ化した型族の引数として使っているので，%\index{ねすとしたきのうがた@ネストした帰納型}%%\emph{ネストした}%帰納型の定義例です．
+Coqではこのような定義はどれも許されていません．
+[nat_tree]で特定化したリストと相互参照的に[nat_tree]を定義しようとしているので，これを展開した定義が通常の規則を満すかどうかの検査にひっかかるということです．
+たとえば，[list]を，関数を引数をもつ型族に置き換えると，定義が陽性要件違反となり，拒絶されます．
 
-As we encountered with mutual inductive types, we find that the automatically generated induction principle for [nat_tree] is too weak. *)
+(*
+As we encountered with mutual inductive types, we find that the automatically generated induction principle for [nat_tree] is too weak.
+*)
+相互帰納型のときに遭遇したように，自動生成した[nat_tree]の帰納法原理では弱いのだということが判ります．
+*)
 
 (* begin hide *)
 (* begin thide *)
@@ -1688,9 +1710,20 @@ Check nat_tree_ind.
        forall n : nat_tree, P n
 ]]
 
+(*
 There is no command like [Scheme] that will implement an improved principle for us.  In general, it takes creativity to figure out _good_ ways to incorporate nested uses of different type families.  Now that we know how to implement induction principles manually, we are in a position to apply just such creativity to this problem.
+*)
+より改善された原理を実装する[Scheme]のようなコマンドはありません．
+一般的に，異なる型族をネストして使う%\emph{うまい}%方法を実現するには創造性が必要です．
+相互帰納法原理の実装方法が判っているので，このような創造性をこの問題に適用する番です．
 
-Many induction principles for types with nested uses of [list] could benefit from a unified predicate capturing the idea that some property holds of every element in a list.  By defining this generic predicate once, we facilitate reuse of library theorems about it.  (Here, we are actually duplicating the standard library's [Forall] predicate, with a different implementation, for didactic purposes.) *)
+(*
+Many induction principles for types with nested uses of [list] could benefit from a unified predicate capturing the idea that some property holds of every element in a list.  By defining this generic predicate once, we facilitate reuse of library theorems about it.  (Here, we are actually duplicating the standard library's [Forall] predicate, with a different implementation, for didactic purposes.)
+*)
+[list]をネストして使用する型に対する帰納法原理の多くは，リストの各要素がなんらかの性質を満すことを捕捉する単一の述語があれば，役に立ちます．
+このような汎用的な述語をいったん定義してしまえば，ライブラリの定理を再利用するのが容易になります．
+（ここでは，説明のために，標準ライブラリの[Forall]述語をそのまま写して別名で実装しています．）
+*)
 
 Section All.
   Variable T : Set.
@@ -1703,16 +1736,30 @@ Section All.
     end.
 End All.
 
-(** It will be useful to review the definitions of [True] and [/\], since we will want to write manual proofs of them below. *)
+(**
+(*
+It will be useful to review the definitions of [True] and [/\], since we will want to write manual proofs of them below.
+*)
+以下にこれらの証明を書き下したいので，[True]および[/\]の定義を復習しておくと役に立ちます．
+*)
 
 Print True.
 (** %\vspace{-.15in}%[[
   Inductive True : Prop :=  I : True
   ]]
 
+(*
 That is, [True] is a proposition with exactly one proof, [I], which we may always supply trivially.
+*)
+すなわち，[True]は，常に自明としてよい証明[I]を1つだけ持つ命題です．
 
-Finding the definition of [/\] takes a little more work.  Coq supports user registration of arbitrary parsing rules, and it is such a rule that is letting us write [/\] instead of an application of some inductive type family.  We can find the underlying inductive type with the %\index{Vernacular commands!Locate}%[Locate] command, whose argument may be a parsing token.%\index{Gallina terms!and}% *)
+(*
+Finding the definition of [/\] takes a little more work.  Coq supports user registration of arbitrary parsing rules, and it is such a rule that is letting us write [/\] instead of an application of some inductive type family.  We can find the underlying inductive type with the %\index{Vernacular commands!Locate}%[Locate] command, whose argument may be a parsing token.%\index{Gallina terms!and}%
+*)
+[/\]の定義はもうすこし考えることがあります．
+Coqは利用者が任意の構文解析規則を登録できるようになっており，帰納型族の適用ではなく[/\]を書ける規則を登録できます．
+引数として構文解析トークンを取れる%\index{Vernacularこまんど@Vernacularコマンド!Locate}%[Locate]コマンドを使って，土台になる帰納型を見つけられます．
+*)
 
 Locate "/\".
 (** %\vspace{-.15in}%[[
@@ -1729,11 +1776,20 @@ Print and.
   For conj: Arguments A, B are implicit
 >>
 
+(*
 In addition to the definition of [and] itself, we get information on %\index{implicit arguments}%implicit arguments (and some other information that we omit here).  The implicit argument information tells us that we build a proof of a conjunction by calling the constructor [conj] on proofs of the conjuncts, with no need to include the types of those proofs as explicit arguments.
+*)
+[and]自体の定義のほかに，%\index{あんもくのひきすう@暗黙の引数}%に関する情報（および，ここでは省略したその他の情報）が得られます．
+暗黙の引数に関する情報は，その連言の証明上で構成子[conj]を呼んで，証明を構成すること教えてくれます．
+このとき，証明の型を引数に明示的に含める必要はありません．
 
 %\medskip%
 
-Now we create a section for our induction principle, following the same basic plan as in the previous section of this chapter. *)
+(*
+Now we create a section for our induction principle, following the same basic plan as in the previous section of this chapter.
+*)
+帰納法原理のセクションを作ったので，次にこの章の直前の節で見たのと同じやり方で進めましょう．
+*)
 
 Section nat_tree_ind'.
   Variable P : nat_tree -> Prop.
@@ -1747,7 +1803,11 @@ Section nat_tree_ind'.
   (* end thide *)
   (* end hide *)
 
-  (** A first attempt at writing the induction principle itself follows the intuition that nested inductive type definitions are expanded into mutual inductive definitions.
+  (**
+  (*
+  A first attempt at writing the induction principle itself follows the intuition that nested inductive type definitions are expanded into mutual inductive definitions.
+  *)
+  ネストした帰納型の定義は相互帰納の定義に展開されるという直観にしたがって，まず帰納法原理自身を書きましょう．
 
   %\vspace{-.15in}%[[
   Fixpoint nat_tree_ind' (tr : nat_tree) : P tr :=
@@ -1762,13 +1822,23 @@ Section nat_tree_ind'.
     end.
   ]]
 
+  (*
   Coq rejects this definition, saying
+  *)
+  Coqは以下のメッセージを残してこの定義を拒絶します．
+
 <<
   Recursive call to nat_tree_ind' has principal argument equal to "tr"
   instead of rest.
 >>
 
-  There is no deep theoretical reason why this program should be rejected; Coq applies incomplete termination-checking heuristics, and it is necessary to learn a few of the most important rules.  The term "nested inductive type" hints at the solution to this particular problem.  Just as mutually inductive types require mutually recursive induction principles, nested types require nested recursion. *)
+  (*
+  There is no deep theoretical reason why this program should be rejected; Coq applies incomplete termination-checking heuristics, and it is necessary to learn a few of the most important rules.  The term "nested inductive type" hints at the solution to this particular problem.  Just as mutually inductive types require mutually recursive induction principles, nested types require nested recursion.
+  *)
+  このプログラムが拒絶される理由は深い理論的なものではありません．
+  Coqは不完全な停止性判定のヒューリスティクスを適用しています．
+  ここでは，最も重要な規則について学んでおく必要があります．
+  *)
 
   Fixpoint nat_tree_ind' (tr : nat_tree) : P tr :=
     match tr with
@@ -1780,11 +1850,22 @@ Section nat_tree_ind'.
           end) ls)
     end.
 
-  (** We include an anonymous [fix] version of [list_nat_tree_ind] that is literally _nested_ inside the definition of the recursive function corresponding to the inductive definition that had the nested use of [list].   *)
+  (**
+  (*
+  We include an anonymous [fix] version of [list_nat_tree_ind] that is literally _nested_ inside the definition of the recursive function corresponding to the inductive definition that had the nested use of [list].
+  *)
+  [list]をネストして使っている帰納的定義に関係する再帰関数の定義において，文字どおり%\emph{ネスト}の内側に無名[fix]を使った%[list_nat_tree_ind]を含めます．
+  *)
 
 End nat_tree_ind'.
 
-(** We can try our induction principle out by defining some recursive functions on [nat_tree] and proving a theorem about them.  First, we define some helper functions that operate on lists. *)
+(**
+(*
+We can try our induction principle out by defining some recursive functions on [nat_tree] and proving a theorem about them.  First, we define some helper functions that operate on lists.
+*)
+[nat_tree]上の再帰関数を定義し，それらに関する定理を証明することで，帰納法原理を試せます．
+まず，リストを操作する補助関数をいくつか定義しましょう．
+*)
 
 Section map.
   Variables T T' : Set.
@@ -1803,14 +1884,24 @@ Fixpoint sum (ls : list nat) : nat :=
     | Cons h t => plus h (sum t)
   end.
 
-(** Now we can define a size function over our trees. *)
+(**
+(*
+Now we can define a size function over our trees.
+*)
+これで木（ツリー）のサイズを測る関数を定義できます．
+*)
 
 Fixpoint ntsize (tr : nat_tree) : nat :=
   match tr with
     | NNode' _ trs => S (sum (map ntsize trs))
   end.
 
-(** Notice that Coq was smart enough to expand the definition of [map] to verify that we are using proper nested recursion, even through a use of a higher-order function. *)
+(**
+(*
+Notice that Coq was smart enough to expand the definition of [map] to verify that we are using proper nested recursion, even through a use of a higher-order function.
+*)
+Coqは賢いので，高階関数を使っても[map]の定義を展開してネストした再帰を適切に使っていることを検証できます．
+*)
 
 Fixpoint ntsplice (tr1 tr2 : nat_tree) : nat_tree :=
   match tr1 with
@@ -1818,7 +1909,12 @@ Fixpoint ntsplice (tr1 tr2 : nat_tree) : nat_tree :=
     | NNode' n (Cons tr trs) => NNode' n (Cons (ntsplice tr tr2) trs)
   end.
 
-(** We have defined another arbitrary notion of tree splicing, similar to before, and we can prove an analogous theorem about its relationship with tree size.  We start with a useful lemma about addition. *)
+(**
+(*
+We have defined another arbitrary notion of tree splicing, similar to before, and we can prove an analogous theorem about its relationship with tree size.  We start with a useful lemma about addition.
+*)
+前回，別の木（ツリー）接合の概念を適当に定義したのと同じように，木（ツリー）のサイズとの関係について同様の定理を証明できます．
+*)
 
 (* begin thide *)
 Lemma plus_S : forall n1 n2 : nat,
@@ -1827,18 +1923,32 @@ Lemma plus_S : forall n1 n2 : nat,
 Qed.
 (* end thide *)
 
-(** Now we begin the proof of the theorem, adding the lemma [plus_S] as a hint. *)
+(**
+(*
+Now we begin the proof of the theorem, adding the lemma [plus_S] as a hint.
+*)
+これで，ヒントとして補題[plus_S]を追加して件の定理を証明します．
+*)
 
 Hint Rewrite plus_S.
 
 Theorem ntsize_ntsplice : forall tr1 tr2 : nat_tree, ntsize (ntsplice tr1 tr2)
   = plus (ntsize tr2) (ntsize tr1).
 (* begin thide *)
-  (** We know that the standard induction principle is insufficient for the task, so we need to provide a %\index{tactics!using}%[using] clause for the [induction] tactic to specify our alternate principle. *)
+  (**
+  (*
+  We know that the standard induction principle is insufficient for the task, so we need to provide a %\index{tactics!using}%[using] clause for the [induction] tactic to specify our alternate principle.
+  *)
+  標準の帰納法原理では不十分ということがわかりましたので，%\index{たくてぃっく@タクティック!using}%[induction]タクティックで[using]節を使って代替の原理を指定します．
+  *)
 
   induction tr1 using nat_tree_ind'; crush.
 
-  (** One subgoal remains: [[
+  (**
+  (*
+  One subgoal remains: [[
+  *)
+  サブゴールが一つのこっています． [[
   n : nat
   ls : list nat_tree
   H : All
@@ -1854,12 +1964,21 @@ Theorem ntsize_ntsplice : forall tr1 tr2 : nat_tree, ntsize (ntsplice tr1 tr2)
      end = S (plus (ntsize tr2) (sum (map ntsize ls)))
  
      ]]
-
-     After a few moments of squinting at this goal, it becomes apparent that we need to do a case analysis on the structure of [ls].  The rest is routine. *)
+  (*
+     After a few moments of squinting at this goal, it becomes apparent that we need to do a case analysis on the structure of [ls].  The rest is routine.
+  *)
+     このゴールを少しにらめば，[ls]の構造の場合わけが必要なことは明らかです．
+     のこりはルーチンワークです．
+  *)
 
   destruct ls; crush.
 
-  (** We can go further in automating the proof by exploiting the hint mechanism.%\index{Vernacular commands!Hint Extern}% *)
+  (**
+  (*
+  We can go further in automating the proof by exploiting the hint mechanism.%\index{Vernacular commands!Hint Extern}%
+  *)
+  ヒント機構をうまく使えば先まで自動的に証明できるようになります．%\index{Vernacularこまんど@Vernacularコマンド!Hint Extern}%
+  *)
 
   Restart.
 
@@ -1869,9 +1988,24 @@ Theorem ntsize_ntsplice : forall tr1 tr2 : nat_tree, ntsize (ntsplice tr1 tr2)
 Qed.
 (* end thide *)
 
-(** We will go into great detail on hints in a later chapter, but the only important thing to note here is that we register a pattern that describes a conclusion we expect to encounter during the proof.  The pattern may contain unification variables, whose names are prefixed with question marks, and we may refer to those bound variables in a tactic that we ask to have run whenever the pattern matches.
+(**
+(*
+We will go into great detail on hints in a later chapter, but the only important thing to note here is that we register a pattern that describes a conclusion we expect to encounter during the proof.  The pattern may contain unification variables, whose names are prefixed with question marks, and we may refer to those bound variables in a tactic that we ask to have run whenever the pattern matches.
+*)
+ヒントについては後の章で詳しく説明しますが，ここで注目すべき唯一重要なことは，証明の途中で遭遇することが予想される結論を記述するためのパターンを登録することです．
+このパターンには単一化変数が含まれています．
+変数名の先頭に疑問符が付きますのでそれと判ります．
+パターンが照合されれば走るタクティック中のこれらの束縛変数を参照できるわけです．
 
-The advantage of using the hint is not very clear here, because the original proof was so short.  However, the hint has fundamentally improved the readability of our proof.  Before, the proof referred to the local variable [ls], which has an automatically generated name.  To a human reading the proof script without stepping through it interactively, it was not clear where [ls] came from.  The hint explains to the reader the process for choosing which variables to case analyze, and the hint can continue working even if the rest of the proof structure changes significantly. *)
+(*
+The advantage of using the hint is not very clear here, because the original proof was so short.  However, the hint has fundamentally improved the readability of our proof.  Before, the proof referred to the local variable [ls], which has an automatically generated name.  To a human reading the proof script without stepping through it interactively, it was not clear where [ls] came from.  The hint explains to the reader the process for choosing which variables to case analyze, and the hint can continue working even if the rest of the proof structure changes significantly.
+*)
+もとの証明が短いものであったために，ここではヒントを使う利点があま明確ではありません．
+しかし，ヒントによって証明の読みやすさは根本的に改善されました．
+以前の証明では自動生成されたローカル変数[ls]が参照されていました．
+対話的に段階を踏むことなしに証明スクリプトを読むと，[ls]がどこから来たのか明確ではありません．
+ヒントは場合分けにおいてどの変数を選択しているかの仮定を説明するもので，のこりの証明部分の構造が大幅に変更されても正しく働きます．
+*)
 
 
 (** * Manual Proofs About Constructors *)
