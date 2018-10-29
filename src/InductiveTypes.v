@@ -31,19 +31,20 @@ Set Asymmetric Patterns.
 (** 
 (* The logical foundation of Coq is the Calculus of Inductive Constructions, or CIC.  In a sense, CIC is built from just two relatively straightforward features: function types and inductive types.  From this modest foundation, we can prove essentially all of the theorems of math and carry out effectively all program verifications, with enough effort expended.  This chapter introduces induction and recursion for functional programming in Coq.  Most of our examples reproduce functionality from the Coq standard library, and I have tried to copy the standard library's choices of identifiers, where possible, so many of the definitions here are already available in the default Coq environment.
 *)
-Coqが論理の基盤としているのはCIC（Calculus of Inductive Constructions）です。
-ある意味では、CICを構成するのは、関数型（function type）と帰納型（inductive type）という2つの簡単な機能だけです。
-この簡素な基盤から、本質的にはあらゆる数学の定理を証明できますし、
-それなりに手間をかければ、あらゆるプログラム検証を効果的に実行できます。
-本章ではCoqにおける関数プログラミングに関して、帰納と再帰の概念を導入します。
-またこの章の例は大部分は、Coqの標準ライブラリにある機能を再現するものです。
-それに、識別子は可能なかぎり標準ライブラリのものを使うようにしましたので、ここにある定義の多くは、デフォルトのCoq環境では使えるものです。
+Coqの論理の基盤はCIC（Calculus of Inductive Constructions）です。
+CICは、関数型（function type）と帰納型（inductive type）という、比較的簡単な2つの機能だけで構成されていると考えられます。
+そのような簡素な基盤であるCICから、事実上あらゆる数学の定理が証明可能であり、
+それなりに手間をかければ、あらゆるプログラム検証を効果的に実行できるのです。
+本章では、Coqにおける関数型プログラミングのために帰納と再帰を導入します。
+本章の例の大部分は、Coqの標準ライブラリの機能を再現するものです。
+標準ライブラリで使われている識別子を可能な場合にはそのまま採用しているので、大半の定義はデフォルトのCoq環境ですぐに使えます。
 
 (*
 The last chapter took a deep dive into some of the more advanced Coq features, to highlight the unusual approach that I advocate in this book.  However, from this point on, we will rewind and go back to basics, presenting the relevant features of Coq in a more bottom-up manner.  A useful first step is a discussion of the differences and relationships between proofs and programs in Coq.
 *)
-前章でCoqの深淵に潜り、本書で主張している特異なアプローチに焦点をあてましたが、ここから先は基本に戻って関連のあるCoqの機能をボトムアップ示しましょう。
-はじめの一歩としては、証明とCoqのプログラムの違いと関連について議論するのがよいでしょう。
+前章では、筆者が本書で伝えたい特異なアプローチに焦点をあてるべく、Coqの深淵に潜りました。
+ここから先は基本に戻り、関連するCoqの機能をボトムアップで見ていくことにしましょう。
+はじめの一歩として、証明とCoqプログラムの差異および関係について考えます。
 *)
 
 
@@ -56,36 +57,36 @@ The last chapter took a deep dive into some of the more advanced Coq features, t
 (*
 Mainstream presentations of mathematics treat proofs as objects that exist outside of the universe of mathematical objects.  However, for a variety of reasoning tasks, it is convenient to encode proofs, traditional mathematical objects, and programs within a single formal language.  Validity checks on mathematical objects are useful in any setting, to catch typos and other uninteresting errors.  The benefits of static typing for programs are widely recognized, and Coq brings those benefits to both mathematical objects and programs via a uniform mechanism.  In fact, from this point on, we will not bother to distinguish between programs and mathematical objects.  Many mathematical formalisms are most easily encoded in terms of programs.
 *)
-数学では証明を数学の世界の外側にあるものとして扱うのが主流です。
-しかし、さまざまな論証作業を行うには、証明や伝統的な数学の対象、
-そしてプログラムを単一の形式的言語で符号化するのが便利です。
-数学の対象に関して正当性を検査すれば、書き間違いやつまらないミスを見つけるのに役立ちます。
-プログラムに静的型付けを行えば、有益であることは広く認知されていることです。
-Coqは数学の対象についてもプログラムに関しても同じ機構を使って役に立ってくれます。
-そういうわけで、これ以降はプログラムと数学の対象との区別に悩むことはやめします。
-多くの数学的形式は簡単にプログラムで符号化できます。
+数学では、数学の世界の外側にあるものとして証明を扱うのが主流です。
+しかし、証明、伝統的な数学の対象、そしてプログラムを単一の形式的言語により符号化すれば、さまざまな論証の作業にとって都合がよくなります。
+数学の対象に対する検証は、どのような形であれ、書き間違いやつまらないミスの発見に役立ちます。
+Coqでは、すでに広く認知されているプログラムへの静的型付けによる有益性を、数学の対象とプログラムに対して同じ仕組みで利用できます。
+そういうわけで、これ以降は、プログラムと数学の対象とをわざわざ区別することはやめにします。
+数学における形式主義のほとんどはプログラムによって簡単に符号化できるのです。
 
 (*
 Proofs are fundamentally different from programs, because any two proofs of a theorem are considered equivalent, from a formal standpoint if not from an engineering standpoint.  However, we can use the same type-checking technology to check proofs as we use to validate our programs.  This is the%\index{Curry-Howard correspondence}% _Curry-Howard correspondence_ %\cite{Curry,Howard}%, an approach for relating proofs and programs.  We represent mathematical theorems as types, such that a theorem's proofs are exactly those programs that type-check at the corresponding type.
 *)
-証明は基本的にはプログラムとは違うものです。
-工学的な見方ではなく正式な見方では、1つの定理に対する2つの証明は同じものだからです。
-そうはいうものの、証明を検査するにも、プログラムを検証するにも同じ型検査技術が使用できます。
-これは、%\index{Curry-Howard対応}% %\emph{Curry-Howard対応}% %\cite{Curry,Howard}%という証明とプログラムを関連付ける方法です。
-数学的定理を型として表現すると、その型をもつことが確認されたプログラムそのものが証明になります。
+証明は、本来はプログラムとは違います。
+ある定理に対する2つの証明は、工学的でなく形式的に見れば、等価なものであるとみなせるからです。
+とはいえ、証明の検査には、プログラムの検証に使うのと同じ型検査の技術が使えます。
+証明とプログラムは、_[Curry-Howard対応]_%\index{Curry-Howard対応}%%\cite{Curry,Howard}%によって関連付けられるのです。
+数学の定理を型として表現すると、その型を持つことを確認するプログラムそのものが、その定理の証明になります。
 
 (*
 The last chapter's example already snuck in an instance of Curry-Howard.  We used the token [->] to stand for both function types and logical implications.  One reasonable conclusion upon seeing this might be that some fancy overloading of notations is at work.  In fact, functions and implications are precisely identical according to Curry-Howard!  That is, they are just two ways of describing the same computational phenomenon.
 *)
 前章の例にはCurry-Howardの具体例を忍び込ませていました。
-[->]という字句を関数型と論理含意との両方を表すのに使っています。
-これを見れば、記法を多重定義しているのだろうと考えるのが理にかないます。
+[->]という字句を、関数型と論理含意の両方を表すのに使っています。
+それを見て、記法を多重定義しているのだろうと考えたかもしれません。
+実際、関数と論理含意は、Curry-Howard対応によってまったく同一であるとみなせるのです！
+これらは、計算における同一の現象を、2つの違う方法で表しているにすぎません。
 
 (*
 A short demonstration should explain how this can be.  The identity function over the natural numbers is certainly not a controversial program.
 *)
-どのような仕組みかは簡単な例で示せるはずです。
-自然数上の恒等関数は自明なプログラムです。
+この仕組みは簡単な例で示せます。
+自然数上の恒等関数は自明なプログラムでしょう。
 
 *)
 
@@ -96,7 +97,7 @@ Check (fun x : nat => x).
 (*
 %\smallskip{}%Consider this alternate program, which is almost identical to the last one.
 *)
-%\smallskip{}%さきほどとほぼ同じ別の関数を考えましょう。
+%\smallskip{}%この恒等関数の代わりに次の恒等プログラムを考えてみましょう。上記の例とほどんと同じものです。
 *)
 
 Check (fun x : True => x).
@@ -106,16 +107,16 @@ Check (fun x : True => x).
 (* 
 %\smallskip{}%The identity program is interpreted as a proof that %\index{Gallina terms!True}%[True], the always-true proposition, implies itself!  What we see is that Curry-Howard interprets implications as functions, where an input is a proposition being assumed and an output is a proposition being deduced.  This intuition is not too far from a common one for informal theorem proving, where we might already think of an implication proof as a process for transforming a hypothesis into a conclusion.
 *)
-%\smallskip{}%この恒等プログラムは、%\index{Gallina terms!True}%[True]すなわち自分自身を含意する恒真命題の証明と解釈されます。
-これかから判ることは、Curry-Howard対応では含意を関数として解釈するということです。
-このときの関数への入力は仮定された命題であり、関数からの出力は演繹された命題になります。
-この直観は、非形式的におこなわれる定理証明に対する一般的な直観とかけはなれたものではありません。
-非形式的な定理証明においても、含意の証明を仮説から結論への変換過程と見なしていると考えられます。
+%\smallskip{}%この恒等プログラムは、[True]%\index{Gallina terms!True}%、すなわち常に真であるという命題が自分自身を含意する、ということの証明であると解釈します。
+含意を、Curry-Howard対応により、関数として解釈するわけです。
+関数への入力は仮定された命題、関数からの出力は演繹された命題になります。
+この見方は、定理を非形式的に証明するときの一般的な直観とかけ離れたものではありません。
+含意を非形式的に証明するとき、仮説を結論に変換する工程であるかのように考えることもあるでしょう。
 
 (*
 There are also more primitive proof forms available.  For instance, the term %\index{Gallina terms!I}%[I] is the single proof of [True], applicable in any context.
 *)
-もっとプリミティブな形式を使えます。
+Coqにはさらに基本的な形の証明も用意されています。
 たとえば、%\index{Gallina terms!I}%[I]という項は[True]の唯一の証明で、あらゆる文脈で適用可能です。
 *)
 
@@ -126,7 +127,7 @@ Check I.
 (*
 %\smallskip{}%With [I], we can prove another simple propositional theorem.
 *)
-%\smallskip{}%[I]を使って、別の命題論理における定理が証明できます。
+%\smallskip{}%[I]を使って、命題論理の別の定理を証明できます。
 *)
 
 Check (fun _ : False => I).
@@ -136,7 +137,7 @@ Check (fun _ : False => I).
 (* %\smallskip{}%No proofs of %\index{Gallina terms!False}%[False] exist in the top-level context, but the implication-as-function analogy gives us an easy way to, for example, show that [False] implies itself.
 *)
 %\smallskip{}% %\index{Gallina terms!False}%[False]の証明はトップレベルの文脈には存在しません。
-しかし、「関数としての含意」という類推によれば、たとえば、[False]が自分自身を含意することは、簡単に示せます。
+しかし、たとえば[False]が自分自身を含意することは、「関数としての含意」からの類推で簡単に示せます。
 *)
 
 Check (fun x : False => x).
@@ -146,25 +147,28 @@ Check (fun x : False => x).
 (*
 %\smallskip{}%Every one of these example programs whose type looks like a logical formula is a%\index{proof term}% _proof term_.  We use that name for any Gallina term of a logical type, and we will elaborate shortly on what makes a type logical.
 *)
-%\smallskip{}%型が論理式のように見えるこれらのプログラム例は、どれも%\index{しょうめいこう@証明項}% %\emph{証明項}%です。
-この術語を論理型の任意のGallina項を表すのに使っています。
-型論理を構成するものについては、後で詳細に解説します。
+%\smallskip{}%これらは、それぞれ型が論理式のように見えるプログラムの例になっており、いずれも%\index{しょうめいこう@証明項}%_[証明項]_と呼ばれます。
+この名称は、論理的な型を持つ任意のGallinaの項を表すのに使うことにします。
+どんな型が論理的であるかについては、すぐあとで詳細に述べます。
 
+(*
+In the rest of this chapter, we will introduce different ways of defining types.  Every example type can be interpreted alternatively as a type of programs or proofs.
+*)
 本章の残りの部分では、型を定義する方法をいくつか導入します。
-例に挙げる型はそれぞれ別にプログラムあるいは証明の型として解釈できます。
+例に挙げる型は、いずれもプログラムの型もしくは証明として解釈できます。
 
 (*
 One of the first types we introduce will be [bool], with constructors [true] and [false].  Newcomers to Coq often wonder about the distinction between [True] and [true] and the distinction between [False] and [false].  One glib answer is that [True] and [False] are types, but [true] and [false] are not.  A more useful answer is that Coq's metatheory guarantees that any term of type [bool] _evaluates_ to either [true] or [false].  This means that we have an _algorithm_ for answering any question phrased as an expression of type [bool].  Conversely, most propositions do not evaluate to [True] or [False]; the language of inductively defined propositions is much richer than that.  We ought to be glad that we have no algorithm for deciding our formalized version of mathematical truth, since otherwise it would be clear that we could not formalize undecidable properties, like almost any interesting property of general-purpose programs.
 *)
-最初に導入する型は[bool]で、構成子[true]および[false]があります。
-Coqに初めて触れると[True]と[true]あるいは[False]と[false]の違いに戸惑うことがよくあります。
-表面的にいうなら、[True]と[False]は型であり、[true]と[false]は型ではないということです。
-もう少しましな答としては、Coqのメタ定理が[bool]型の任意の項は%\emph{評価する}%と[true]か[false]のどちらかになることを保証している、ということになります。
-その意味は、型が[bool]である式で表されたどのような問題に対しても、それに答える%\emph{アルゴリズム}%があるということです。
-逆にほとんどの命題は評価しても[True]あるいは[False]になることはないということです。
-帰納的に定義された命題の言語は、これよりもはるかに豊かな表現力があります。(* 意味がよくわからない -nobsun *)
-形式化された数学的真理を決定するアルゴリズムがないことは喜ぶべきことです。
-もし、そのようなアルゴリズムがあるとすれば、汎用プログラムの興味深い性質がそうであるような、決定不能な性質を形式化できないということになるからです。
+最初に導入する型は[bool]であり、その構成子は[true]および[false]です。
+Coqに不慣れのうちは、[True]と[true]あるいは[False]と[false]の違いによく戸惑います。
+もっともらしく言うと、[True]と[False]は型であり、[true]と[false]は型ではありません。
+もう少しきちんと言うと、[bool]型の任意の項は[true]か[false]のどちらかに_[評価]_され、そのことがCoqのメタ定理によって保証されています。
+つまり、型が[bool]であるような式で表されたどんな問題に対しても、それに答える_[アルゴリズム]_があるということです。
+逆に言うと、ほとんどの命題は[True]あるいは[False]には評価されません。
+帰納的に定義される命題の言語には、もっと豊かな表現力があるのです。(* 意味がよくわからない -nobsun *)
+数学的に形式化された真理をアルゴリズムで決定できないことは、残念なことではありません。
+そのようなアルゴリズムがあれば、決定不能な性質の形式化は不可能であることが明らかになってしまい、汎用のプログラムが持つような興味深い性質のほとんどを形式化できなくなってしまうでしょう。
 *)
 
 
@@ -176,10 +180,10 @@ Coqに初めて触れると[True]と[true]あるいは[False]と[false]の違い
 (**
 (* Coq inductive types generalize the %\index{algebraic datatypes}%algebraic datatypes found in %\index{Haskell}%Haskell and %\index{ML}%ML.  Confusingly enough, inductive types also generalize %\index{generalized algebraic datatypes}%generalized algebraic datatypes (GADTs), by adding the possibility for type dependency.  Even so, it is worth backing up from the examples of the last chapter and going over basic, algebraic-datatype uses of inductive datatypes, because the chance to prove things about the values of these types adds new wrinkles beyond usual practice in Haskell and ML.
 *)
-Coqの帰納型は、%\index{Haskell}%Haskellや%\index{ML}%MLにある%\index{だいすうデータがた@代数データ型}%代数データ型を一般化したものです。
-さらにややこしいことに、帰納型は、型依存性を追加することでGADT（一般化代数データ型）の一般化にもなっています。
-それでも、前章の例をひとまずおいて、帰納データ型を使う基本的な代数的データを見る価値はあります。
-こうした型の値に関するなにがしかを証明する機会によって、HaskellやMLでの実践以上の知恵が得られます。
+Coqの帰納型は、%\index{Haskell}%Haskellや%\index{ML}%MLにおける%\index{だいすうデータがた@代数データ型}%代数データ型を一般化したものです。
+さらに、値への依存性を型に持たせることで、Coqの帰納型はGADT（一般化代数データ型）の一般化にもなっています。
+混乱しやすいところですが、前章で説明した例を踏まえたうえで、帰納データ型における代数的データの基本的な使い方を丹念に見ておく価値はあります。
+そのような型の値に関する証明を見ることで、HaskellやMLを普通に使っているだけでは手にできない知見が得られるからです。
 
 (*
 The singleton type [unit] is an inductive type:%\index{Gallina terms!unit}\index{Gallina terms!tt}%
@@ -195,8 +199,8 @@ Inductive unit : Set :=
 This vernacular command defines a new inductive type [unit] whose only value is [tt].
 We can verify the types of the two identifiers we introduce: 
 *)
-このCoqのコマンドは、[tt]がその唯一の値であるような新しい帰納型[unit]を定義しています。
-ここで導入した2つの識別子の型を検証できます。
+このVernacularコマンドにより、[tt]を唯一の値として持つ新しい帰納型[unit]が定義されます。
+導入した二つの識別子の型は次のようにして検証できます。
 *)
 
 Check unit.
@@ -209,7 +213,7 @@ Check tt.
 (*
 %\smallskip{}%We can prove that [unit] is a genuine singleton type. 
 *)
-%\smallskip{}%[unit]が確かにシングルトン（値を一つしか持たない）型であることを証明できます。
+%\smallskip{}%[unit]が確かにシングルトン（値を一つしか持たない）型であることを証明しましょう。
 *)
 
 Theorem unit_singleton : forall x : unit, x = tt.
@@ -218,8 +222,9 @@ Theorem unit_singleton : forall x : unit, x = tt.
 (*
 The important thing about an inductive type is, unsurprisingly, that you can do induction over its values, and induction is the key to proving this theorem.  We ask to proceed by induction on the variable [x].%\index{tactics!induction}%
 *)
-帰納型に関して重要なことは、なにも驚くようなことではなく、その値上で帰納法を用いられるということです。
-そして、帰納法はこの定理を証明するためのまさに鍵になっています。
+帰納型については、当たり前のこととして、その値の上で帰納法を使える点が重要です。
+そして上記の定理の証明では、まさに帰納法を使います。
+変数[x]に関する帰納法を進めるよう、Coqに指示します。%\index{tactics!induction}%
 *)
 
 (* begin thide *)
@@ -229,7 +234,7 @@ The important thing about an inductive type is, unsurprisingly, that you can do 
 (*
 The goal changes to:
 *)
-ゴールを以下のように変更します。
+ゴールは以下のようになります。
 [[
  tt = tt
 ]]
@@ -239,7 +244,7 @@ The goal changes to:
   (* 
   %\noindent{}%...which we can discharge trivially.
   *)
-  %\noindent{}%...これは自明。(* うまい訳を思いつかない-nobsun *)
+  %\noindent{}%これは自明ですね。(* うまい訳を思いつかない-nobsun *)
   *)
 
   reflexivity.
@@ -252,24 +257,25 @@ It seems kind of odd to write a proof by induction with no inductive hypotheses.
   destruct x.
 ]]
 *)
-帰納法の仮説がない帰納法による証明を書くというのは奇妙なものに思えます。
-%\index{tactics!destruct}% [[
+帰納法の仮説なしで帰納法による証明を書くのは、少し奇妙に思えます。
+伝統的な数学における「場合分けによる証明」に対応するのは[destruct]タクティクです。%\index{tactics!destruct}%
+
+[[
   destruct x.
 ]]
-というタクティクスを使った証明から始めると同じ結果になるでしょう。
 
 (*
 %\noindent%...which corresponds to "proof by case analysis" in classical math.  For non-recursive inductive types, the two tactics will always have identical behavior.  Often case analysis is sufficient, even in proofs about recursive types, and it is nice to avoid introducing unneeded induction hypotheses.
 *)
-%\noindent%「...これは」というのは古典数学での「すべての場合を尽しての証明」に対応します。
-非再帰的帰納型では、この2つのタクティクスは同じ振舞です。
-すべての場合を尽すというやりかたは、再帰型に関する証明においても使えることが多いものです。
-また、不要な帰納法の仮説をせずに済むという点で優れています。
+%\noindent%上記のように証明を始めても、同じ結果になったでしょう。
+[induction]と[destruct]の二つのタクティクは、再帰のない帰納型に対しては常にまったく同じ振る舞いをします。
+再帰的な型に関する証明であっても、場合分けによる証明で十分なことが少なくありません。
+また、場合分けによる証明により、不必要な帰納法の仮説を増やさないで済むこともあります。
 
 (*
 What exactly _is_ the %\index{induction principles}%induction principle for [unit]?  We can ask Coq:
 *)
-では、[unit]に対する%\index{induction principles}%帰納法原理とは%\emph{何}%でしょうか。
+ここで、[unit]の対する%\index{induction principles}%帰納法の原理をCoqに聞いてみましょう。
 *)
 
 Check unit_ind.
@@ -279,35 +285,38 @@ Check unit_ind.
 (* 
 %\smallskip{}%Every [Inductive] command defining a type [T] also defines an induction principle named [T_ind].  Recall from the last section that our type, operations over it, and principles for reasoning about it all live in the same language and are described by the same type system.  The key to telling what is a program and what is a proof lies in the distinction between the type %\index{Gallina terms!Prop}%[Prop], which appears in our induction principle; and the type %\index{Gallina terms!Set}%[Set], which we have seen a few times already.
 *)
-%\smallskip{}%ある型[T]を定義する[Inductive]コマンドはどれも[T_ind]という帰納法原理を定義します。
-前節で、型、それに対する操作、論証のための帰納法原理はどれも同じ言語に存在し、同じ型システムで表現されています。
-プログラムとは何か、証明とは何かをいい当てるための鍵は、帰納法原理で見た%\index{Gallinaこう@Gallina項!Prop}%[Prop]型と、何度か見ている%\index{Gallinaこう@Gallina項!Set}%[Set]型とをはっきり区別することにあります。
+%\smallskip{}%ある型[T]を定義する[Inductive]コマンドによって、[T_ind]という名前がついた帰納法の原理も定義されます。
+前節で述べたように、型、それに対する操作、論証のための帰納法の原理は、すべて同一の言語によって表され、同一の型システムにより記述されています。
+あるプログラムが何なのか、ある証明が何なのかを知りたいときに鍵となるのは、上記の帰納法の原理に出てくる%\index{Gallinaこう@Gallina項!Prop}%[Prop]型と、すでに何度か登場している%\index{Gallinaこう@Gallina項!Set}%[Set]型とをきちんと区別することです。
 
 (*
 The convention goes like this: [Set] is the type of normal types used in programming, and the values of such types are programs.  [Prop] is the type of logical propositions, and the values of such types are proofs.  Thus, an induction principle has a type that shows us that it is a function for building proofs.
 *)
-慣習としての規約では、[Set]はプログラミングで使われている通常の型を表す型で、その値はプログラムです。
-[Prop]は論理命題を表す型で、その値はその型の証明です。
-したがって、帰納法原理の型は、証明を構成するための関数を示す型になります。
+慣習によれば、[Set]はプログラミングで使われている通常の型を表す型で、その値はプログラムです。
+[Prop]は論理的な命題を表す型で、その値は証明です。
+したがって、帰納法の原理の型を見れば、帰納法の原理は「証明を構成するための関数」であることがわかります。
 
 (*
 Specifically, [unit_ind] quantifies over a predicate [P] over [unit] values.  If we can present a proof that [P] holds of [tt], then we are rewarded with a proof that [P] holds for any value [u] of type [unit].  In our last proof, the predicate was [(fun u : unit => u = tt)].
 *)
-特に[unit_ind]は、[unit]値の上の述語[P]を限量化します。
-述語[P]が[tt]であることの証明を示せれば、[P]が[unit]型の任意の値[u]について成り立つことを証明したことになります。
+特に[unit_ind]では、[unit]値に対する述語[P]が限量化されています。
+述語[P]が[tt]を満たすことの証明を提示できれば、[unit]型の任意の値[u]について[P]が成り立つことを証明したことになります。
+さきほどの証明で述語[P]に相当するのは、[(fun u : unit => u = tt)]です。
 
 (*
 The definition of [unit] places the type in [Set].  By replacing [Set] with [Prop], [unit] with [True], and [tt] with [I], we arrive at precisely the definition of [True] that the Coq standard library employs!  The program type [unit] is the Curry-Howard equivalent of the proposition [True].  We might make the tongue-in-cheek claim that, while philosophers have expended much ink on the nature of truth, we have now determined that truth is the [unit] type of functional programming.
 *)
-[unit]は[Set]の要素である型と定義されています。
-[Set]を[Prop]と、[unit]を[True]と、[tt]を[I]と取り替えると、Coqの標準ライブラリが採用している[True]の定義とぴったり一致します。
+[unit]の定義では、型を[Set]としています。
+[Set]を[Prop]に置き換え、[unit]を[True]に置き換え、[tt]を[I]に置き換えると、Coqの標準ライブラリが採用している[True]の定義とぴったり一致します。
+プログラムの型[unit]は、Curry-Howard対応によって述語[True]と同等です。
+皮肉っぽくいえば、哲学者が真とは何かをどんなに時間をかけて論じたところで、ここでは真を関数プログラミングの[unit]型であると決めた、ということです。
 
 %\medskip%
 
 (*
 We can define an inductive type even simpler than [unit]:%\index{Gallina terms!Empty\_set}%
 *)
-[unit]:%\index{Gallinaこう@Gallina項!Empty\_set}%よりも単純な帰納型も定義できます。
+[unit]よりさらに単純な帰納型も定義できます。%\index{Gallinaこう@Gallina項!Empty\_set}%
 *)
 
 Inductive Empty_set : Set := .
@@ -315,8 +324,8 @@ Inductive Empty_set : Set := .
 (**
 (* [Empty_set] has no elements.  We can prove fun theorems about it:
 *)
-[Empty_set]は要素を持ちません。
-これに関して面白い定理を証明してみましょう。
+[Empty_set]には要素がありません。
+そんな[Empty_set]については面白い定理が証明できます。
 *)
 
 Theorem the_sky_is_falling : forall x : Empty_set, 2 + 2 = 5.
@@ -329,16 +338,17 @@ Qed.
 (*
 Because [Empty_set] has no elements, the fact of having an element of this type implies anything.  We use [destruct 1] instead of [destruct x] in the proof because unused quantified variables are relegated to being referred to by number.  (There is a good reason for this, related to the unity of quantifiers and implication.  At least within Coq's logical foundation of %\index{constructive logic}%constructive logic, which we elaborate on more in the next chapter, an implication is just a quantification over a proof, where the quantified variable is never used.  It generally makes more sense to refer to implication hypotheses by number than by name, and Coq treats our quantifier over an unused variable as an implication in determining the proper behavior.)
 *)
-[Empty_set]は要素を持ちませんので、この型の要素が一つあるという事実はすべてを含意します。
-証明の中で[destruct x]ではなく[destruct 1]を使っているのは、使用しない被限量化変数は格下げされて、数字で参照するようになるからです。
-（このようになっているには、限量化子と含意を統一した扱いにすることに関連する、正当な理由があります。
-少くとも、Coqの%\index{こうせいてきろんり@構成的論理}%構成的論理の論理的基盤（次章で詳しく説明する）においては、含意は被限量化変数を使わない証明を限量化しているにすぎないのです。
-含意の仮説を変数名で参照するより数字で参照するほうが理にかなっており、Coqは適切な振舞を決定するにあたって、使用しない変数に対する限量化子を含意として扱います。）
+[Empty_set]には要素がないので、この型の要素があるという事実は、あらゆることを含意します。
+証明の中で[destruct x]ではなく[destruct 1]を使っているのは、限量化された変数のうち使用しないものが格下げされて数字で参照されるようになるからです。
+（これには限量化子と含意の統一した扱いに関係した正当な理由があります。
+含意とは、少なくともCoqの構成的論理（constructive logic、次章で詳しく説明します）の基盤においては証明に対する限量化にすぎず、その証明において限量化された変数が使われることはありません。
+一般に、含意における仮説は、変数名ではなく数字で参照するほうが理にかなっています。
+Coqは、適切な挙動を決定するにあたり、使用されない変数に対する限量化子を含意として扱います。）
 
 (*
 We can see the induction principle that made this proof so easy:
 *)
-この証明を生みだす帰納法原理は簡単です。
+さきほどの証明が簡単にできたのは、次のようにして確認できる帰納法の原理のおかげです。
 *)
 
 Check Empty_set_ind.
@@ -347,14 +357,14 @@ Check Empty_set_ind.
 (**
 (* %\smallskip{}%In other words, any predicate over values from the empty set holds vacuously of every such element.  In the last proof, we chose the predicate [(fun _ : Empty_set => 2 + 2 = 5)].
 *)
-%\smallskip{}%いいかえれば、空集合に属する値上の任意の述語は、そのような要素について何も表明していないということです。(* 良いいいまわしを思いつかない-nobsun *)
-直前の証明では、述語として[(fun _ : Empty_set => 2 + 2 = 5)]を選んでいます。
+%\smallskip{}%要するに、空集合から取ってきた値に対しては、どんな述語も自明に満たされるということです。(* 良いいいまわしを思いつかない-nobsun / "holds vacuously ..."は「自明に満たされる」で（TaPLの訳のときの"satisfied vacuously"の訳を参考にしました） -kshikano *)
+さきほどの証明では、述語として[(fun _ : Empty_set => 2 + 2 = 5)]を選びました。
 
 (*
 We can also apply this get-out-of-jail-free card programmatically.  Here is a lazy way of converting values of [Empty_set] to values of [unit]: 
 *)
-この魔法の切り札をプログラミングの場面に応用することもできます。
-以下は[Empty_set]の値を[unit]の値に変換する横着な方法です。
+この魔法の切り札は、実際のプログラミングで応用することもできます。
+以下に、[Empty_set]の値を[unit]の値に変換する横着な方法を示します。
 *)
 
 Definition e2u (e : Empty_set) : unit := match e with end.
@@ -362,17 +372,18 @@ Definition e2u (e : Empty_set) : unit := match e with end.
 (**
 (* We employ [match] pattern matching as in the last chapter.  Since we match on a value whose type has no constructors, there is no need to provide any branches.  It turns out that [Empty_set] is the Curry-Howard equivalent of [False].  As for why [Empty_set] starts with a capital letter and not a lowercase letter like [unit] does, we must refer the reader to the authors of the Coq standard library, to which we try to be faithful.
 *)
-前章で、パターン照合に[match]を採用しています。
-構成子を持たない型の値の照合なので、選択肢は必要ありません。
-[Empty_set]はCurry-Howard対応により[False]と同等であることが判ります。
-[Empty_set]が[unit]と違って大文字から始まる理由は、本書ではCoq標準ライブラリの作成者のやり方に忠実に従っていて、読者にそれに従ってもらうためである。(* ちょっと訳に自信なし-nobsun *)
+この定義では、前章でパターンマッチに使った[match]を採用しています。
+構成子を持たない型の値に対してパターンマッチをしているので、ほかの選択肢は必要ありません。
+[Empty_set]はCurry-Howard対応により[False]と同等であることがわかります。
+[unit]と違って[Empty_set]の先頭が大文字である理由は、Coqの標準ライブラリの作者に聞いてもらうしかありません。
+本書はCoqの標準ライブラリに忠実に従っているだけです。
 
 %\medskip%
 
 (*
 Moving up the ladder of complexity, we can define the Booleans:%\index{Gallina terms!bool}\index{Gallina terms!true}\index{Gallina terms!false}%
 *)
-より複雑なものへ移行すると論理値を定義できます。%\index{Gallinaこう@Gallina項!bool}\index{Gallinaこう@Gallina項!true}\index{Gallinaこう@Gallina項!false}%
+今度は複雑なほうへ話を進めましょう。論理値は次のように定義できます。%\index{Gallinaこう@Gallina項!bool}\index{Gallinaこう@Gallina項!true}\index{Gallinaこう@Gallina項!false}%
 *)
 
 Inductive bool : Set :=
@@ -383,7 +394,7 @@ Inductive bool : Set :=
 (* 
 We can use less vacuous pattern matching to define Boolean negation.%\index{Gallina terms!negb}% 
 *)
-空ではないパターン照合を使って論理否定を定義できます。%\index{Gallinaこう@Gallina項!negb}%
+それほど自明ではないパターンマッチを使って論理否定を定義できます。%\index{Gallinaこう@Gallina項!negb}%
 *)
 
 Definition negb (b : bool) : bool :=
@@ -396,8 +407,8 @@ Definition negb (b : bool) : bool :=
 (*
 An alternative definition desugars to the above, thanks to an %\index{Gallina terms!if}%[if] notation overloaded to work with any inductive type that has exactly two constructors: 
 *)
-上の定義を構文糖衣を使わず行うこともできます。
-それには%\index{Gallinaこう@Gallina項!if}%[if]記法を使い、ちょうど2つの構成子をもつ任意の帰納型上で機能するようにします。
+
+ちょうど二つの構成子を持つ任意の帰納型に対して使えるようにオーバーロードされた[if]記法%\index{Gallinaこう@Gallina項!if}%を使って、上の定義の構文糖衣を剥がすこともできます。
 *)
 
 Definition negb' (b : bool) : bool :=
@@ -407,7 +418,7 @@ Definition negb' (b : bool) : bool :=
 (*
 We might want to prove that [negb] is its own inverse operation.
 *)
-[negb]がそれ自身の逆演算になることを証明したいとしましょう。
+[negb]の逆演算が[negb]になることは証明しておきたいところです。
 *)
 
 Theorem negb_inverse : forall b : bool, negb (negb b) = b.
@@ -418,7 +429,7 @@ Theorem negb_inverse : forall b : bool, negb (negb b) = b.
   (*
   After we case-analyze on [b], we are left with one subgoal for each constructor of [bool].
   *)
-  [b]上のすべての場合を調べてしまえば、[bool]のそれぞれの構成子に対するサブゴールがが1つずつ残ります。
+  [b]に関する場合分けをすべて調べると、[bool]の構成子ごとにサブゴールが一つずつ残ります。
 [[
   2 subgoals
 
@@ -432,7 +443,7 @@ subgoal 2 is
 (*
 The first subgoal follows by Coq's rules of computation, so we can dispatch it easily: 
 *)
-最初のサブゴールはCoqのコンピュテーション規則に従いますので、ディスパッチするのは簡単です。
+最初のサブゴールはCoqの計算規則から示せるので、簡単に片付きます。
 *)
 
   reflexivity.
@@ -441,8 +452,7 @@ The first subgoal follows by Coq's rules of computation, so we can dispatch it e
 (* 
 Likewise for the second subgoal, so we can restart the proof and give a very compact justification.%\index{Vernacular commands}%
 *)
-2つめのサブゴールについても同様です。
-証明を再開すればきわめてコンパクトに正当化できます。%\index{Vernacularこまんど@Vernacularコマンド!Restart}%
+2つめのサブゴールも同様なので、証明を再開して極めて簡潔な正当化を与えるだけです。%\index{Vernacularこまんど@Vernacularコマンド!Restart}%
 *)
 
 Restart.
@@ -455,7 +465,7 @@ Qed.
 (*
 Another theorem about Booleans illustrates another useful tactic.%\index{tactics!discriminate}%
 *)
-論理値に関する別の定理を使ってもう1つ便利なタクティックを説明しましょう。%\index{たくてぃくす@タクティクス!discriminate}%
+論理値に関する別の定理を使って、便利なタクティクをもう一つ紹介しましょう。%\index{たくてぃく@タクティク!discriminate}%
 *)
 
 Theorem negb_ineq : forall b : bool, negb b <> b.
@@ -468,12 +478,13 @@ Qed.
 (*
 The [discriminate] tactic is used to prove that two values of an inductive type are not equal, whenever the values are formed with different constructors.  In this case, the different constructors are [true] and [false].
 *)
-[discriminate]タクティックを使うと、ある帰納型の2つの値がそれぞれ別の構成子で形成されるなら等しくないことを証明できます。
+[discriminate]タクティクを使うと、ある帰納型の二つの値は、それらが別々の構成子で形成される場合には常に等しくない、ということを証明できます。
+この場合には[true]と[false]が別々の構成子です。
 
 (*
 At this point, it is probably not hard to guess what the underlying induction principle for [bool] is.
 *)
-ここまでくれば、[bool]の対する帰納法原理がどのようなものであるか推測するのは難しくありません。
+ここまでくれば、[bool]に対する帰納法の原理がどのようなものか、簡単に推測できるでしょう。
 *)
 
 Check bool_ind.
@@ -488,10 +499,10 @@ Check bool_ind.
 (*
 There is no interesting Curry-Howard analogue of [bool].  Of course, we can define such a type by replacing [Set] by [Prop] above, but the proposition we arrive at is not very useful.  It is logically equivalent to [True], but it provides two indistinguishable primitive proofs, [true] and [false].   In the rest of the chapter, we will skip commenting on Curry-Howard versions of inductive definitions where such versions are not interesting.
 *)
-[bool]に関するCurr-Howard対応の類推には興味深いことはなにもありません。
-もちろん、上述の[Set]を[Prop]に置き換えて[bool]のような型を定義できますが、それで得られた命題はあまり使いではありません。
-これは論理的には[True]に相当しますが、区別不可能な2つのプリミティブな証明、すなわち、[true]と[false]を提供することになります。(* ここは意味がよくわからない-nobsun *)
-本章の残りの部分では、このような興味を持てない機能的定義のCurry-Howard対応版に対するコメントしません。
+[bool]のCurr-Howard対応版はあまり面白くありません。
+もちろん、上述の定義の[Set]を[Prop]に置き換えた型を定義することは可能です。しかし、それで得られる命題にあまり使い手はありません。
+これは論理的には[True]に相当しますが、それによって得られる[true]と[false]の原始的な二つの証明は区別が不可能です。(* ここは意味がよくわからない-nobsun *)
+以降では、帰納的な定義のCurry-Howard対応版について、このようにあまり意味がないものについては特に言及しないことにします。
 *)
 
 
@@ -634,7 +645,7 @@ Now the conclusion is [S (plus n O) = S n].  Using our inductive hypothesis:
 Not much really went on in this proof, so the [crush] tactic from the [CpdtTactics] module can prove this theorem automatically.
 *)
 この証明はこれ以上進みません。
-そこで、[CpdtTactics]モジュールの[crush]タクティックを使うとこの定理は自動的に証明できます。
+そこで、[CpdtTactics]モジュールの[crush]タクティクを使うとこの定理は自動的に証明できます。
 *)
 
 Restart.
@@ -680,18 +691,18 @@ Qed.
 (*
 The [injection] tactic refers to a premise by number, adding new equalities between the corresponding arguments of equated terms that are formed with the same constructor.  We end up needing to prove [n = m -> n = m], so it is unsurprising that a tactic named [trivial] is able to finish the proof.  This tactic attempts a variety of single proof steps, drawn from a user-specified database that we will later see how to extend.
 *)
-[injection]タクティックでは前提を数字で指定します。
+[injection]タクティクでは前提を数字で指定します。
 新しい同等性(* equalities が複数形なのはなぜ-nobsun *)を同じ構成子で構成された対象項の引数間に追加します。
 最後に[n = m -> n = m]を証明しなければならないところに至ります。
-したがって、[trivial]という名前のタクティックで、この証明を終了できても不思議ではありません。
-この[injection]タクティックは、ユーザ指定のデータベース（これについては後で拡張方法を説明します）から引いてきた様々な単一証明ステップを試します。
+したがって、[trivial]という名前のタクティクで、この証明を終了できても不思議ではありません。
+この[injection]タクティクは、ユーザ指定のデータベース（これについては後で拡張方法を説明します）から引いてきた様々な単一証明ステップを試します。
 
 (*
 There is also a very useful tactic called %\index{tactics!congruence}%[congruence] that can prove this theorem immediately.  The [congruence] tactic generalizes [discriminate] and [injection], and it also adds reasoning about the general properties of equality, such as that a function returns equal results on equal arguments.  That is, [congruence] is a%\index{theory of equality and uninterpreted functions}% _complete decision procedure for the theory of equality and uninterpreted functions_, plus some smarts about inductive types.
 *)
-この定理を一発で証明できる%\index{たくてぃくす@タクティクス!congruence}%[congruence]というきわめて役に立つタクティックもあります。
-[congruence]タクティックは[discriminate]および[injection]を一般化したもので、関数は等しい引数について等しい結果を返すという同等性に関する一般的な性質の論証を追加します。
-すなわち、[congruence]は%\index{みかいしゃくかんすうのどうとうせいりろん@未解釈関数の同等性理論}%%\emph{未解釈関数の同等性理論に対する完全決定手続}%であり、帰納型に関してもスマートなタクティックです。
+この定理を一発で証明できる%\index{たくてぃくす@タクティクス!congruence}%[congruence]というきわめて役に立つタクティクもあります。
+[congruence]タクティクは[discriminate]および[injection]を一般化したもので、関数は等しい引数について等しい結果を返すという同等性に関する一般的な性質の論証を追加します。
+すなわち、[congruence]は%\index{みかいしゃくかんすうのどうとうせいりろん@未解釈関数の同等性理論}%%\emph{未解釈関数の同等性理論に対する完全決定手続}%であり、帰納型に関してもスマートなタクティクです。
 (* the theory of equality and uninterpreted functions は何のことか？-nobsun *)
 
 %\medskip%
@@ -1084,7 +1095,7 @@ The [Scheme] command is for asking Coq to generate particular induction schemes 
 There is one more wrinkle left in using the [even_list_mut] induction principle: the [induction] tactic will not apply it for us automatically.  It will be helpful to look at how to prove one of our past examples without using [induction], so that we can then generalize the technique to mutual inductive types.%\index{tactics!apply}% 
 *)
 帰納法原理[even_list_mut]を使うにあたって残念なことがもう1つあります。
-[induction]タクティックが自動的に適用されないことです。
+[induction]タクティクが自動的に適用されないことです。
 以前に見た例のうちで、[induction]を使わずに証明しているものがあるので、そのやりかたを相互帰納型に一般化すればよいでしょう。%\index{たくてぃくす@タクティクス!apply}%
 *)
 
@@ -1115,7 +1126,7 @@ From this example, we can see that [induction] is not magic.  It only does some 
 *)
 この例を見れば、[induction]は少しも魔法ではないことが判ります。
 やっていることといえば、ある種の記録付けだけです。
-これのおかげで、定理の適用が簡単になり、[apply]タクティックを直接使えるようになります。
+これのおかげで、定理の適用が簡単になり、[apply]タクティクを直接使えるようになります。
 
 (*
 This technique generalizes to our mutual example:
@@ -1939,7 +1950,7 @@ Theorem ntsize_ntsplice : forall tr1 tr2 : nat_tree, ntsize (ntsplice tr1 tr2)
   (*
   We know that the standard induction principle is insufficient for the task, so we need to provide a %\index{tactics!using}%[using] clause for the [induction] tactic to specify our alternate principle.
   *)
-  標準の帰納法原理では不十分ということがわかりましたので、%\index{たくてぃっく@タクティック!using}%[induction]タクティックで[using]節を使って代替の原理を指定します。
+  標準の帰納法原理では不十分ということがわかりましたので、%\index{たくてぃっく@タクティク!using}%[induction]タクティクで[using]節を使って代替の原理を指定します。
   *)
 
   induction tr1 using nat_tree_ind'; crush.
@@ -1995,7 +2006,7 @@ We will go into great detail on hints in a later chapter, but the only important
 ヒントについては後の章で詳しく説明しますが、ここで注目すべき唯一重要なことは、証明の途中で遭遇することが予想される結論を記述するためのパターンを登録することです。
 このパターンには単一化変数が含まれています。
 変数名の先頭に疑問符が付きますのでそれと判ります。
-パターンが照合されれば走るタクティック中のこれらの束縛変数を参照できるわけです。
+パターンが照合されれば走るタクティク中のこれらの束縛変数を参照できるわけです。
 
 (*
 The advantage of using the hint is not very clear here, because the original proof was so short.  However, the hint has fundamentally improved the readability of our proof.  Before, the proof referred to the local variable [ls], which has an automatically generated name.  To a human reading the proof script without stepping through it interactively, it was not clear where [ls] came from.  The hint explains to the reader the process for choosing which variables to case analyze, and the hint can continue working even if the rest of the proof structure changes significantly.
@@ -2019,7 +2030,7 @@ The advantage of using the hint is not very clear here, because the original pro
 (*
 It can be useful to understand how tactics like %\index{tactics!discriminate}%[discriminate] and %\index{tactics!injection}%[injection] work, so it is worth stepping through a manual proof of each kind.  We will start with a proof fit for [discriminate].
 *)
-%\index{たくてぃくす@タクティクス!discriminate}%[discriminate]や%\index{たくてぃくす@タクティクス!injection}%[injection]のようなタクティックがどのように機能しているかを理解することは役に立ちますから、それぞれを段階をおって手作業で証明することが重要です。
+%\index{たくてぃくす@タクティクス!discriminate}%[discriminate]や%\index{たくてぃくす@タクティクス!injection}%[injection]のようなタクティクがどのように機能しているかを理解することは役に立ちますから、それぞれを段階をおって手作業で証明することが重要です。
 まず、[discriminate]から着手しましょう。
 *)
 
@@ -2030,7 +2041,7 @@ Theorem true_neq_false : true <> false.
 (*
 We begin with the tactic %\index{tactics!red}%[red], which is short for "one step of reduction," to unfold the definition of logical negation.
 *)
-まず、[red]タクティックから始めましょう。
+まず、[red]タクティクから始めましょう。
 この名前は「1ステップの簡約（one step of reduction）」の省略形です。
 これを使って、論理否定の定義を展開しましょう。
 *)
@@ -2045,7 +2056,7 @@ We begin with the tactic %\index{tactics!red}%[red], which is short for "one ste
 The negation is replaced with an implication of falsehood.  We use the tactic %\index{tactics!intro}%[intro H] to change the assumption of the implication into a hypothesis named [H].
 *)
 否定は偽への含意に置き換えられます。
-タクティック%\index{たくてぃくす@タクティクス!intro}%[intro H]を用いて、含意の仮定を[H]という名の仮説にします。
+タクティク%\index{たくてぃくす@タクティクス!intro}%[intro H]を用いて、含意の仮定を[H]という名の仮説にします。
 *)
   
   intro H.
@@ -2071,7 +2082,7 @@ It is worth recalling the difference between the lowercase and uppercase version
 真と偽の小文字バージョンと大文字バージョンの違いをぜひ思い出してください。
 [True]と[False]は論理命題です。[true]と[false]は場合分け可能な論理値です。
 [toProp]は、[False]の結論が[toProp false]と同等になるように定義しました。
-したがって、%\index{たくてぃくす@タクティクス!change}%[change]タクティックは、結論を[toProp false]に変更します。
+したがって、%\index{たくてぃくす@タクティクス!change}%[change]タクティクは、結論を[toProp false]に変更します。
 一般形式[change e]は、Coq組込みの計算規則で[e]と元の結論が同等であることを証明できるときには、元の結論を[e]に置き換えます。
 *)
 
