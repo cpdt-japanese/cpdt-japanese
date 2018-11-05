@@ -517,7 +517,7 @@ There is no interesting Curry-Howard analogue of [bool].  Of course, we can defi
 (* 
 The natural numbers are the simplest common example of an inductive type that actually deserves the name.%\index{Gallina terms!nat}\index{Gallina terms!O}\index{Gallina terms!S}%
 *)
-自然数はその名に値する帰納型の最も単純でだれもが知る例です。%\index{Gallinaこう@Gallina項!nat}\index{Gallinaこう@Gallina項!O}\index{Gallinaこう@Gallina項!S}%
+帰納型のもっとも単純な例として一般的なのは自然数です。文字通り、もっとも自然な例といえるでしょう。%\index{Gallinaこう@Gallina項!nat}\index{Gallinaこう@Gallina項!O}\index{Gallinaこう@Gallina項!S}%
 *)
 
 Inductive nat : Set :=
@@ -528,12 +528,12 @@ Inductive nat : Set :=
 (*
 The constructor [O] is zero, and [S] is the successor function, so that [0] is syntactic sugar for [O], [1] for [S O], [2] for [S (S O)], and so on.
 *)
-構成子[O]は零のことであり、[S]は後者関数です。したがって、[0]は[O]の構文糖衣であり、[1]は[S O]の、[2]は[S (S O)]のそれぞれ構文糖衣です。
+構成子[O]はゼロ、[S]は後者関数です。したがって、[0]は[O]の構文糖衣、[1]は[S O]の構文糖衣、[2]は[S (S O)]の構文糖衣といった具合になります。
 
 (*
 Pattern matching works as we demonstrated in the last chapter:%\index{Gallina terms!pred}%
 *)
-前章で示したようにパターン照合が上手く効きます。
+前章で見たようにパターンマッチができます。
 *)
 
 Definition isZero (n : nat) : bool :=
@@ -552,8 +552,8 @@ Definition pred (n : nat) : nat :=
 (*
 We can prove theorems by case analysis with [destruct] as for simpler inductive types, but we can also now get into genuine inductive theorems.  First, we will need a recursive function, to make things interesting.%\index{Gallina terms!plus}%
 *)
-もっと単純な帰納型であれば[destruct]を使って場合を尽せば定理を証明することも可能ですが、本物の帰納的定理を探索することも可能です。
-話を面白くするのにまず必要なのは再帰関数です。
+比較的単純な帰納型なので[destruct]による場合分けを使って定理を証明することも可能ですが、ここでは正真正銘の帰納的な定理を考えてみましょう。
+話を面白くするために、まずは再帰関数が必要です。
 *)
 
 Fixpoint plus (n m : nat) : nat :=
@@ -566,8 +566,8 @@ Fixpoint plus (n m : nat) : nat :=
 (*
 Recall that [Fixpoint] is Coq's mechanism for recursive function definitions.  Some theorems about [plus] can be proved without induction.
 *)
-[Fixpoint]はCoqで再帰関数を定義するための機構であることを思い出してください。
-[plus]に関する定理で帰納法を使わずに証明できるものがあります。
+[Fixpoint]は、Coqで再帰関数を定義する仕組みでしたね。
+[plus]に関する定理には、帰納法を使わずに証明できるものがあります。
 *)
 
 Theorem O_plus_n : forall n : nat, plus O n = n.
@@ -580,9 +580,8 @@ Qed.
 (*
 Coq's computation rules automatically simplify the application of [plus], because unfolding the definition of [plus] gives us a [match] expression where the branch to be taken is obvious from syntax alone.  If we just reverse the order of the arguments, though, this no longer works, and we need induction.
 *)
-Coqのコンピュテーション規則は自動的に[plus]の適用を単純化します。
-[plus]の定義を展開すると、構文だけ見れば採用されることが明らかな選択肢しかない[match]式になるからです。
-引数の順序を逆にするだけで、もう動かなくなり、帰納法が必要になります。
+[plus]の定義を展開すると、採用される選択肢が構文だけから明らかな[match]式が得られるので、[plus]の適用はCoqの計算規則によって自動的に単純化されます。
+これは引数の順序を逆にすると機能しなくなり、帰納法が必要になります。
 *)
 
 Theorem n_plus_O : forall n : nat, plus n O = n.
@@ -593,7 +592,7 @@ Theorem n_plus_O : forall n : nat, plus n O = n.
 (*
 Our first subgoal is [plus O O = O], which _is_ trivial by computation.
 *)
-最初のサブゴールは[plus O O = O]で、これはコンピュテーションにより%\emph{自明}%です。
+最初のサブゴールは[plus O O = O]で、この計算は_[自明]_です。
 *)
 
   reflexivity.
@@ -602,8 +601,7 @@ Our first subgoal is [plus O O = O], which _is_ trivial by computation.
 (*
 Our second subgoal requires more work and also demonstrates our first inductive hypothesis.
 *)
-2つめのサブゴールについてはもっと手をかけなければなりません。
-最初の帰納法の仮説を示します。
+二つめのサブゴールにはもう少し手がかかります。これは帰納法の仮説の最初の例でもあります。
 
 [[
   n : nat
@@ -616,7 +614,7 @@ Our second subgoal requires more work and also demonstrates our first inductive 
 (*
 We can start out by using computation to simplify the goal as far as we can.%\index{tactics!simpl}%
 *)
-コンピュテーションを使ってこのゴールを単純化するところから始めて行けるところまで行きましょう。%\index{たくてぃくす@タクティクス!simpl}%
+このゴールを計算でできるだけ単純化することから始めましょう。%\index{たくてぃくす@タクティクス!simpl}%
 *)
 
   simpl.
@@ -625,8 +623,8 @@ We can start out by using computation to simplify the goal as far as we can.%\in
 (*
 Now the conclusion is [S (plus n O) = S n].  Using our inductive hypothesis:
 *)
-これで、結論は[S (plus n O) = S n]となります。
-ここで、帰納法の仮説を使います。
+これにより結論は[S (plus n O) = S n]となります。
+ここで帰納法の仮説を使います。
 *)
 
   rewrite IHn.
@@ -635,7 +633,7 @@ Now the conclusion is [S (plus n O) = S n].  Using our inductive hypothesis:
 (*
 %\noindent{}%...we get a trivial conclusion [S n = S n].
 *)
-%\noindent{}%そうすると自明な結論[S n = S n]が得られます。
+%\noindent{}%すると自明な結論[S n = S n]が得られます。
 *)
 
   reflexivity.
@@ -644,8 +642,8 @@ Now the conclusion is [S (plus n O) = S n].  Using our inductive hypothesis:
 (*
 Not much really went on in this proof, so the [crush] tactic from the [CpdtTactics] module can prove this theorem automatically.
 *)
-この証明はこれ以上進みません。
-そこで、[CpdtTactics]モジュールの[crush]タクティクを使うとこの定理は自動的に証明できます。
+この証明は、それほど手がかかるものではありませんでした。
+そのため、[CpdtTactics]モジュールの[crush]タクティクを使ってこの定理を自動的に証明できます。
 *)
 
 Restart.
@@ -658,7 +656,7 @@ Qed.
 (*
 We can check out the induction principle at work here:
 *)
-ここで効いている帰納法原理を確認できます。
+ここで使われる帰納法の原理は次のようにして確認できます。
 *)
 
 Check nat_ind.
@@ -670,15 +668,16 @@ Check nat_ind.
 (*
 Each of the two cases of our last proof came from the type of one of the arguments to [nat_ind].  We chose [P] to be [(fun n : nat => plus n O = n)].  The first proof case corresponded to [P O] and the second case to [(forall n : nat, P n -> P (S n))].  The free variable [n] and inductive hypothesis [IHn] came from the argument types given here.
 *)
-前述の証明における2つの場合それぞれは、[nat_ind]への引数のうちの1つの型に由来します。
+先ほどの証明における二つの場合分けは、それぞれ、[nat_ind]に対する引数のうちの一つが持つ型に対応しています。
 [P]を[(fun n : nat => plus n O = n)]としましょう。
-1つめの証明は[P O]に対応し、2つめは[(forall n : nat, P n -> P (S n))]に対応します。
-自由変数[n]および帰納法の仮説[IHn]はここで与えられた引数の型に由来します。
+証明の場合分けのうち一つめは[P O]に対応し、二つめは[(forall n : nat, P n -> P (S n))]に対応します。
+自由変数[n]および帰納法の仮説[IHn]は、これら引数の型に由来するのです。
 
 (*
 Since [nat] has a constructor that takes an argument, we may sometimes need to know that that constructor is injective.%\index{tactics!injection}\index{tactics!trivial}%
 *)
-[nat]は引数を1つとる構成子を持ちますので、この構成子が単射であることを知らなけれならないこともあります。%\index{たくてぃくす@タクティクス!injection}\index{たくてぃくす@タクティクス!trivial}%
+[nat]には、引数を一つとる構成子があります。
+この構成子が単射（injective）であることは確認しておきたいものです。%\index{たくてぃくす@タクティクス!injection}\index{たくてぃくす@タクティクス!trivial}%
 *)
 
 Theorem S_inj : forall n m : nat, S n = S m -> n = m.
@@ -691,18 +690,16 @@ Qed.
 (*
 The [injection] tactic refers to a premise by number, adding new equalities between the corresponding arguments of equated terms that are formed with the same constructor.  We end up needing to prove [n = m -> n = m], so it is unsurprising that a tactic named [trivial] is able to finish the proof.  This tactic attempts a variety of single proof steps, drawn from a user-specified database that we will later see how to extend.
 *)
-[injection]タクティクでは前提を数字で指定します。
-新しい同等性(* equalities が複数形なのはなぜ-nobsun *)を同じ構成子で構成された対象項の引数間に追加します。
-最後に[n = m -> n = m]を証明しなければならないところに至ります。
-したがって、[trivial]という名前のタクティクで、この証明を終了できても不思議ではありません。
-この[injection]タクティクは、ユーザ指定のデータベース（これについては後で拡張方法を説明します）から引いてきた様々な単一証明ステップを試します。
+[injection]タクティクは、数字で指定された前提を参照し、等号の左右にある同じ構成子で構成された項について、対応する引数間の新しい同等性を追加します。(* equalities が複数形なのはなぜ-nobsun *)
+結果的に[n = m -> n = m]を証明することになるので、その名も[trivial]というタクティクで証明を完了できます。
+この[trivial]タクティクは、ユーザが指定したデータベース（のちほど拡張方法を説明します）にあるさまざまな単一の証明ステップを試します。
 
 (*
 There is also a very useful tactic called %\index{tactics!congruence}%[congruence] that can prove this theorem immediately.  The [congruence] tactic generalizes [discriminate] and [injection], and it also adds reasoning about the general properties of equality, such as that a function returns equal results on equal arguments.  That is, [congruence] is a%\index{theory of equality and uninterpreted functions}% _complete decision procedure for the theory of equality and uninterpreted functions_, plus some smarts about inductive types.
 *)
-この定理を一発で証明できる%\index{たくてぃくす@タクティクス!congruence}%[congruence]というきわめて役に立つタクティクもあります。
-[congruence]タクティクは[discriminate]および[injection]を一般化したもので、関数は等しい引数について等しい結果を返すという同等性に関する一般的な性質の論証を追加します。
-すなわち、[congruence]は%\index{みかいしゃくかんすうのどうとうせいりろん@未解釈関数の同等性理論}%%\emph{未解釈関数の同等性理論に対する完全決定手続}%であり、帰納型に関してもスマートなタクティクです。
+この定理を一発で証明できる%\index{たくてぃくす@タクティクス!congruence}%[congruence]という便利なタクティクもあります。
+[congruence]タクティクは、[discriminate]および[injection]を一般化し、さらに「関数は等しい引数について等しい結果を返す」といった同等性についての一般的な性質に対する論証を追加してくれます。
+すなわち、[congruence]は、%\index{みかいしゃくかんすうのどうとうせいりろん@未解釈関数の同等性理論}%_[未解釈関数の同等性理論に対する完全な決定的手続き]_に帰納型に関するさまざまな機能を追加したタクティクだといえます。
 (* the theory of equality and uninterpreted functions は何のことか？-nobsun *)
 
 %\medskip%
@@ -710,7 +707,7 @@ There is also a very useful tactic called %\index{tactics!congruence}%[congruenc
 (*
 We can define a type of lists of natural numbers.
 *)
-以下のように自然数のリストの型を定義できます。
+自然数のリストの型は以下のように定義できます。
 *)
 
 Inductive nat_list : Set :=
@@ -721,7 +718,7 @@ Inductive nat_list : Set :=
 (*
 Recursive definitions over [nat_list] are straightforward extensions of what we have seen before.
 *)
-[nat_list]上の再帰的定義は既に説明したものの素直な拡張になっています。
+すでに見た例を素直に拡張することで[nat_list]上の再帰的定義が得られます。
 *)
 
 Fixpoint nlength (ls : nat_list) : nat :=
@@ -740,7 +737,7 @@ Fixpoint napp (ls1 ls2 : nat_list) : nat_list :=
 (*
 Inductive theorem proving can again be automated quite effectively.
 *)
-帰納的定理の証明はきわめて効率的に自動化可能です。
+やはり前と同様に、帰納的な定理の証明を効率的に自動化できます。
 *)
 
 Theorem nlength_napp : forall ls1 ls2 : nat_list, nlength (napp ls1 ls2)
@@ -764,8 +761,8 @@ Check nat_list_ind.
 (*
 In general, we can implement any "tree" type as an inductive type.  For example, here are binary trees of naturals.
 *)
-一般的には、任意の「木（ツリー）」型を帰納型として実装可能です。
-たとえば、以下は自然数の二分木です。
+一般に、「木」（tree）の型はすべて帰納型として実装可能です。
+たとえば、自然数の二分木は以下のように実装できます。
 *)
 
 Inductive nat_btree : Set :=
@@ -776,8 +773,8 @@ Inductive nat_btree : Set :=
 (*
 Here are two functions whose intuitive explanations are not so important.  The first one computes the size of a tree, and the second performs some sort of splicing of one tree into the leftmost available leaf node of another. 
 *)
-以下に2つの関数を示す（その直観的説明はあまり重要ではありません）。
-1つめは木のサイズを計算する関数で、2つめは一方の木を他方の木の最も左にある葉に接合します。
+ここで関数を二つ用意します。
+一つは木のサイズを計算する関数で、もう一つは一方の木を他方の木の最も左にある葉に接合する関数ですが、いずれも直観的な説明はあまり重要ではありません。
 *)
 
 Fixpoint nsize (tr : nat_btree) : nat :=
@@ -811,7 +808,7 @@ Qed.
 (*
 It is convenient that these proofs go through so easily, but it is still useful to look into the details of what happened, by checking the statement of the tree induction principle.
 *)
-これらの証明が簡単に行えるというのは便利なことですが、木（ツリー）の帰納法原理のステートメントを確認し、何が起こったのかを詳しく調べることも有効です。
+こうした証明が簡単にできるのは便利なことですが、木の帰納法の原理がどのように提示されているか確認することで、その動作も詳しく調べておいたほうがいいでしょう。
 *)
 
 Check nat_btree_ind.
@@ -827,7 +824,7 @@ Check nat_btree_ind.
 (*
 We have the usual two cases, one for each constructor of [nat_btree].
 *)
-通常の場合分けは2通りで、それぞれ[nat_btree]の構成子に対応しています。
+いつものように二つの場合分けになっており、それぞれの場合分けが[nat_btree]の構成子に対応していることがわかります。
 *)
 
 (**
