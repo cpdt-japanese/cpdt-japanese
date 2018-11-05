@@ -499,7 +499,7 @@ Check bool_ind.
 (*
 There is no interesting Curry-Howard analogue of [bool].  Of course, we can define such a type by replacing [Set] by [Prop] above, but the proposition we arrive at is not very useful.  It is logically equivalent to [True], but it provides two indistinguishable primitive proofs, [true] and [false].   In the rest of the chapter, we will skip commenting on Curry-Howard versions of inductive definitions where such versions are not interesting.
 *)
-[bool]のCurr-Howard対応版はあまり面白くありません。
+[bool]のCurry-Howard対応版はあまり面白くありません。
 もちろん、上述の定義の[Set]を[Prop]に置き換えた型を定義することは可能です。しかし、それで得られる命題にあまり使い手はありません。
 これは論理的には[True]に相当しますが、それによって得られる[true]と[false]の原始的な二つの証明は区別が不可能です。(* ここは意味がよくわからない-nobsun *)
 以降では、帰納的な定義のCurry-Howard対応版について、このようにあまり意味がないものについては特に言及しないことにします。
