@@ -839,9 +839,11 @@ We have the usual two cases, one for each constructor of [nat_btree].
 (*
 We can also define %\index{polymorphism}%polymorphic inductive types, as with algebraic datatypes in Haskell and ML.%\index{Gallina terms!list}\index{Gallina terms!Nil}\index{Gallina terms!Cons}\index{Gallina terms!length}\index{Gallina terms!app}% 
 *)
-HaskellやMLにおける代数データ型のように%\index{たそうせい@多相性}%多相帰納型を定義できます。
+HaskellやMLにおける代数データ型と同様、多相的な帰納型も定義できます。%\index{たそうせい@多相性}%
 %\index{Gallinaこう@Gallina項!list}\index{Gallinaこう@Gallina項!Nil}\index{Gallinaこう@Gallina項!Cons}\index{Gallinaこう@Gallina項!length}\index{Gallinaこう@Gallina項!app}% 
 *)
+
+(* Set Asymmetric Patterns. が必要なので、脚注をいれたほうがよさそう -kshikano *)
 
 Inductive list (T : Set) : Set :=
 | Nil : list T
@@ -870,8 +872,9 @@ Qed.
 (*
 There is a useful shorthand for writing many definitions that share the same parameter, based on Coq's%\index{sections}\index{Vernacular commands!Section}\index{Vernacular commands!Variable}% _section_ mechanism.  The following block of code is equivalent to the above:
 *)
-同じパラメータを共有する多くの定義を書くための便利な省略形があります。
-これらはCoqの%\index{せくしょん@セクション}\index{Vernacularこんまんど@Vernacularコマンド!Section}\index{Vernacularこまんど@Vernacularコマンド!Variable}\emph{セクション}%機構に基づくものです。
+Coqには、同じパラメータを共有するさまざまな定義に対する便利な省略記法があります。これは、Coqの_[セクション]_（[Section]）という仕組みを利用したものです。
+%\index{せくしょん@セクション}\index{Vernacularこんまんど@Vernacularコマンド!Section}\index{Vernacularこまんど@Vernacularコマンド!Variable}
+上記のコードブロックは下記のように書いても同じです。
 *)
 
 (* begin hide *)
@@ -911,12 +914,12 @@ Implicit Arguments Nil [T].
 (*
 After we end the section, the [Variable]s we used are added as extra function parameters for each defined identifier, as needed.  With an [Implicit Arguments]%~\index{Vernacular commands!Implicit Arguments}% command, we ask that [T] be inferred when we use [Nil]; Coq's heuristics already decided to apply a similar policy to [Cons], because of the [Set Implicit Arguments]%~\index{Vernacular commands!Set Implicit Arguments}% command elided at the beginning of this chapter.  We verify that our definitions have been saved properly using the [Print] command, a cousin of [Check] which shows the definition of a symbol, rather than just its type.
 *)
-このセクションを終端すると、使用した[Variable]は定義された各識別子に対し、必要に応じて、追加の関数パラメータとして付加されます。
-[Implicit Arguments]%~\index{Vernacularこまんど@Vernacularコマンド!Implicit Arguments}%コマンドを使うと、[Nil]を使用したときに[T]が推論されるようにできます。
-Coqのヒューリスティックは、似た方針を[Cons]に適用することを決定ずみです。
-それは、この章の冒頭で[Set Implicit Aruguments]%~\index{Vernacularこまんど@Vernacularコマンド!Set Implicit Arguments}%コマンドを省略したからです。
-[Print]コマンドを使って、定義が適切に保存されたかどうかを確認します。
-[Check]コマンドはシンボルの型だけではなく定義も表示します。
+セクションで使った[Variable]は、セクションを[End]で終端したあと、定義された各識別子に対する追加の関数パラメータとして付加されます。
+[Implicit Arguments]%~\index{Vernacularこまんど@Vernacularコマンド!Implicit Arguments}%コマンドを使って、[Nil]を使用したときに[T]が推論されるようにしています。
+[Cons]に対しては、Coqのヒューリスティクスによって、すでに同様の方針が適用されるようになっています。
+これは、本章のソースファイルの冒頭に、[Set Implicit Arguments]%~\index{Vernacularこまんど@Vernacularコマンド!Set Implicit Arguments}%コマンドがあるからです。
+定義が適切に保存されたかどうかは、[Print]コマンドを使って確認します。
+[Print]コマンドは、[Check]コマンドに似ていますが、シンボルの型だけではなく定義も表示します。
 *)
 
 Print list.
@@ -928,9 +931,8 @@ Print list.
 (*
 The final definition is the same as what we wrote manually before.  The other elements of the section are altered similarly, turning out exactly as they were before, though we managed to write their definitions more succinctly.
 *)
-最終的な定義は以前に手書きしたものと同じです。
-セクションの他の要素も同様に変更されています。
-しかし、定義をより簡潔に記述したにもかかわらず、以前のものとぴったり同じになっています。
+このように、[list]の最終的な定義は以前に手書きしたものと同じです。
+[list]以外の定義も、セクションの中では前より少し簡潔に書けているにもかかわらず、以前の定義とぴったり同じになっていることがわかります。
 *)
 
 Check length.
@@ -942,7 +944,7 @@ Check length.
 (*
 The parameter [T] is treated as a new argument to the induction principle, too.
 *)
-パラメータ[T]は帰納法原理の新しい引数としても扱われます。
+パラメータ[T]は、帰納法の原理に対する新しい引数としても扱われます。
 *)
 
 Check list_ind.
@@ -957,8 +959,9 @@ Check list_ind.
 (*
 Thus, despite a very real sense in which the type [T] is an argument to the constructor [Cons], the inductive case in the type of [list_ind] (i.e., the third line of the type) includes no quantifier for [T], even though all of the other arguments are quantified explicitly.  Parameters in other inductive definitions are treated similarly in stating induction principles.
 *)
-このように、型[T]が構成子[Cons]への引数になっているというきわめて現実的な意味があるにもかかわらず、さらに他の引数はどれも明示的に限量化修飾されているにもかかわらず、[list_ind]の型の場合分けにおける帰納部（たとえば上の3行目）には、[T]への限量子がありません。
-他の帰納的定義におけるパラメータは帰納法原理で表明されているとおりの扱いを受けます。
+そのため、構成子[Cons]への引数として型[T]には確かに意味があるのですが、[list_ind]の型における帰納部（すなわち上記の3行め）では[T]に限量子が付いていません。
+それ以外のすべての引数は明示的に限量化されているにもかかわらず、[T]は限量化されていないのです。
+他の帰納的な定義におけるパラメータは、帰納法の原理で表明されているとおりに扱われます。
 *)
 
 
@@ -973,7 +976,7 @@ Thus, despite a very real sense in which the type [T] is an argument to the cons
 (*
 We can define inductive types that refer to each other:
 *)
-相互参照する帰納型を以下のように定義できます。
+相互に参照する帰納型を以下のように定義できます。
 *)
 
 Inductive even_list : Set :=
@@ -1009,7 +1012,8 @@ with oapp (ol : odd_list) (el : even_list) : odd_list :=
 (*
 Everything is going roughly the same as in past examples, until we try to prove a theorem similar to those that came before.
 *)
-すでに見たのと同じような定理を証明しようとしない限りは、どの型も見たことのある例とだいたい同じように見えます。
+
+大まかに見れば、いずれもこれまでの例と同じです。しかし、これまでと同じ要領で定理を証明しようとすると、様子が変わります。
 *)
 
 Theorem elength_eapp : forall el1 el2 : even_list,
@@ -1029,10 +1033,10 @@ Theorem elength_eapp : forall el1 el2 : even_list,
   (*
   We have no induction hypothesis, so we cannot prove this goal without starting another induction, which would reach a similar point, sending us into a futile infinite chain of inductions.  The problem is that Coq's generation of [T_ind] principles is incomplete.  We only get non-mutual induction principles generated by default.
   *)
-  帰納法の仮説がありませんので、別の帰納法から始めないとこのゴールを証明できません。
-  そのようにするとまた同じところに到達することになり、無駄な帰納法の無限連鎖を辿ることになってしまいます。
-  この問題はCoqが[T_ind]の帰納原理を不完全にしか生成しないことに起因します。
-  デフォルトでは非相互帰納的な原理のみしか生成されません。
+  帰納法の仮説がないので、このゴールを証明するには別の帰納法から始めるしかありません。
+  しかし、別の帰納法から始めても同じような状況になるので、何も得られないまま帰納法の無限連鎖に陥ります。
+  問題なのは、Coqによる帰納法の原理[T_ind]の生成が不完全なことです。
+  デフォルトでは、相互参照がない帰納法の原理しか生成されないのです。
   *)
 
 Abort.
@@ -1049,7 +1053,7 @@ Check even_list_ind.
 We see that no inductive hypotheses are included anywhere in the type.  To get them, we must ask for mutual principles as we need them, using the %\index{Vernacular commands!Scheme}%[Scheme] command.
 *)
 この型には帰納法の仮定がどこにも含まれていません。
-これらを得るには%\index{Vernacularこまんど@Vernacularコマンド!Scheme}%[Scheme]コマンドを使って、必要な相互帰納法の原理を求めなければなりません。
+帰納法の仮定を手に入れるには、%\index{Vernacularこまんど@Vernacularコマンド!Scheme}%[Scheme]コマンドを使うことで、必要に応じて相互帰納法の原理を要求します。
 *)
 
 Scheme even_list_mut := Induction for even_list Sort Prop
@@ -1059,9 +1063,10 @@ with odd_list_mut := Induction for odd_list Sort Prop.
 (*
 This invocation of [Scheme] asks for the creation of induction principles [even_list_mut] for the type [even_list] and [odd_list_mut] for the type [odd_list].  The [Induction] keyword says we want standard induction schemes, since [Scheme] supports more exotic choices.  Finally, [Sort Prop] establishes that we really want induction schemes, not recursion schemes, which are the same according to Curry-Howard, save for the [Prop]/[Set] distinction.
 *)
-このように[Scheme]を呼び出して、型[even_list]の帰納法原理[even_list_mut]および型[odd_list]の帰納法原理[odd_list_mut]を作るように指示します。
-[Scheme]キーワードはより奇妙な選択肢までサポートしているので、[Induction]キーワードを使って、標準の帰納法スキームが必要なことを示しています。
-最後の[Srot Prop]は、[Prop]と[Set]との違いを除けば、必要なものは帰納法スキームであって、Curry-Howard対応に関する再帰スキームではないことを確認するためのコマンドです。
+このように[Scheme]を呼び出すことで、型[even_list]の帰納法の原理[even_list_mut]と、型[odd_list]の帰納法の原理[odd_list_mut]を作るように指示しています。
+[Induction]キーワードを指定しているのは、標準の帰納法スキームを要求するためです。[Scheme]キーワードは、かなり奇妙な選択肢にも対応しているので、この[Induction]キーワードが必要になります。
+最後に[Srot Prop]コマンドを指定しているのは、いま要求しているのが帰納法のスキームであって再帰のスキームではないことを確実にするためです。
+Curry-Howard対応により、帰納法のスキームと再帰のスキームは、[Prop]と[Set]の違いを除けば同じになります。
 *)
 
 Check even_list_mut.
@@ -1077,23 +1082,23 @@ Check even_list_mut.
 (*
 This is the principle we wanted in the first place.
 *)
-これが最初に必要であった帰納法原理です。
+これが、そもそも必要としていた帰納法の原理になります。
 
 (*
 The [Scheme] command is for asking Coq to generate particular induction schemes that are mutual among a set of inductive types (possibly only one such type, in which case we get a normal induction principle).  In a sense, it generalizes the induction scheme generation that goes on automatically for each inductive definition.  Future Coq versions might make that automatic generation smarter, so that [Scheme] is needed in fewer places.  In a few sections, we will see how induction principles are derived theorems in Coq, so that there is not actually any need to build in _any_ automatic scheme generation.
 *)
-[Scheme]コマンドはCoqに帰納型の集合において、相互に関連する帰納法原理を具体的に生成するためものです（通常の帰納法原理として得られるときには、そのような型は1つだけです）。
-ある意味これは、帰納法スキーム生成の一般化で、それぞれの帰納的定義に対して自動的に行われます。
-将来のCoqのバージョンでは、この自動生成がもっとスマートになるかもしれませんので、[Scheme]コマンドが必要な場所は限られてくるでしょう。
-この後のいくつかのセクションを通じて、Coqでは帰納法原理がどのようにして定理として導出されるかを説明します。
-そこで、%\emph{任意の}%自動スキーム生成において構築すべきものはなにもないことが判ります。
+[Scheme]コマンドは、いくつかの帰納型の集合において相互に関連するような帰納法のスキームを具体的に生成するよう、Coqに指示するためものです（帰納型が1つだけの場合もあり、その場合には通常の帰納法の原理が得られます）。
+Coqでは帰納的な定義ごとに帰納法のスキームが自動生成されますが、これはその一般化だといえるでしょう。
+将来のCoqのバージョンでは、この自動生成がもっとスマートになって、[Scheme]コマンドが必要な場面が少なくなるかもしれません。
+この後の節で説明するように、帰納法の原理はCoqにおいて導出される定理です。
+したがって、自動的なスキーム生成を組み込む必要は、実際のところどこにもありません。
 
 (*
 There is one more wrinkle left in using the [even_list_mut] induction principle: the [induction] tactic will not apply it for us automatically.  It will be helpful to look at how to prove one of our past examples without using [induction], so that we can then generalize the technique to mutual inductive types.%\index{tactics!apply}% 
 *)
-帰納法原理[even_list_mut]を使うにあたって残念なことがもう1つあります。
-[induction]タクティクが自動的に適用されないことです。
-以前に見た例のうちで、[induction]を使わずに証明しているものがあるので、そのやりかたを相互帰納型に一般化すればよいでしょう。%\index{たくてぃくす@タクティクス!apply}%
+帰納法の原理[even_list_mut]には、使用にあたって困ったことがもう1つあります。
+[induction]タクティクによって自動的に適用されないのです。
+以前の例を[induction]を使わないで証明する方法を見てみると、相互帰納型への一般化に役立つでしょう。%\index{たくてぃくす@タクティクス!apply}%
 *)
 
 Theorem n_plus_O' : forall n : nat, plus n O = n.
@@ -1102,15 +1107,14 @@ Theorem n_plus_O' : forall n : nat, plus n O = n.
   (*
   Here we use [apply], which is one of the most essential basic tactics.  When we are trying to prove fact [P], and when [thm] is a theorem whose conclusion can be made to match [P] by proper choice of quantified variable values, the invocation [apply thm] will replace the current goal with one new goal for each premise of [thm].
   *)
-  ここで使っている[apply]は基本タクティクスのうちでも最も重要なものです。
-  [P]を証明しようとするときや、[thm]が定理であって被量子化変数の値を適切に選択することでその結論を[P]に照合できるときには[apply thm]を起動すれば、現在のゴールを[thm]のそれぞれの仮定に対する新たなゴールに置き換えられます。
+  ここで使っている[apply]は、基本的なタクティクのなかでも特に本質的なものです。
+  [P]を証明しようとしているとき、限量化された変数の値をうまく選ぶことで帰結を[P]にマッチするようにできる定理[thm]があれば、[apply thm]を呼び出すことで、[thm]の仮定のそれぞれに対する新たなゴールへと現在のゴールを置き換えられます。
 
   (*
   This use of [apply] may seem a bit _too_ magical.  To better see what is going on, we use a variant where we partially apply the theorem [nat_ind] to give an explicit value for the predicate that gives our induction hypothesis.
   *)
-  このような[apply]の使い方は、魔法じみていると感じるかもしれません。
-  なにが起っているのかをもうすこしよく理解するために、定理[nat_ind]を部分適用する方法を使ってみましょう。
-  それには、帰納法の仮説を与える述語に明示的に値を渡します。
+  このような[apply]の使い方は黒魔術に見えるかもしれません。
+  背景を理解するために、帰納法の仮定を与えてくれる述語に明示的な値を渡すことで定理[nat_ind]を部分適用したものを使ってみましょう。
   *)
 
   Undo.
@@ -1121,13 +1125,12 @@ Qed.
 (*
 From this example, we can see that [induction] is not magic.  It only does some bookkeeping for us to make it easy to apply a theorem, which we can do directly with the [apply] tactic.
 *)
-この例を見れば、[induction]は少しも魔法ではないことが判ります。
-やっていることといえば、ある種の記録付けだけです。
-これのおかげで、定理の適用が簡単になり、[apply]タクティクを直接使えるようになります。
+この例を見れば、[induction]が魔法ではないことがわかります。
+[induction]は、[apply]タクティクを使って定理を直接簡単に適用できるように、帳簿のようなものを付けてくれているだけなのです。
 
 (*
 This technique generalizes to our mutual example:
-この技法を一般化して相互帰納の例に使いましょう。
+この技法を相互帰納型の例に一般化しましょう。
 *)
 
 *)
@@ -1147,9 +1150,8 @@ Qed.
 (*
 We simply need to specify two predicates, one for each of the mutually inductive types.  In general, it is not a good idea to assume that a proof assistant can infer extra predicates, so this way of applying mutual induction is about as straightforward as we may hope for.
 *)
-相互帰納型のそれぞれに対応する2つの述語を指定するだけですみます。
-一般に、証明補助機構が追加の述語を推論できると仮定するのは良いとはいえないことを考えると、
-相互帰納を適用するこの方法は望みどおりすっきりした方法です。
+必要なのは、相互帰納型のそれぞれに、対応する二つの述語を指定することだけです。
+証明支援器が余分な述語を推論してくれることは一般に望めないので、この方法で相互帰納を適用するのがもっとも直接的でしょう。
 *)
 
 
@@ -1157,19 +1159,18 @@ We simply need to specify two predicates, one for each of the mutually inductive
 (*
 * Reflexive Types
 *)
-* 反映型
+* 反射的型
 *)
 
 (**
 (*
 A kind of inductive type called a _reflexive type_ includes at least one constructor that takes as an argument _a function returning the same type we are defining_.  One very useful class of examples is in modeling variable binders.  Our example will be an encoding of the syntax of first-order logic.  Since the idea of syntactic encodings of logic may require a bit of acclimation, let us first consider a simpler formula type for a subset of propositional logic.  We are not yet using a reflexive type, but later we will extend the example reflexively.
 *)
-帰納型のある種のものを%\emph{反映型}%と呼びます。
-反映型は%\emph{定義しようとしている型と同じ型を返す関数}%を引数とする構成子を少くとも1つもつ型のことです。
-きわめて有用な例としては、変数束縛のモデリングがあります。
-以下の例は一階論理の構文を符号化しようとするものです。
-論理の構文を符号化するというアイデアにはすこし慣れが必要なので、まず、命題論理のサブセットに対するより単純な論理式型を考えましょう。
-ここではまだ反映型を使っていませんが、後でこれを反映型に拡張します。
+「定義しようとしている型と同じ型を返す関数」を引数として取る構成子を、少くとも一つ持つような帰納型のことを、_[反射的型]_と呼びます。
+反射的型の実用的な例として、変数束縛のモデリングが挙げられます。
+ここでは、一階論理の構文を符号化する例を紹介します。
+論理の構文を符号化するという考え方には少しばかり慣れが必要でしょうから、より単純な、命題論理のサブセットに対する論理式型から考えてみましょう。
+まだ反射的型は使いませんが、あとでこの例を反射的型へと拡張します。
 *)
 
 Inductive pformula : Set :=
@@ -1205,7 +1206,7 @@ Fixpoint pformulaDenote (f : pformula) : Prop :=
 (*
 This is just a warm-up that does not use reflexive types, the new feature we mean to introduce.  When we set our sights on first-order logic instead, it becomes very handy to give constructors recursive arguments that are functions.
 *)
-これは、まだ反映型を使っていないウォーミングアップです。
+これは、まだ反射的型を使っていないウォーミングアップです。
 一階論理に同様のアイデアを持ち込むと、構成子に関数である再帰的な引数を与えるのに便利です。
 *)
 
@@ -1230,7 +1231,7 @@ Example forall_refl : formula := Forall (fun x => Eq x x).
 (*
 We can write recursive functions over reflexive types quite naturally.  Here is one translating our formulas into native Coq propositions.
 *)
-反映型上の再帰関数はごく自然に書けます。
+反射的型上の再帰関数はごく自然に書けます。
 以下はいままでの論理式をCoqの命題に翻訳するものです。
 *)
 
@@ -1299,7 +1300,7 @@ Up to this point, we have seen how to encode in Coq more and more of what is pos
 このことが帰納型が代数データ型の拡張であるという不正確な印象を与えるかもしれません。
 実際、Coqでは、HaskellやMLの代数データ型では許されているある種の型を排除する必要があります。
 これは健全性を維持するためです。
-反映型はその最初の良い例で、そのうちいくつかだけが許されています。
+反射的型はその最初の良い例で、そのうちいくつかだけが許されています。
 
 (*
 Given our last example of an inductive type, many readers are probably eager to try encoding the syntax of %\index{lambda calculus}%lambda calculus.  Indeed, the function-based representation technique that we just used, called%\index{higher-order abstract syntax}\index{HOAS|see{higher-order abstract syntax}}% _higher-order abstract syntax_ (HOAS)%~\cite{HOAS}%, is the representation of choice for lambda calculi in %\index{Twelf}%Twelf and in many applications implemented in Haskell and ML.  Let us try to import that choice to Coq:
@@ -1643,7 +1644,7 @@ End even_list_mut'.
 (*
 Even induction principles for reflexive types are easy to implement directly.  For our [formula] type, we can use a recursive definition much like those we wrote above.
 *)
-反映型の帰納法原理であっても直接実装するのは簡単です。
+反射的型の帰納法原理であっても直接実装するのは簡単です。
 前に見た[formula]型なら、上で書いたものとほとんど同じように再帰的な定義が使えます。
 *)
 
