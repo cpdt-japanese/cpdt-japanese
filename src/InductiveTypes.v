@@ -1301,7 +1301,7 @@ Focusing on the [Forall] case, which comes third, we see that we are allowed to 
 (*
 Up to this point, we have seen how to encode in Coq more and more of what is possible with algebraic datatypes in %\index{Haskell}%Haskell and %\index{ML}%ML.  This may have given the inaccurate impression that inductive types are a strict extension of algebraic datatypes.  In fact, Coq must rule out some types allowed by Haskell and ML, for reasons of soundness.  Reflexive types provide our first good example of such a case; only some of them are legal.
 *)
-ここまでは、%\index{Haskell}%Haskellや%\index{ML}%MLの代数データ型できることの多くをCoqで符号化する方法を見てきました。
+ここまでは、%\index{Haskell}%Haskellや%\index{ML}%MLの代数データ型でできることの多くをCoqで符号化する方法を見てきました。
 そのため、帰納型とは代数データ型の拡張であるという不正確な印象を抱かせてしまったかもしれません。
 実際には、HaskellやMLの代数データ型で許されているような型であっても、Coqでは排除が必要なものがあります。
 これは健全性を維持するためです。
