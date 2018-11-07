@@ -292,8 +292,8 @@ Check unit_ind.
 (*
 The convention goes like this: [Set] is the type of normal types used in programming, and the values of such types are programs.  [Prop] is the type of logical propositions, and the values of such types are proofs.  Thus, an induction principle has a type that shows us that it is a function for building proofs.
 *)
-慣習によれば、[Set]はプログラミングで使われている通常の型を表す型で、その値はプログラムです。
-[Prop]は論理的な命題を表す型で、その値は証明です。
+慣習によれば、[Set]はプログラミングで使われている通常の型を表す型で、そのような型の値がプログラムです。
+[Prop]は論理的な命題を表す型で、そのような型の値が証明です。
 したがって、帰納法の原理の型を見れば、帰納法の原理は「証明を構成するための関数」であることがわかります。
 
 (*
@@ -1166,10 +1166,10 @@ We simply need to specify two predicates, one for each of the mutually inductive
 (*
 A kind of inductive type called a _reflexive type_ includes at least one constructor that takes as an argument _a function returning the same type we are defining_.  One very useful class of examples is in modeling variable binders.  Our example will be an encoding of the syntax of first-order logic.  Since the idea of syntactic encodings of logic may require a bit of acclimation, let us first consider a simpler formula type for a subset of propositional logic.  We are not yet using a reflexive type, but later we will extend the example reflexively.
 *)
-「定義しようとしている型と同じ型を返す関数」を引数として取る構成子を、少くとも一つ持つような帰納型のことを、_[反射的型]_と呼びます。
+「定義している型と同じ型を返す関数」を引数として取る構成子を、少くとも一つ持つような帰納型のことを、_[反射的型]_と呼びます。
 反射的型の実用的な例として、変数束縛のモデリングが挙げられます。
-ここでは、一階論理の構文を符号化する例を紹介します。
-論理の構文を符号化するという考え方には少しばかり慣れが必要でしょうから、より単純な、命題論理のサブセットに対する論理式型から考えてみましょう。
+ここでは、一階述語論理の構文を符号化する例を紹介します。
+論理の構文を符号化するという考え方には少しばかり慣れが必要でしょうから、より単純な、命題論理のサブセットに対する論理式型[pformula]から考えてみましょう。
 まだ反射的型は使いませんが、あとでこの例を反射的型へと拡張します。
 *)
 
@@ -1188,11 +1188,12 @@ Definition prod' := prod.
 (*
 A key distinction here is between, for instance, the _syntax_ [Truth] and its _semantics_ [True].  We can make the semantics explicit with a recursive function.  This function uses the infix operator %\index{Gallina operators!/\textbackslash}%[/\], which desugars to instances of the type family %\index{Gallina terms!and}%[and] from the standard library.  The family [and] implements conjunction, the [Prop] Curry-Howard analogue of the usual pair type from functional programming (which is the type family %\index{Gallina terms!prod}%[prod] in Coq's standard library).
 *)
-ここで鍵となるのは、たとえば、%\emph{構文}%[Truth]とその%\emph{意味}%[True]との区別です。
-再帰関数を使って意味を明示できます。
-この関数は中置演算子%\index{Gallinaえんざんし@Gallina演算子!/\textbackslash}%[/\]を使っています。
-この演算子は標準ライブラリにある型族のインスタンス%\index{Gallinaこう@Gallina項!and}%[and]に展開されます。
-型族[and]は連言の実装で、ここの[Prop]はCurry-Howard対応の類推から関数プログラミングでは通常ペア型（Coqの標準ライブラリにある型族%\index{Gallinaこう@Gallina項!prod}%[prod]）にあたるものです。
+ここで肝心なのは、_[構文]_と_[意味]_をはっきり区別することです。
+たとえば、[Truth]は構文であり、その意味は[True]です。
+意味を明らかにするには、次のような再帰関数が使えます。
+この関数の定義にある[/\]という中置演算子%\index{Gallinaえんざんし@Gallina演算子!/\textbackslash}%は、標準ライブラリにある型族[and]のインスタンス%\index{Gallinaこう@Gallina項!and}%に展開されます。
+型族[and]は、連言の実装です。
+連言の[Prop]にCurry-Howard対応するのは、関数プログラミングにおける通常のペア型です（Coqでは標準ライブラリにある型族%\index{Gallinaこう@Gallina項!prod}%[prod]に相当）。
 *)
 
 Fixpoint pformulaDenote (f : pformula) : Prop :=
@@ -1206,8 +1207,9 @@ Fixpoint pformulaDenote (f : pformula) : Prop :=
 (*
 This is just a warm-up that does not use reflexive types, the new feature we mean to introduce.  When we set our sights on first-order logic instead, it becomes very handy to give constructors recursive arguments that are functions.
 *)
-これは、まだ反射的型を使っていないウォーミングアップです。
-一階論理に同様のアイデアを持ち込むと、構成子に関数である再帰的な引数を与えるのに便利です。
+ここまではウォーミングアップです。これから紹介する新しい機能である反射的型は、この命題論理の論理式型の例ではまだ使っていません。
+そこで次は一階述語論理の論理式型[formula]を考えてみましょう。
+[formula]を返す関数を再帰的な引数として構成子に与えられると、次のようにして[formula]を簡単に定義できることがわかります。
 *)
 
 Inductive formula : Set :=
@@ -1219,10 +1221,10 @@ Inductive formula : Set :=
 (*
 Our kinds of formulas are equalities between naturals, conjunction, and universal quantification over natural numbers.  We avoid needing to include a notion of "variables" in our type, by using Coq functions to encode the syntax of quantification.  For instance, here is the encoding of [forall x : nat, x = x]:%\index{Vernacular commands!Example}%
 *)
-ここでの論理式は自然数間の同等性、連言、自然数上での全称限量化です。(* equalityの訳語に迷う-nobsun *)
-ここでは「変数」の概念が必要にならないようにしています。
-Coqの関数を使って限量化の構文を符号化すると「変数」が必要になります。
-たとえば、以下は[forall x : nat, x = x]の符号化です。%\index{Vernacularこまんど@Vernacularコマンド!Example}%
+[formula]としてありうるのは、自然数の間の等号、連言、自然数に対する全称限量化です。(* equalityの訳語に迷う-nobsun *)
+ここで、型から「変数」という概念が不要になっていることに注目してください。
+限量化の構文は、Coqの関数を使って符号化します。
+たとえば、[forall x : nat, x = x]は次のように符号化できます。%\index{Vernacularこまんど@Vernacularコマンド!Example}%
 *)
 
 Example forall_refl : formula := Forall (fun x => Eq x x).
@@ -1231,8 +1233,8 @@ Example forall_refl : formula := Forall (fun x => Eq x x).
 (*
 We can write recursive functions over reflexive types quite naturally.  Here is one translating our formulas into native Coq propositions.
 *)
-反射的型上の再帰関数はごく自然に書けます。
-以下はいままでの論理式をCoqの命題に翻訳するものです。
+反射的型の上の再帰関数はとても自然に書けます。
+たとえば、いま定義した[formula]型の論理式をCoqの命題に翻訳する再帰関数は次のように書けます。
 *)
 
 Fixpoint formulaDenote (f : formula) : Prop :=
@@ -1242,7 +1244,11 @@ Fixpoint formulaDenote (f : formula) : Prop :=
     | Forall f' => forall n : nat, formulaDenote (f' n)
   end.
 
-(** We can also encode a trivial formula transformation that swaps the order of equality and conjunction operands. *)
+(**
+(* We can also encode a trivial formula transformation that swaps the order of equality and conjunction operands. *)
+論理式に対する単純な変換も符号化できます。
+等号と連言の順序を変更する変換の例を次に示します。
+*)
 
 Fixpoint swapper (f : formula) : formula :=
   match f with
@@ -1255,9 +1261,8 @@ Fixpoint swapper (f : formula) : formula :=
 (*
 It is helpful to prove that this transformation does not make true formulas false.
 *)
-これは、この変換によって真が偽になることはないことの証明に使えます。
+この変換によって真が偽になることがないことを証明しておきましょう。
 *)
-
 
 Theorem swapper_preserves_truth : forall f, formulaDenote f -> formulaDenote (swapper f).
 (* begin thide *)
@@ -1269,7 +1274,7 @@ Qed.
 (*
 We can take a look at the induction principle behind this proof.
 *)
-この証明の背後にある帰納法原理を見られます。
+この証明の背後にある帰納法の原理は次のように確認できます。
 *)
 
 Check formula_ind.
@@ -1287,26 +1292,26 @@ Check formula_ind.
 (*
 Focusing on the [Forall] case, which comes third, we see that we are allowed to assume that the theorem holds _for any application of the argument function [f1]_.  That is, Coq induction principles do not follow a simple rule that the textual representations of induction variables must get shorter in appeals to induction hypotheses.  Luckily for us, the people behind the metatheory of Coq have verified that this flexibility does not introduce unsoundness.
 *)
-[Forall]の場合で3つめにあるものに注目すると、この定理が%\emph{引数である関数[f1]の任意の適用}%で成り立つと考えてよりことがわかります。
-つまり、Coqの帰納法原理は帰納変数のテキスト上の表現が帰納法の仮定によって必ず短くなるという単純な法則に従っているわけではないということです。
-幸い、Coqのこのメタ定理を準備した人たちが、このような柔軟性があっても系が不健全にならないという検証をしてくれています。
+[Forall]に関する場合分け（3つめの場合分け）に注目してみると、「引数である関数[f1]の任意の適用」に対して定理が成り立つことを仮定してよい、となっています。
+つまり、Coqの帰納法の原理は、「帰納法に関する変数のテキスト上の見た目が常に帰納法の仮定によって短くなる」という単純な法則に従っているわけではないということです。
+このような柔軟性があっても体系が不健全にならないことは、Coqのメタ定理の開発者たちが検証してくれています。
 
 %\medskip%
 
 (*
 Up to this point, we have seen how to encode in Coq more and more of what is possible with algebraic datatypes in %\index{Haskell}%Haskell and %\index{ML}%ML.  This may have given the inaccurate impression that inductive types are a strict extension of algebraic datatypes.  In fact, Coq must rule out some types allowed by Haskell and ML, for reasons of soundness.  Reflexive types provide our first good example of such a case; only some of them are legal.
 *)
-ここまでは、%\index{Haskell}%Haskellや%\index{ML}%MLの代数データ型できることを次々にCoqで符号化する方法を見ました。
-このことが帰納型が代数データ型の拡張であるという不正確な印象を与えるかもしれません。
-実際、Coqでは、HaskellやMLの代数データ型では許されているある種の型を排除する必要があります。
+ここまでは、%\index{Haskell}%Haskellや%\index{ML}%MLの代数データ型できることの多くをCoqで符号化する方法を見てきました。
+そのため、帰納型とは代数データ型の拡張であるという不正確な印象を抱かせてしまったかもしれません。
+実際には、HaskellやMLの代数データ型で許されているような型であっても、Coqでは排除が必要なものがあります。
 これは健全性を維持するためです。
-反射的型はその最初の良い例で、そのうちいくつかだけが許されています。
+反射的型は、そのことを説明する最初の好例です。Coqでは、ある種の反射的型だけしか許されていません。
 
 (*
 Given our last example of an inductive type, many readers are probably eager to try encoding the syntax of %\index{lambda calculus}%lambda calculus.  Indeed, the function-based representation technique that we just used, called%\index{higher-order abstract syntax}\index{HOAS|see{higher-order abstract syntax}}% _higher-order abstract syntax_ (HOAS)%~\cite{HOAS}%, is the representation of choice for lambda calculi in %\index{Twelf}%Twelf and in many applications implemented in Haskell and ML.  Let us try to import that choice to Coq:
 *)
-さきほどの帰納型の例を考えれば、%\index{らむだけいさん@λ計算}%λ計算の構文をエンコードしようとする読者も多いかと思います。
-実際には、いま使ったばかりの関数を基本として表現の技法は%\index{こうかいちゅうしょうこうぶん@高階抽象構文}\index{HOAS|see{高階抽象構文}}%%\emph{高階抽象構文}%（HOAS）%~\cite{HOAS}%と呼ばれるもので、%\index{Twelf}%Twelfをはじめとする多くのHaskellやMLで実装されたアプリケーションで、λ計算の表現として用いられます。
+読者のなかには、さきほどの帰納型の例を見て、%\index{らむだけいさん@λ計算}%λ計算の構文をエンコードしようとする人も多いでしょう。
+さきほどの例で見たような、関数による表現技法は、%\index{こうかいちゅうしょうこうぶん@高階抽象構文}\index{HOAS|see{高階抽象構文}}%_[高階抽象構文]_（HOAS、higher-order abstract syntax）と呼ばれています%~\cite{HOAS}%。HOASは、%\index{Twelf}%Twelfをはじめ、HaskellやMLで実装されたアプリケーションにおけるλ計算の表現として採用されています。
 この技法をCoqでも使ってみましょう。
 *)
 
@@ -1330,16 +1335,17 @@ Error: Non strictly positive occurrence of "term" in "(term -> term) -> term"
 (*
 We have run afoul of the%\index{strict positivity requirement}\index{positivity requirement}% _strict positivity requirement_ for inductive definitions, which says that the type being defined may not occur to the left of an arrow in the type of a constructor argument.  It is important that the type of a constructor is viewed in terms of a series of arguments and a result, since obviously we need recursive occurrences to the lefts of the outermost arrows if we are to have recursive occurrences at all.  Our candidate definition above violates the positivity requirement because it involves an argument of type [term -> term], where the type [term] that we are defining appears to the left of an arrow.  The candidate type of [App] is fine, however, since every occurrence of [term] is either a constructor argument or the final result type.
 *)
-これは帰納的定義に対する%\index{げんみつようせいようけん@厳密陽性要件}\index{ようせいようけん@陽性要件}%%\emph{厳密陽性要件}%を犯しているからです。
-とにかく再帰的な出現があれば、一番外側の矢印の左側に再帰的な出現が必要なことは明らかですから、厳密陽性要件では構成子の引数の型の矢印の左側に定義しようとしている型が現れてはいけないことになっています。
-いまの[Abs]では、矢印の左側にいま定義しようとしている[term]型が現れる[term -> term]型の引数を含みますので、陽性要件に違反します。
-[App]の方は問題ありません。
-[term]の出現はどれも構成子の引数であるか最終結果の型だからです。
+ここで抵触したのは、帰納的定義に対する_[厳密陽性要件]（strict positivity requirement）_という制限です%\index{げんみつようせいようけん@厳密陽性要件}\index{ようせいようけん@陽性要件}。
+厳密陽性要件では、定義しようとしている型が、構成子の引数の型において矢印の左側に出現してはいけないことになっています。
+もし再帰的な出現があれば、一番外側の矢印の左側に再帰的な出現が明らかに必要なので、構成子の型は引数と結果の列として見ればよい、というのがポイントです。
+上記の定義では、[term -> term]型という形で、いま定義しようとしている[term]型が矢印の左側に出現する引数が関与しており、これが陽性要件に違反します。
+ただし、[App]の型は問題ありません。
+[App]では、すべての[term]の出現が、構成子の引数か最終結果の型のいずれかだからです。
 
 (*
 Why must Coq enforce this restriction?  Imagine that our last definition had been accepted, allowing us to write this function:
 *)
-なぜ、Coqにはこのような制限があるのでしょうか。
+なぜCoqにはこのような制限があるのでしょうか。
 さきほどの定義が許容されるとどうなるか想像してみましょう。
 以下の関数が書けることになります。
 
@@ -1354,21 +1360,21 @@ Definition uhoh (t : term) : term :=
 (*
 Using an informal idea of Coq's semantics, it is easy to verify that the application [uhoh (Abs uhoh)] will run forever.  This would be a mere curiosity in OCaml and Haskell, where non-termination is commonplace, though the fact that we have a non-terminating program without explicit recursive function definitions is unusual.
 *)
-Coqの意味論に関する非形式的アイデアを使えば、[uho (Abs uho)]のような適用は無限ループになってしまうことが容易に確認できます。
-停止しないことが普通にあるOCamlやHaskellでは、だからどうした、ということになるでしょうが、はっきりとした再帰が見えないプログラムが停止しないという事実は普通ではありません。
+Coqの意味論について非形式的に考えてみると、[uho (Abs uho)]のような適用が無限ループになってしまうことが容易に確認できます。
+明示的に再帰関数として定義されていない停止しないプログラムの存在は異常ですが、停止しないことが普通にあるOCamlやHaskellでは「だからどうした」という話かもしれません。
 
 (*
 %\index{termination checking}%For Coq, however, this would be a disaster.  The possibility of writing such a function would destroy all our confidence that proving a theorem means anything.  Since Coq combines programs and proofs in one language, we would be able to prove every theorem with an infinite loop.
 *)
-%\index{ていしせいけんさ@停止性検査}%しかし、Coqではこれを認めると酷いことになります。
-このような関数を書けてしまうことは、定理を証明することの意味における信頼を破壊してしまいます。
-Coqはプログラムや証明を1つの言語で組み合わせますので、無限ループですべての定理が証明できることになってしまいます。
+%\index{ていしせいけんさ@停止性検査}%しかし、Coqでこれを認めるとひどいことになります。
+このような関数を書けてしまうようでは、定理を証明することに意味があるという私たちの信念が台無しです。
+Coqでは、プログラムと証明が単一の言語で結び付いているので、無限ループですべての定理が証明できることになってしまいます。
 
 (*
 Nonetheless, the basic insight of HOAS is a very useful one, and there are ways to realize most benefits of HOAS in Coq.  We will study a particular technique of this kind in the final chapter, on programming language syntax and semantics. 
 *)
-とはいうものの、HOASに関する基本的な洞察はきわめて有用で、CoqでHOASの利点のほとんどを実現する方法があります。
-この手の具体的な技法については最終章で、プログラミング言語の構文と意味に関して研究することにします。
+それでもHOASに関する基本的な洞察はきわめて有用であり、CoqでHOASの利点のほとんどを実現する方法もあります。
+最終章では、そのような具体的な技法について、プログラミング言語の構文と意味を研究することにします。
 *)
 
 (**
