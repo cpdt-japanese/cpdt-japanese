@@ -1381,17 +1381,17 @@ Nonetheless, the basic insight of HOAS is a very useful one, and there are ways 
 (*
 * An Interlude on Induction Principles
 *)
-* 帰納法原理についての間奏曲
+* 帰納法の原理についての補足
 *)
 
 (**
 (*
 As we have emphasized a few times already, Coq proofs are actually programs, written in the same language we have been using in our examples all along.  We can get a first sense of what this means by taking a look at the definitions of some of the %\index{induction principles}%induction principles we have used.  A close look at the details here will help us construct induction principles manually, which we will see is necessary for some more advanced inductive definitions.
 *)
-なんどか強調したように、Coqの証明は実のところプログラムで、いままでの例はどれも同じ言語言語で書いたものです。
-いままでに使った%\index{きのうほうのげんり@帰納法の原理}%帰納法の原理にはひと目でその意味を理解できるものがあります。
-ここでじっくりと詳細に観察しておくと、帰納法の原理を自分の手で構成するのに役立ちます。
-これを理解しておくことは、より進んだ帰納的定義を構成するのに必要です。
+なんどか強調したように、Coqの証明はこれまでの例題で使ってきた言語と同じ言語で書かれており、実のところプログラムです。
+その意味をしっかりと把握できるように、これまでに使用した%\index{きのうほうのげんり@帰納法の原理}%帰納法の原理をここで確認しておきましょう。
+帰納的定義の応用例では、帰納法の原理を自分の手で構成することが必要になる場合もあります。
+これまでに使った帰納法の原理をここでしっかり確認しておけば、自分の手で帰納法の原理の構成が必要になるときに役立ちます。
 *)
 
 Print nat_ind.
@@ -1405,8 +1405,8 @@ fun P : nat -> Prop => nat_rect P
 (*
 We see that this induction principle is defined in terms of a more general principle, [nat_rect].  The <<rec>> stands for "recursion principle," and the <<t>> at the end stands for [Type].
 *)
-この帰納法の原理は、さらに一般的な帰納法の原理[nat_rect]を用いて定義されていることがわかります。
-<<rec>>は再帰原理を表し、最後についている<<t>>は[Type]を表すものです。
+上記に示した帰納法の原理は、さらに一般的な帰納法の原理である[nat_rect]を用いて定義されていることがわかります。
+[nat_rect]という原理の名前に出てくる<<rect>>は、先頭の<<rec>>は「再帰（recursion）原理」であることを、末尾の<<t>>は[Type]を表しています。
 *)
 
 
@@ -1420,12 +1420,12 @@ nat_rect
 (*
 The principle [nat_rect] gives [P] type [nat -> Type] instead of [nat -> Prop].  This [Type] is another universe, like [Set] and [Prop].  In fact, it is a common supertype of both.  Later on, we will discuss exactly what the significances of the different universes are.  For now, it is just important that we can use [Type] as a sort of meta-universe that may turn out to be either [Set] or [Prop].  We can see the symmetry inherent in the subtyping relationship by printing the definition of another principle that was generated for [nat] automatically:
 *)
-帰納法の原理[nat_rect]は[na -> Prop]型ではなく[nat -> Type]型の[P]を与えるものです。
-この[Type]は[Set]や[Prop]とは別の領域です。(* universe の訳語は「領域」でよいか-nobsun *)
-実際は[Set]と[Prop]の両方に共通の上位型です。 (* supertype の訳語は「上位型」でよいか-nobsun *)
-異なる領域であることの意味についての正確な議論は後で行います。
-今のところは、[Type]は[Set]か[Prop]のどちらかになりうるメタ領域の一種として使えるということが重要です。
-部分型付け関係における継承の対称性については、[nat]用に自動生成された別の帰納法原理の定義を表示すれば確認できます。
+[nat_rect]という原理によって与えられるのは、[nat -> Type]型の[P]であり、[nat -> Prop]型ではありません。
+[Type]は、[Set]や[Prop]と同じく、一つの領域です。(* universe の訳語は「領域」でよいか-nobsun *)
+実際には、[Set]と[Prop]の両者の上位型になっています。(* supertype の訳語は「上位型」でよいか-nobsun *)
+領域が別であることにどんな意味があるのか、正確なところは後で説明します。
+今のところ重要なのは、[Type]は[Set]か[Prop]のどちらにもなりうるメタ領域のようなものとして使えるということです。
+[nat]用に自動生成された別の帰納法の原理の定義を表示してみれば、部分型付けの関係になっていることに伴う対称性を確認できます。
 *)
 
 Print nat_rec.
@@ -1439,10 +1439,10 @@ fun P : nat -> Set => nat_rect P
 (*
 This is identical to the definition for [nat_ind], except that we have substituted [Set] for [Prop].  For most inductive types [T], then, we get not just induction principles [T_ind], but also %\index{recursion principles}%recursion principles [T_rec].  We can use [T_rec] to write recursive definitions without explicit [Fixpoint] recursion.  For instance, the following two definitions are equivalent:
 *)
-これは、[Prop]を[Set]に置き換えた以外は、[nat_ind]の定義と同じです。
-したがって、ほとんどの帰納型[T]に対して帰納法原理[T_ind]だけではなく、%\index{さいきほうのげんり@再帰法の原理}%再帰法の原理[T_rec]も手に入ります。
-[T_rec]を使えば、[Fixpoint]を明示した再帰を使わなくても再帰的定義が書けます。
-たとえば、以下の2つの定義は同じです。
+これは、[Prop]を[Set]に置き換えれば[nat_ind]の定義と同じです。
+さらに、ほとんどの帰納型[T]に対し、[T_ind]という帰納法の原理だけでなく、[T_rec]という%\index{さいきのげんり@再帰の原理}%再帰の原理も手に入ります。
+[T_rec]を使えば、[Fixpoint]を明示しなくても再帰的な定義を書けます。
+たとえば、以下の二つの定義は同じです。
 *)
 
 Fixpoint plus_recursive (n : nat) : nat -> nat :=
@@ -1462,7 +1462,7 @@ Qed.
 (*
 Going even further down the rabbit hole, [nat_rect] itself is not even a primitive.  It is a functional program that we can write manually.
 *)
-さらに不思議の国を進んでいきましょう。
+さらに不思議の国の奥へと降りていきましょう。
 [nat_rect]自身はプリミティブでさえありません。
 自分の手で書くこともできる関数プログラムです。
 *)
@@ -1483,22 +1483,25 @@ fix F (n : nat) : P n :=
 (*
 The only new wrinkles here are, first, an anonymous recursive function definition, using the %\index{Gallina terms!fix}%[fix] keyword of Gallina (which is like [fun] with recursion supported); and, second, the annotations on the [match] expression.  This is a%\index{dependent pattern matching}% _dependently typed_ pattern match, because the _type_ of the expression depends on the _value_ being matched on.  We will meet more involved examples later, especially in Part II of the book.
 *)
-ここで、少し煩雑なのものの1つめは、Gallinaのキーワード%\index{Gallinaこう@Gallina項!fix}%[fix]（[fun]のように再帰をサポートしています）を使った無名再帰関数で、2つめは、[match]式上の注釈です。
-この式の%\emph{型}%は、照合した%\emph{値}%に依存するので、このことを%\index{dependent pattern matching}%%\emph{依存型付けパターンマッチ}%といいます。
-より詳しい説明は、後で、特に第2部で行います。
+ここで新しく登場したのは、%\index{Gallinaこう@Gallina項!fix}%[fix]というGallinaのキーワードを使った無名再帰関数（[fix]は[fun]と同じく再帰に対応しています）と、[match]式に対する注釈です。
+このような[match]を%\index{dependent pattern matching}%_[依存型付きパターンマッチ]_と呼びます。
+なぜかというと、この式の_[型]_は、マッチする_[値]_に依存するからです。
+のちほど、特に第II部で、もっと複雑な例が登場します。
 
 (*
 %\index{type inference}%Type inference for dependent pattern matching is undecidable, which can be proved by reduction from %\index{higher-order unification}%higher-order unification%~\cite{HOU}%.  Thus, we often find ourselves needing to annotate our programs in a way that explains dependencies to the type checker.  In the example of [nat_rect], we have an %\index{Gallina terms!as}%[as] clause, which binds a name for the discriminee; and a %\index{Gallina terms!return}%[return] clause, which gives a way to compute the [match] result type as a function of the discriminee.
 *)
-%\index{かたすいろん@型推論}%依存型付けパターンマッチに対する型推論は非決定的です。
-このことは%\index{こうかいたんいつか@高階単一化}%高階単一化の簡約により証明できます。
-したがって、たびたび、依存関係を型検査器に教えるための注釈をプログラムに付ける必要にせまられます。
-[nat_rect]の例では、%\index{Gallinaこう@Gallina項!as}%[as]節を用いて識別対象の名前を束縛し、%\index{Gallinaこう@Gallina項!return}%[return]節を用いて、識別対象の関数として[match]の結果の型を計算します。(* 判りにくい、よい表現がないものか-nobsun *)
+%\index{かたすいろん@型推論}%依存型付きパターンマッチに対する型推論は、非決定的です。
+このことは、%\index{こうかいたんいつか@高階単一化}%高階単一化からの簡約により証明できます%~\cite{HOU}%。
+型推論が非決定的なので、プログラムに手で注釈を付けることにより型検査器に依存関係を伝えなければならないことがよくあります。
+[nat_rect]の例では、
+[as]節により識別対象の名前を束縛し%\index{Gallinaこう@Gallina項!as}%、
+[return]節により[match]の結果の型を計算する手段を識別対象の関数として指定しています%\index{Gallinaこう@Gallina項!return}%。
 
 (*
 To prove that [nat_rect] is nothing special, we can reimplement it manually.
 *)
-手で再実装してみれば、[nat-rect]がなにも特別なものではないことを示せます。
+[nat-rect]が特別なものでないことは、手で再実装してみれば証明できます。
 *)
 
 Fixpoint nat_rect' (P : nat -> Type) 
@@ -1513,7 +1516,7 @@ Fixpoint nat_rect' (P : nat -> Type)
 (*
 We can understand the definition of [nat_rect] better by reimplementing [nat_ind] using sections.
 *)
-セクションを使って[nat_ind]を再実装すれば、この[nat_rect]の定義がよりよいものだと理解できます。
+[nat_rect]の定義をさらによく理解できるように、[nat_ind]をセクションで再実装してみましょう。
 *)
 
 Section nat_ind'.
@@ -1521,7 +1524,7 @@ Section nat_ind'.
    (*
    First, we have the property of natural numbers that we aim to prove.
    *)
-   まず、証明すべき自然数の性質です。
+   まずは証明したい自然数の性質を用意します。
    *)
 
   Variable P : nat -> Prop.
@@ -1530,8 +1533,8 @@ Section nat_ind'.
    (*
    Then we require a proof of the [O] case, which we declare with the command %\index{Vernacular commands!Hypothesis}%[Hypothesis], which is a synonym for [Variable] that, by convention, is used for variables whose types are propositions.
    *)
-   それから、[O]の場合の証明が必要です。これを%\index{Vernacularこまんど@Vernacularコマンド!Hypothesis}%[Hypothesis]コマンドで宣言します。
-   このコマンドは利便のためのもので、[Variable]のシノニムになっています。
+   まず必要なのは[O]の場合の証明です。これは%\index{Vernacularこまんど@Vernacularコマンド!Hypothesis}%[Hypothesis]コマンドで宣言します。
+   このコマンドは[Variable]のシノニムで、規約により、型が命題である変数に対して使うことになっています。
    *)
 
   Hypothesis O_case : P O.
@@ -1541,7 +1544,7 @@ Section nat_ind'.
    Next is a proof of the [S] case, which may assume an inductive hypothesis.
    *)
    次は[S]の場合の証明です。
-   ここで、帰納法の仮説が使えます。
+   この場合には帰納法の仮説が使えるでしょう。
    *)
 
   Hypothesis S_case : forall n : nat, P n -> P (S n).
@@ -1564,15 +1567,17 @@ End nat_ind'.
 (*
 Closing the section adds the [Variable]s and [Hypothesis]es as new [fun]-bound arguments to [nat_ind'], and, modulo the use of [Prop] instead of [Type], we end up with the exact same definition that was generated automatically for [nat_rect].
 *)
-セクションを閉じたところで、[Variable]と[Hypothesis]が、新しい[nat_ind']への[fun]に束縛された引数を追加し、[Type]の代りに[Prop]を法として[nat_rect]の全く同じ定義を自動生成されました。
+セクションを閉じると、[nat_ind']に対する、[fun]で束縛された新しい引数として、[Variable]と[Hypothesis]が追加されます。
+[Type]の代りに[Prop]を使っている点を除くと、最終的には[nat_rect]のために自動生成された定義とまったく同じものになります。
 
 %\medskip%
 
 (*
 We can also examine the definition of [even_list_mut], which we generated with [Scheme] for a mutually recursive type.
 *)
-これは[even_list_mut]の定義でも確認するできます。
-以前には相互再帰型に対しては[Scheme]を使って生成したものです。
+相互再帰型では[even_list_mut]という帰納法の原理を使いました。
+そのときは、[Scheme]を使って[even_list_mut]を生成しました。
+この原理についても定義を詳しく調べることが可能です。
 *)
 
 Print even_list_mut.
@@ -1601,9 +1606,10 @@ Print even_list_mut.
 (*
 We see a mutually recursive [fix], with the different functions separated by %\index{Gallina terms!with}%[with] in the same way that they would be separated by <<and>> in ML.  A final %\index{Gallina terms!for}%[for] clause identifies which of the mutually recursive functions should be the final value of the [fix] expression.  Using this definition as a template, we can reimplement [even_list_mut] directly.
 *)
-相互再帰する[fix]を見ると、異なる関数は、MLだと<<and>>で分けるように、%\index{Gallinaこう@Gallina項!with}%[with]で分けることが判ります。
-最後の%\index{Gallinaこう@Gallina項!for}%[for]節は、相互に再帰している関数のどちらが[fix]式の最終的な値になるべきかを識別します。
-この定義をテンプレートにすると[even_list_mut]は以下のように直接定義できます。
+相互再帰する[fix]では、%\index{Gallinaこう@Gallina項!with}%[with]で区切ることで別々の関数を使っています。
+ちょうど、MLにおいて<<and>>で区切るのと同じ要領です。
+相互再帰する関数のいずれが[fix]式の最終的な値になるべきかは、最後の%\index{Gallinaこう@Gallina項!for}%[for]節で識別されます。
+この定義をテンプレートにすることで、以下のように[even_list_mut]を直接定義できます。
 *)
 
 Section even_list_mut'.
@@ -1611,7 +1617,7 @@ Section even_list_mut'.
   (*
   First, we need the properties that we are proving.
   *)
-  まず、必要なのは証明すべき性質です。
+  まず、これから証明する性質が必要です。
   *)
 
   Variable Peven : even_list -> Prop.
@@ -1621,7 +1627,7 @@ Section even_list_mut'.
   (*
   Next, we need proofs of the three cases.
   *)
-  次に3つの場合の証明がそれぞれ必要です。
+  次に、三つの場合分けのそれぞれに対する証明が必要です。
   *)
   
   Hypothesis ENil_case : Peven ENil.
@@ -1650,8 +1656,8 @@ End even_list_mut'.
 (*
 Even induction principles for reflexive types are easy to implement directly.  For our [formula] type, we can use a recursive definition much like those we wrote above.
 *)
-反射的型の帰納法原理であっても直接実装するのは簡単です。
-前に見た[formula]型なら、上で書いたものとほとんど同じように再帰的な定義が使えます。
+反射的型についても簡単に帰納法の原理を直接実装できます。
+前に見た[formula]型に対しては、上記とほとんど同じ要領で再帰的な定義が使えます。
 *)
 
 Section formula_ind'.
@@ -1674,7 +1680,7 @@ End formula_ind'.
 (*
 It is apparent that induction principle implementations involve some tedium but not terribly much creativity.
 *)
-帰納法原理を実装するのはとんでもなく創造的というわけではなく、多少退屈であることは否めません。
+帰納法の原理を実装するのは、どちらかというと退屈であり、それほど創造的ではありません。
 *)
 
 
