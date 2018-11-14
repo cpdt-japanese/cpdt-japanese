@@ -2050,8 +2050,8 @@ The advantage of using the hint is not very clear here, because the original pro
 (*
 It can be useful to understand how tactics like %\index{tactics!discriminate}%[discriminate] and %\index{tactics!injection}%[injection] work, so it is worth stepping through a manual proof of each kind.  We will start with a proof fit for [discriminate].
 *)
-%\index{たくてぃくす@タクティクス!discriminate}%[discriminate]や%\index{たくてぃくす@タクティクス!injection}%[injection]のようなタクティクがどのように機能しているかを理解することは役に立ちますから、それぞれを段階をおって手作業で証明することが重要です。
-まず、[discriminate]から着手しましょう。
+%\index{たくてぃく@タクティク!discriminate}%[discriminate]や%\index{たくてぃく@タクティク!injection}%[injection]のようなタクティクがどのように機能するかを理解するために、これらのタクティクの仕事を手で追って証明してみましょう。
+まずは[discriminate]です。
 *)
 
 Theorem true_neq_false : true <> false.
@@ -2061,9 +2061,8 @@ Theorem true_neq_false : true <> false.
 (*
 We begin with the tactic %\index{tactics!red}%[red], which is short for "one step of reduction," to unfold the definition of logical negation.
 *)
-まず、[red]タクティクから始めましょう。
-この名前は「1ステップの簡約（one step of reduction）」の省略形です。
-これを使って、論理否定の定義を展開しましょう。
+論理否定の定義を展開するために、[red]タクティクから始めます。
+このタクティクの名前は「1ステップの簡約（one step of reduction）」からきています。
 *)
 
   red.
@@ -2075,8 +2074,8 @@ We begin with the tactic %\index{tactics!red}%[red], which is short for "one ste
 (*
 The negation is replaced with an implication of falsehood.  We use the tactic %\index{tactics!intro}%[intro H] to change the assumption of the implication into a hypothesis named [H].
 *)
-否定は偽への含意に置き換えられます。
-タクティク%\index{たくてぃくす@タクティクス!intro}%[intro H]を用いて、含意の仮定を[H]という名の仮説にします。
+否定は、偽の含意で置き換えられます。
+%\index{たくてぃくす@タクティクス!intro}%[intro H]というタクティクを使って、含意の仮定を[H]という名前の仮説にします。
 *)
   
   intro H.
@@ -2089,8 +2088,9 @@ The negation is replaced with an implication of falsehood.  We use the tactic %\
 (*
 This is the point in the proof where we apply some creativity.  We define a function whose utility will become clear soon.
 *)
-ここが、この証明の中で創造性を発揮するところです。
-効用がすぐに判る関数を定義します。
+ここで少し独創性が必要になります。
+関数を一つ定義しましょう。
+なぜこの関数を定義するかは、すぐにわかります。
 *)
 
   Definition toProp (b : bool) := if b then True else False.
@@ -2099,11 +2099,11 @@ This is the point in the proof where we apply some creativity.  We define a func
 (*
 It is worth recalling the difference between the lowercase and uppercase versions of truth and falsehood: [True] and [False] are logical propositions, while [true] and [false] are Boolean values that we can case-analyze.  We have defined [toProp] such that our conclusion of [False] is computationally equivalent to [toProp false].  Thus, the %\index{tactics!change}%[change] tactic will let us change the conclusion to [toProp false].  The general form [change e] replaces the conclusion with [e], whenever Coq's built-in computation rules suffice to establish the equivalence of [e] with the original conclusion.
 *)
-真と偽の小文字バージョンと大文字バージョンの違いをぜひ思い出してください。
-[True]と[False]は論理命題です。[true]と[false]は場合分け可能な論理値です。
+先頭が小文字か大文字かで、真（true）と偽（false）に違いがあったことを思い出してください。
+[True]と[False]は論理命題であり、[true]と[false]は場合分けが可能な論理値です。
 [toProp]は、[False]の結論が[toProp false]と同等になるように定義しました。
-したがって、%\index{たくてぃくす@タクティクス!change}%[change]タクティクは、結論を[toProp false]に変更します。
-一般形式[change e]は、Coq組込みの計算規則で[e]と元の結論が同等であることを証明できるときには、元の結論を[e]に置き換えます。
+したがって、%\index{たくてぃくす@タクティクス!change}%[change]タクティクにより、[False]の結論を[toProp false]に置き換え可能です。
+一般に[change e]という形式は、結論が[e]と同等であることがCoqに組み込まれている計算規則により証明できるときは、常に元の結論を[e]に置き換えてくれます。
 *)
 
   change (toProp false).
@@ -2116,7 +2116,7 @@ It is worth recalling the difference between the lowercase and uppercase version
 (*
 Now the righthand side of [H]'s equality appears in the conclusion, so we can rewrite, using the notation [<-] to request to replace the righthand side of the equality with the lefthand side.%\index{tactics!rewrite}%
 *)
-[H]の等式の右辺が結論に現れましたので、[<-]記法を使って等式の右辺を左辺に置き換えるよう書き換えられます。
+[H]の等式の右辺が結論に現れたので、等式の右辺を左辺に置き換えるように、[<-]記法を使って書き換えられます。
 *)
 
   
@@ -2131,7 +2131,7 @@ Now the righthand side of [H]'s equality appears in the conclusion, so we can re
 We are almost done.  Just how close we are to done is revealed by computational simplification.
 *)
 これでほぼおしまいです。
-できあがりにどれほど近付いたかは、単純化のコンピュテーションを使えば明かです。
+計算で単純化すれば、ほとんど完了していることがわかります。
 *)
   
   simpl.
@@ -2150,15 +2150,15 @@ Qed.
 (*
 I have no trivial automated version of this proof to suggest, beyond using [discriminate] or [congruence] in the first place.
 *)
-[discriminate]あるいは[congruence]を最初の場所で使う以外には、この証明の自明な自動化バージョンはありません。
+この証明の自動化をしてくれるのが、[discriminate]や[congruence]というわけです。
 
 %\medskip%
 
 (*
 We can perform a similar manual proof of injectivity of the constructor [S].  I leave a walk-through of the details to curious readers who want to run the proof script interactively.
 *)
-同じように構成子[S]の単射性を手動で行えます。
-詳しいところは、証明スクリプトを対話的に実行してみたい関心の高い読者に残しておきます。
+構成子[S]の単射性の証明も同じように手動で実行できます。
+詳細は、証明スクリプトを対話的に実行してみたい熱心な読者に残しておきます。
 *)
 
 Theorem S_inj' : forall n m : nat, S n = S m -> n = m.
@@ -2174,14 +2174,14 @@ Qed.
 (*
 The key piece of creativity in this theorem comes in the use of the natural number predecessor function [pred].  Embodied in the implementation of [injection] is a generic recipe for writing such type-specific functions.
 *)
-この定理で鍵となる部分は、自然数の前者関数[pred]の使い方です。
-このような型固有の関数を書くときの一般的なレシピは、[injection]の実装で具体化されています。
+この定理で鍵となるのは、自然数の前者関数[pred]の使い方です。
+[injection]の実装には、このような型に固有の関数を書くときの一般的なレシピが具現化されているのです。
 
 (*
 The examples in this section illustrate an important aspect of the design philosophy behind Coq.  We could certainly design a Gallina replacement that built in rules for constructor discrimination and injectivity, but a simpler alternative is to include a few carefully chosen rules that enable the desired reasoning patterns and many others.  A key benefit of this philosophy is that the complexity of proof checking is minimized, which bolsters our confidence that proved theorems are really true.
 *)
-この節の例は、Coqの背景にあるデザイン哲学の重要な面を説明しています。
-構成子の区別と単射性の規則を組み込んだGallinaの代替を設計できるかもしれませんが、それより簡単な選択肢は、欲しい論証パターンその他を可能にする規則を注意深く選んでおくことです。
-この哲学の利点は、証明検証の複雑さを最小限に抑えていることです。
-そのおかげで、証明された定理が本当に正しいという確信を強く持てます。
+本節で紹介した例からは、Coqの背景にある設計思想の重要な側面が見えてきます。
+構成子の区別と単射性に関する規則を組み込み、Gallinaの代替を設計することは可能ですが、
+むしろ、必要な論証パターンなどが可能になるように選び抜いた規則を含めておくほうが選択肢として単純です。
+Coqの設計思想の利点は、証明の確認にかかる複雑さが最小限に抑えられていることで、証明された定理が本当に正しいという確信を強く持てることです。
 *)
