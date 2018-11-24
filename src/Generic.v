@@ -19,19 +19,53 @@ Set Asymmetric Patterns.
 (** printing ~> $\leadsto$ *)
 
 
-(** %\chapter{Generic Programming}% *)
+(**
+ (* %\chapter{Generic Programming}% *)
+    %\chapter{総称的プログラミング}%
+ *)
 
-(** %\index{generic programming}% _Generic programming_ makes it possible to write functions that operate over different types of data.  %\index{parametric polymorphism}%Parametric polymorphism in ML and Haskell is one of the simplest examples.  ML-style %\index{module systems}%module systems%~\cite{modules}% and Haskell %\index{type classes}%type classes%~\cite{typeclasses}% are more flexible cases.  These language features are often not as powerful as we would like.  For instance, while Haskell includes a type class classifying those types whose values can be pretty-printed, per-type pretty-printing is usually either implemented manually or implemented via a %\index{deriving clauses}%[deriving] clause%~\cite{deriving}%, which triggers ad-hoc code generation.  Some clever encoding tricks have been used to achieve better within Haskell and other languages, but we can do%\index{datatype-generic programming}% _datatype-generic programming_ much more cleanly with dependent types.  Thanks to the expressive power of CIC, we need no special language support.
+(**
+ (* %\index{generic programming}% _Generic programming_ makes it possible to write functions that operate over different types of data.  %\index{parametric polymorphism}%Parametric polymorphism in ML and Haskell is one of the simplest examples.  ML-style %\index{module systems}%module systems%~\cite{modules}% and Haskell %\index{type classes}%type classes%~\cite{typeclasses}% are more flexible cases.  These language features are often not as powerful as we would like.  For instance, while Haskell includes a type class classifying those types whose values can be pretty-printed, per-type pretty-printing is usually either implemented manually or implemented via a %\index{deriving clauses}%[deriving] clause%~\cite{deriving}%, which triggers ad-hoc code generation.  Some clever encoding tricks have been used to achieve better within Haskell and other languages, but we can do%\index{datatype-generic programming}% _datatype-generic programming_ much more cleanly with dependent types.  Thanks to the expressive power of CIC, we need no special language support.
 
    Generic programming can often be very useful in Coq developments, so we devote this chapter to studying it.  In a proof assistant, there is the new possibility of generic proofs about generic programs, which we also devote some space to. *)
 
-(** * Reifying Datatype Definitions *)
+  %\index{そうしょうてきぷろぐらみんぐ@総称的プログラミング}%%\emph{総称的プログラミング}%はデータの異なる型にわたって動作する関数を書くことを可能にします。
+  MLとHaskellでの%\index{ぱらめーたたそう@パラメータ多相}%パラメータ多相は最も単純な例の一つです。
+  MLスタイルの %\index{もじゅーるしすてむ@モジュールシステム}%モジュールシステム%~\cite{modules}% とHaskellの %\index{かたくらす@型クラス}%型クラス%~\cite{typeclasses}% はより柔軟な事例です。
+  これらの言語機能は私たちが望んでいるほど強力でないことがよくあります。
+  例えば、Haskellには型の値をプリティプリント(整形印字)できるよう分類する型クラスが含まれますが、型ごとのプリティプリントは通常は、手動で実装するか%\index{derivingせつ@deriving節}%[deriving]節%~\cite{deriving}%を経由して(これはアドホックにコードを生成します)実装するかです。
+  Haskellや他の言語ではよりうまく書くための多少の巧妙な符号化の技巧が利用されてきましたが、私たちは%\index{でーたがたについてのそうしょうてきなぷろぐらみんぐ@データ型について総称的なプログラミング}%%\emph{データ型について総称的な}%プログラミングをより明快に依存型とともに行なうことができます。
+  CICの表現力のおかげで、特別な言語サポートは必要ありません。
 
-(** The key to generic programming with dependent types is%\index{universe types}% _universe types_.  This concept should not be confused with the idea of _universes_ from the metatheory of CIC and related languages, which we will study in more detail in the next chapter.  Rather, the idea of universe types is to define inductive types that provide _syntactic representations_ of Coq types.  We cannot directly write CIC programs that do case analysis on types, but we _can_ case analyze on reified syntactic versions of those types.
+  総称的プログラミングはCoqでの開発においてとても有用なので、この章ではこれを学ぶことに専念します。
+  証明アシスタントにおいては、総称的プログラムにおける総称的な証明の新しい可能性があり、多少の紙面をこのために費やします。
+ *)
+
+(**
+ (* * Reifying Datatype Definitions *)
+    * データ型の定義を具体化する
+  *)
+
+(**
+ (* The key to generic programming with dependent types is%\index{universe types}% _universe types_.  This concept should not be confused with the idea of _universes_ from the metatheory of CIC and related languages, which we will study in more detail in the next chapter.  Rather, the idea of universe types is to define inductive types that provide _syntactic representations_ of Coq types.  We cannot directly write CIC programs that do case analysis on types, but we _can_ case analyze on reified syntactic versions of those types.
 
    Thus, to begin, we must define a syntactic representation of some class of datatypes.  In this chapter, our running example will have to do with basic algebraic datatypes, of the kind found in ML and Haskell, but without additional bells and whistles like type parameters and mutually recursive definitions.
 
    The first step is to define a representation for constructors of our datatypes.  We use the [Record] command as a shorthand for defining an inductive type with a single constructor, plus projection functions for pulling out any of the named arguments to that constructor. *)
+
+  依存型のある総称的プログラミングの秘訣は %\index{ゆにばーすたいぷ@ユニバースタイプ}%%\emph{ユニバースタイプ}%です。
+  この概念は、CIC や、それに関係する言語のメタ理論からの%\emph{宇宙(ユニバース)}%のアイデアと混同されるべきではありません。それについては次の章でより詳しく学ぶことになるでしょう。
+  むしろ、ユニバースタイプのアイデアは、Coqの型の%\emph{構文上の表現}%を提供ような、帰納型を定義するものです。
+  型についての場合分けをするCICのプログラムを直接書くことはできませんが、これらの型を構文に具体化したものについてなら場合分けすることが%\emph{できます}%。
+
+  よって、最初にデータ型のあるクラスの構文上の表現を定義しなければなりません。
+  この章では、実行例は、MLやHaskellで見られるような基本的な代数的データ型を使用することになるでしょう。しかし、型パラメータや相互再帰的定義のような付加機能は無しです。
+  (* 慣用表現: bells and whistles - おまけ、付加機能 *)
+
+  最初の一歩はデータ型のコンストラクタに対する表現を定義することです。
+  単一のコンストラクタをもつ帰納型を定義する簡潔な表現として [Record] コマンドを使います。
+  その帰納型は、加えて、そのコンストラクタの名前付き引数を任意に取り出すための射影関数を持ちます。
+ *)
 
 (* EX: Define a reified representation of simple algebraic datatypes. *)
 
@@ -41,13 +75,29 @@ Record constructor : Type := Con {
   recursive : nat
 }.
 
-(** The idea is that a constructor represented as [Con T n] has [n] arguments of the type that we are defining.  Additionally, all of the other, non-recursive arguments can be encoded in the type [T].  When there are no non-recursive arguments, [T] can be [unit].  When there are two non-recursive arguments, of types [A] and [B], [T] can be [A * B].  We can generalize to any number of arguments via tupling.
+(**
+ (* The idea is that a constructor represented as [Con T n] has [n] arguments of the type that we are defining.  Additionally, all of the other, non-recursive arguments can be encoded in the type [T].  When there are no non-recursive arguments, [T] can be [unit].  When there are two non-recursive arguments, of types [A] and [B], [T] can be [A * B].  We can generalize to any number of arguments via tupling.
 
    With this definition, it is easy to define a datatype representation in terms of lists of constructors.  The intended meaning is that the datatype came from an inductive definition including exactly the constructors in the list. *)
 
+  このアイデアは、[Con T n]として表現されたコンストラクタが[n]個の定義された型の引数を持つというものです。
+  加えて、他のすべての再帰的でない引数は型[T]に符号化できます。
+  再帰的でない引数が無い場合には、[T]としては[unit]を取れます。
+  二つの再帰的でない引数、型[A]と[B]がある場合、[T]としては[A * B]を取れます。
+  タプル化によって任意の数の引数へと一般化できます。
+
+  この定義では、コンストラクタのリストにおいてデータ型の表現を容易に定義できます。
+  趣旨としては、そのデータ型はそのリスト内のコンストラクタを正確に含んだ帰納的定義から生じるということです。
+ *)
+
 Definition datatype := list constructor.
 
-(** Here are a few example encodings for some common types from the Coq standard library.  While our syntax type does not support type parameters directly, we can implement them at the meta level, via functions from types to [datatype]s. *)
+(**
+ (* Here are a few example encodings for some common types from the Coq standard library.  While our syntax type does not support type parameters directly, we can implement them at the meta level, via functions from types to [datatype]s. *)
+
+ Coqの標準ライブラリから、いくつかのありふれた型の符号化の例をここで紹介します。
+ 構文の型は、型パラメータを直接はサポートしていませんが、型から [datatype]への関数によって、メタレベルでそれらを実装することができます。
+ *)
 
 Definition Empty_set_dt : datatype := nil.
 Definition unit_dt : datatype := Con unit 0 :: nil.
@@ -55,9 +105,19 @@ Definition bool_dt : datatype := Con unit 0 :: Con unit 0 :: nil.
 Definition nat_dt : datatype := Con unit 0 :: Con unit 1 :: nil.
 Definition list_dt (A : Type) : datatype := Con unit 0 :: Con A 1 :: nil.
 
-(** The type [Empty_set] has no constructors, so its representation is the empty list.  The type [unit] has one constructor with no arguments, so its one reified constructor indicates no non-recursive data and [0] recursive arguments.  The representation for [bool] just duplicates this single argumentless constructor.    We get from [bool] to [nat] by changing one of the constructors to indicate 1 recursive argument.  We get from [nat] to [list] by adding a non-recursive argument of a parameter type [A].
+(**
+ (* The type [Empty_set] has no constructors, so its representation is the empty list.  The type [unit] has one constructor with no arguments, so its one reified constructor indicates no non-recursive data and [0] recursive arguments.  The representation for [bool] just duplicates this single argumentless constructor.    We get from [bool] to [nat] by changing one of the constructors to indicate 1 recursive argument.  We get from [nat] to [list] by adding a non-recursive argument of a parameter type [A].
 
    As a further example, we can do the same encoding for a generic binary tree type. *)
+
+  型[Empty_set]にはコンストラクタは無いので、その表現は空リストです。
+  型[unit]は引数の無い一つのコンストラクタを持ち、その具体化されたコンストラクタは、再帰的でないデータを持たず、再帰的な引数は[0]であることを表わします。
+  [bool]の表現は、引数の無い単一のコンストラクタをただ複製しています。
+  [bool]から[nat]へは、コンストラクタの一つを、一つの再帰的引数を持つように変化させることで得られます。
+  [nat]から[list]へは、パラメータ型[A]の再帰的でない引数を加えることで得られます。
+
+  さらなる例として、総称的な二分木に対する同様の符号化を行なうことができます。
+ *)
 
 (* end thide *)
 
@@ -72,23 +132,49 @@ End tree.
 (* begin thide *)
 Definition tree_dt (A : Type) : datatype := Con A 0 :: Con unit 2 :: nil.
 
-(** Each datatype representation stands for a family of inductive types.  For a specific real datatype and a reputed representation for it, it is useful to define a type of _evidence_ that the datatype is compatible with the encoding. *)
+(**
+ (* Each datatype representation stands for a family of inductive types.  For a specific real datatype and a reputed representation for it, it is useful to define a type of _evidence_ that the datatype is compatible with the encoding. *)
+
+ それぞれのデータ型の表現は帰納型の族をあらわします。
+ 特定の現実のデータ型とそれに対するいわゆる表現に対して、そのデータ型が符号化について互換性がある%\emph{証拠}%としての型を定義するのは便利です。
+ *)
 
 Section denote.
   Variable T : Type.
-  (** This variable stands for the concrete datatype that we are interested in. *)
+  (**
+   (* This variable stands for the concrete datatype that we are interested in. *)
+
+   この変数は注目している具体的なデータ型を表します。
+   *)
 
   Definition constructorDenote (c : constructor) :=
     nonrecursive c -> ilist T (recursive c) -> T.
-  (** We write that a constructor is represented as a function returning a [T].  Such a function takes two arguments, which pack together the non-recursive and recursive arguments of the constructor.  We represent a tuple of all recursive arguments using the length-indexed list type %\index{Gallina terms!ilist}%[ilist] that we met in Chapter 8. *)
+  (**
+   (* We write that a constructor is represented as a function returning a [T].  Such a function takes two arguments, which pack together the non-recursive and recursive arguments of the constructor.  We represent a tuple of all recursive arguments using the length-indexed list type %\index{Gallina terms!ilist}%[ilist] that we met in Chapter 8. *)
+
+   コンストラクタは[T]を返す関数として表現されると書きました。
+   その関数は2つ引数を取り、 コンストラクタの、再帰的でないあるいは再帰的な引数を一緒にパックしています。
+   8章で出てきた、長さでインデックスされたリスト型%\index{Gallinaこう@Gallina項!ilist}%[ilist]を使って、全ての再帰的な引数のタプルを表現します。
+   *)
 
   Definition datatypeDenote := hlist constructorDenote.
-  (** Finally, the evidence for type [T] is a %\index{Gallina terms!hlist}%heterogeneous list, including a constructor denotation for every constructor encoding in a datatype encoding.  Recall that, since we are inside a section binding [T] as a variable, [constructorDenote] is automatically parameterized by [T]. *)
+  (**
+   (* Finally, the evidence for type [T] is a %\index{Gallina terms!hlist}%heterogeneous list, including a constructor denotation for every constructor encoding in a datatype encoding.  Recall that, since we are inside a section binding [T] as a variable, [constructorDenote] is automatically parameterized by [T]. *)
+
+   最後に、型[T] に対する証拠は%\index{Gallinaこう@Gallina項!hlist}%ヘテロリストです。データ型の符号化内のそれぞれのコンストラクタの符号化に対するコンストラクタの表示的意味を含みます。
+   [T] を変数に束縛しているセクション内なので、[constructorDenote] は自動的に [T] によってパラメタ化されることを思い出しましょう。
+   *)
 
 End denote.
 (* end thide *)
 
-(** Some example pieces of evidence should help clarify the convention.  First, we define a helpful notation for constructor denotations.  %The ASCII \texttt{\textasciitilde{}>} from the notation will be rendered later as $\leadsto$.% *)
+(**
+ (* Some example pieces of evidence should help clarify the convention.  First, we define a helpful notation for constructor denotations.  %The ASCII \texttt{\textasciitilde{}>} from the notation will be rendered later as $\leadsto$.%  *)
+
+ 証拠のいくつかの例は約束事を明らかにするのに役立つはずです。
+ 最初にコンストラクタの表示的意味なための便利な記法を定義します。
+ %アスキー文字 \texttt{\textasciitilde{}>} は後で $\leadsto$ としてレンダリングされます。%
+ *)
 
 Notation "[ v , r ~> x ]" := ((fun v r => x) : constructorDenote _ (Con _ _)).
 
@@ -107,7 +193,12 @@ Definition tree_den (A : Type) : datatypeDenote (tree A) (tree_dt A) :=
   [v, _ ~> Leaf v] ::: [_, r ~> Node (hd r) (hd (tl r))] ::: HNil.
 (* end thide *)
 
-(** Recall that the [hd] and [tl] calls above operate on richly typed lists, where type indices tell us the lengths of lists, guaranteeing the safety of operations like [hd].  The type annotation attached to each definition provides enough information for Coq to infer list lengths at appropriate points. *)
+(**
+ (* Recall that the [hd] and [tl] calls above operate on richly typed lists, where type indices tell us the lengths of lists, guaranteeing the safety of operations like [hd].  The type annotation attached to each definition provides enough information for Coq to infer list lengths at appropriate points. *)
+
+ 上記の [hd] と [tl] の呼び出しはリッチに型付けされたリストを操作することを思い出しましょう。型の添字でリストの長さがわかり、[hd]のように操作の安全性を保証します。
+ 各定義につけられた型注釈は Coq が適切な箇所でリストの長さを推論するのに十分な情報を提供します。
+ *)
 
 
 (** * Recursive Definitions *)
