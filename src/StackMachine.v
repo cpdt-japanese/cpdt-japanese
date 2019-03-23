@@ -16,9 +16,9 @@
 As always, you can step through the source file <<StackMachine.v>> for this chapter interactively in Proof General.  Alternatively, to get a feel for the whole lifecycle of creating a Coq development, you can enter the pieces of source code in this chapter in a new <<.v>> file in an Emacs buffer.  If you do the latter, include these three lines at the start of the file. *)
 *)
 (**
-まずは実際に動く例として、ソース言語からスタックマシンへの証明付きコンパイラの構成から始めましょう。最初はシンプルなソース言語から始め、少しずつ複雑なソース言語も扱っていきます。証明に関しては、いくつかの便利なタクティクを紹介し、それらがどのように手動の証明で使われるか、またそれらがどれだけ簡単に自動化できるかを見ていきます。この章では使う機能の完全な説明を与えるつもりはありません。それよりはむしろ、Coq でできることは何なのかを述べるつもりです。後の章ですべての概念をボトムアップに紹介していきます。言い換えれば、ほとんどの読者にとってここで行われることを完璧に理解するのは難しいかもしれませんが、ここでのデモが残りの章への興味に繋がっていただければ十分です！
+まずは実際に動く例として、ソース言語からスタックマシンを生成する証明付きコンパイラの構成から始めましょう。単純なソース言語をコンパイルできる状態から始めて、少しずつ複雑なソース言語に対応できるようにしていきます。証明に関しては、便利なタクティクをいくつか紹介し、それらが手動の証明でどう使えるかを見ます。さらに、どれくらい簡単に自動化できるかも見ます。本章では利用する機能の完全な説明を与えるつもりはありません。むしろ本章の狙いは、Coqで何ができるのかを見てもらうことです。後の章ですべての概念をボトムアップに紹介していきます。言い換えれば、ほとんどの読者にとって本章の内容を完璧に理解するのは難しいかもしれません。ここで紹介するデモが残りの章への興味に繋がればそれで十分です！
 
-読者はいつでもこの章のソースファイル <<StackMachine.v>> を Proof General を使って対話的に1ステップずつ見ていくことができます。あるいは、Coq 開発の過程を手で書いて感じたければ、この章のソースコードの一つ一つを Emacs バッファ内で新規の <<.v>> ファイルに書き込んでいっても良いでしょう。後者の方法を取るなら、ファイルの先頭に以下の三行をコピーしてください。
+本章についても、Proof Generalを使うことで、ソースファイルである<<StackMachine.v>>を対話的に1ステップずつ実行していけます。Coqによる開発の工程を肌で感じたければ、本章に出てくるソースコードをEmacsバッファ内で新規の<<.v>>ファイルに1つずつ書き込んでいってもよいでしょう。後者の方法を取るなら、ファイルの先頭に以下の三行をコピーしてください。
 *)
 
 Require Import Bool Arith List Cpdt.CpdtTactics.
@@ -35,13 +35,13 @@ Definition bleh := app_assoc.
 (** In general, similar commands will be hidden in the book rendering of each chapter's source code, so you will need to insert them in from-scratch replayings of the code that is presented.  To be more specific, every chapter begins with the above three lines, with the import list tweaked as appropriate, considering which definitions the chapter uses.  The second command above affects the default behavior of definitions regarding type inference, and the third allows for more concise pattern-matching syntax in Coq versions 8.5 and higher (having no effect in earlier versions). *)
 *)
 (**
-今後、各章のソースコード内の似たコマンドは文章中では省略するので、省略された部分は以前与えたところからコピー&ペーストする必要があります。具体的には、どの章の始めにも上の三行が挿入されます。ただし、章ごとに [Require Import] の後を必要に合わせて書き換えなければいけません。二行目のコマンドは型推論に関して定義の標準的なふるまいに影響し、三行目はより簡潔なパターンマッチングの機能を与えます(三行目は Coq のバージョン 8.5 以降のコマンドで、バージョン 8.5 未満には機能しません)。*)
+以降、本書では、各章のソースコード内の似通ったコマンドを省略します。省略されている部分については、前を同じものをコピー&ペーストする必要があります。具体的には、どの章も先頭には上記の三行が挿入されています。ただし、[Require Import]の後ろの部分は、章ごとに必要な定義に書き換える必要があります。二行めのコマンドは、型推論に関する定義の標準的なふるまいに影響します。三行めは、より簡潔なパターンマッチングの機能を利用できるようにするためのものです（Coqのバージョン8.5以降のコマンドであり、バージョン8.5未満に対する影響はありません）。*)
 
 
 (** * 自然数の算術式 *)
 
 (** (* We will begin with that staple of compiler textbooks, arithmetic expressions over a single type of numbers. *)
-コンパイラの教科書にはおなじみの、数値型の上での算術式から始めましょう。*)
+コンパイラの教科書ではおなじみの、数値型の上での算術式から始めましょう。*)
 
 (** ** ソース言語 *)
 
@@ -57,7 +57,7 @@ Inductive binop : Set := Plus | Times.
 (** Our first line of Coq code should be unsurprising to ML and Haskell programmers.  We define an %\index{algebraic datatypes}%algebraic datatype [binop] to stand for the binary operators of our source language.  There are just two wrinkles compared to ML and Haskell.  First, we use the keyword [Inductive], in place of <<data>>, <<datatype>>, or <<type>>.  This is not just a trivial surface syntax difference; inductive types in Coq are much more expressive than garden variety algebraic datatypes, essentially enabling us to encode all of mathematics, though we begin humbly in this chapter.  Second, there is the %\index{Gallina terms!Set}%[: Set] fragment, which declares that we are defining a datatype that should be thought of as a constituent of programs.  Later, we will see other options for defining datatypes in the universe of proofs or in an infinite hierarchy of universes, encompassing both programs and proofs, that is useful in higher-order constructions. *)
 *)
 (**
-私たちの初めての Coq コードとなるこの一行は、ML や Haskell のプログラマには意外なものではないでしょう。ソース言語の二項演算子を表すため、%\index{代数的データ型}%代数的データ型(algebraic datatype) [binop] を定義しました。ここで、ML や Haskell と比較されるべき二つのポイントがあります。一つは、Coq は <<data>>、<<datatype>>、<<type>> の代わりに [Inductive] を使うことです。これは単なる表面上のシンタックスの違いではありません。この章ではごく簡潔にしか触れませんが、Coq の帰納的データ型(inductive data types)はありふれた代数的データ型よりもずっと豊かな表現力を持っていて、とくに数学のすべてを表現することができます。二つ目は、%\index{Gallina terms!Set}%[: Set] です。これは、プログラムの構成要素として考えられるべきデータ型を定義していることを宣言します。プログラムの構成要素ではなく、証明の世界のデータ型、さらにプログラムと証明の両方を包含する、無限の階層を持つ世界のデータ型を定義するときのキーワードも後に与えます。後者は、高階の構成をするときに役立ちます。*)
+はじめてのCoqコードとなるこの一行は、MLやHaskellのプログラマにとっては意外なものではないでしょう。ソース言語の二項演算子を表すために、[binop]という%\index{代数的データ型}%代数的データ型（algebraic datatype）を定義しています。MLやHaskellと異なる点は二つだけです。一つめは、Coqでは<<data>>や<<datatype>>、<<type>>の代わりに、[Inductive]を使うことです。これは単なる表面的なシンタックスの違いではありません。本章ではあまり威力を発揮しませんが、Coqの帰納的データ型（inductive data types）にはありふれた代数的データ型よりもずっと豊かな表現力があり、とくに数学のすべてを表現できます。二つめは%\index{Gallina terms!Set}%[: Set]の存在です。これは、プログラムの構成要素として考えられるべきデータ型を定義することを宣言するものです。のちほど、証明の世界のデータ型や、プログラムと証明の両方を包含する無限の階層を持った世界のデータ型（高階の構成で役立ちます）といった、他のデータ型を定義するときのキーワードも登場します。*)
 
 Inductive exp : Set :=
 | Const : nat -> exp
@@ -73,13 +73,13 @@ A note for readers following along in the PDF version: %\index{coqdoc}%coqdoc su
 Now we are ready to say what programs in our expression language mean.  We will do this by writing an %\index{interpreters}%interpreter that can be thought of as a trivial operational or denotational semantics.  (If you are not familiar with these semantic techniques, no need to worry: we will stick to "common sense" constructions.)%\index{Vernacular commands!Definition}% *)
 *)
 (**
-算術式を定義しました。定数 [Const] は一つの自然数値の引数から成り、二項演算子 [Binop] は一つの演算子と二つのオペランド式から成るものとして与えます。
+次は算術式の型の定義です。定数[Const]は一つの自然数値の引数から作られること、二項演算子[Binop]は一つの演算子と二つのオペランド式から作られることを、それぞれ書き下してあります。
 
-本書をPDF版で読んでいる読者への注意：%\index{coqdoc}%coqdoc は Coq のソースコードを %\LaTeX{}%#LaTeX# や HTML 形式に変換します。この PDF 上の右矢印→はソース上では ASCII テキストの <<->>> です。この章では他に、二重の右矢印⇒を <<=>>>、記号∀を <<forall>>、デカルト積×を <<*>> にする置き換えがあります。ASCII テキストでどう書くのかが分からなくなったら、ソースコードを参照してください。
+ここで、本書をPDF版で読んでいる読者に注意があります。本書に出てくるCoqのソースコードは、coqdoc%\index{coqdoc}%により、%\LaTeX{}%#LaTeX#やHTML形式に変換されています。PDF上の右矢印「→」は、ソース上ではASCIIテキストの<<->>>です。ほかにも、二重の右矢印「⇒」は<<=>>>に、記号「∀」は<<forall>>に、デカルト積「×」は<<*>>に置き換えが必要です。ASCIIテキストでどう書くのかが分からなくなったら、本書のソースコードを参照してください。
 
 %\medskip%
 
-言語が定義されたので、次にこの言語のプログラムの意味を与えることができます。ここでは、プログラムの意味は、%\index{インタプリタ}%インタプリタを書いて与えることにします。これはごく単純な操作的/表示的意味論として考えることができます。(もしあなたがこれらの意味論的手法に不慣れでも、心配いりません。「あたりまえの」構成をしていきますから。)%\index{Vernacular commands!Definition}% *)
+ソース言語を定義したところで、この言語で表現されるプログラムの意味を与えましょう。ここでは、%\index{インタプリタ}%インタプリタを書くことにより、プログラムの意味を与えます。これはごく単純な操作的意味論と表示的意味論として考えられます（これらの意味論の手法に不慣れでも心配いりません。「常識的」な構成をするという程度の話です）。%\index{Vernacular commands!Definition}% *)
 
 Definition binopDenote (b : binop) : nat -> nat -> nat :=
   match b with
@@ -121,7 +121,7 @@ Finally, commands like [Inductive] and [Definition] are part of %\index{Vernacul
 We can give a simple definition of the meaning of an expression:%\index{Vernacular commands!Fixpoint}% *)
 *)
 (**
-二項演算子の意味は自然数の二引数関数です。ML や Haskell における <<match>> や <<case>> のようなパターンマッチングを使って定義し、Coq の標準ライブラリ内の関数 [plus] と [mult] を参照しています。[Definition] キーワードは、Coq の項を名前に束縛するための Coq で頻繁に使われる記法で、場合に応じて構文糖衣を持ちます。上の例でも関数を定義するための構文糖衣が用いられており、展開すると以下のようになります：
+二項演算子の意味は、自然数の上の二引数関数です。この関数は、MLやHaskellにおける<<match>>や<<case>>のようなパターンマッチングを使って定義し、Coqの標準ライブラリ内の関数[plus]と[mult]を参照しています。[Definition]というキーワードは、Coqの項を名前に束縛する汎用の記法です。さまざまな目的に応じた構文糖衣が用意されており、この例では関数定義のための構文糖衣を使っています。この構文糖衣を展開すると以下のようになります。
 [[
 Definition binopDenote : binop -> nat -> nat -> nat := fun (b : binop) =>
   match b with
@@ -130,7 +130,7 @@ Definition binopDenote : binop -> nat -> nat -> nat := fun (b : binop) =>
   end.
 ]]
 
-この例では、次のようにすべての型注釈を外すことができます：
+この例では、次のように、型注釈をすべて外してもかまいません。
 [[
 Definition binopDenote := fun b =>
   match b with
@@ -139,19 +139,19 @@ Definition binopDenote := fun b =>
   end.
 ]]
 
-ML や Haskell のような言語は%\index{principal types}\index{type inference}% _principal types_ 性という有用な性質を持っています。principal types 性とは、型推論がいかに効果的であるかの強い保証を与えます。残念ながら、Coq の型システムは表現力がとても豊かであるがために「完全な」型推論は不可能で、この課題は実際的にも困難です。それでもやはり Coq はとても便利なヒューリスティクスを含んでおり、それらの多くは Coq の単純なコードに落ちるようなプログラムに対する ML や Haskell の型検査器の仕組みを模倣しています。
+MLやHaskellのような言語には、_[主要型]_%\index{principal types}\index{type inference}%（principal type）を求められるという有用な性質があります。この性質は、型推論の効果に対し、強い保証を与えてくれるものです。残念ながら、Coqの型システムは表現力がとても豊かであるがために、あらゆる意味で「完全」な型推論は不可能であり、実際に主要型を求めることは困難にさえ思えます。とはいえCoqには、そのためのヒューリスティックな仕組みがいくつか含まれています。それらの仕組みの多くは、Coqの単純なコードに落ちるようなプログラムに対するMLやHaskellの型検査器の仕組みから移植されたものです。
 
-この機会に Coq に関連した様々な種類の言語について触れましょう。Coq の理論的基礎は%\index{Calculs of Inductive Constructions}\index{CIC|see{Calculus of Inductive Constructions}}% _Calculus of Inductive Constructions_ (CIC)%~\cite{CIC}% と呼ばれる形式システムに基いています。CIC は %\index{Calculus of Constructions}\index{CoC|see{Calculus of Constructions}}% _Calculus of Constructions_ (CoC)%~\cite{CoC}% という型システムの拡張です。CIC はメタ理論を証明するのに有用ですが実際の開発には少し厳格すぎるような基礎理論です。しかしながら、CIC は%\index{強正規化性}%[強正規化性](strong normalizaiton)や %\index{Zermelo-Fraenkel集合論}%Zermelo-Fraenkel 集合論の類似システムに対する%\index{相対無矛盾性}%[相対無矛盾性](relative consistency)のような性質が証明されていることは知っておいて良いでしょう。強正規化性は、すべてのプログラムが(さらに重要なことに、すべての証明項も)停止するという性質で、相対無矛盾性は簡単に言えば Coq で書かれた証明は対応する数学的命題が「本当に正しい」ことを信じてよいという性質です。
+いい機会なので、ここでCoqに付随する複数の言語について触れておきましょう。Coqの理論的な基礎は、_[Calculus of Inductive Constructions]_%\index{Calculs of Inductive Constructions}\index{CIC|see{Calculus of Inductive Constructions}}%（CIC）%~\cite{CIC}%と呼ばれる形式システムにあります。そのCICは、それ以前にあった_[Calculus of Constructions]_、%\index{Calculus of Constructions}\index{CoC|see{Calculus of Constructions}}%（CoC）%~\cite{CoC}%という型システムの拡張です。CICは、メタ理論の証明には有用ですが、現場の開発に使うには厳格すぎるシステムです。それでも、CICには%\index{強正規化性}%_[強正規化性]_（strong normalizaiton）や、%\index{Zermelo-Fraenkel集合論}%Zermelo-Fraenkel集合論に類似した系に対する%\index{相対無矛盾性}%_[相対無矛盾性]_（relative consistency）といった性質があると証明されていることは知っておくとよいでしょう。強正規化性とは、すべてのプログラム（さらにはすべての証明項も）が停止するという性質です。相対無矛盾性とは、簡単に言うと、Coqで書かれた証明に対応する数学的命題が「本当に正しい」ことを、集合論を信じるならば信じてよい、という性質です。
 
-Coq は本当は %\index{Gallina}%Gallina と呼ばれる CIC の拡張の上に基いています。上のコードの [:=] から [.] までの中身は Gallina の項です。Gallina は CIC の拡張として考慮されなければいけない有用な特徴を含んでいます。CIC についての重要なメタ定理は形式言語の範囲を越えた特徴の一部にまでは拡張されていませんが、ほとんどの Coq ユーザはこの欠落をさほど気にしていません。
+Coqは、実際には%\index{Gallina}%Gallinaと呼ばれるCICの拡張に基いています。上記のコードのうち、「[:=]」から「[.]」までの中身は、Gallinaの項です。Gallinaには、CICの拡張として考えるべき有用な特徴が含まれています。形式言語の範囲を越える全機能に至るまでCICに関する重要なメタ定理が拡張されているわけではありませんが、それを気に病んでいるCoqユーザはほとんどいません。
 
-さらに、Coq は証明を書いたり手続きを決定するためのドメイン固有言語である %\index{Ltac}%Ltac を含みます。この章の後半でいくつかの基本的な Ltac の例を見ていき、本書のほとんどはさらに有用な Ltac の例を挙げることに捧げます。
+Coqに付随する次の言語は、証明を書いたり手続きを決定したりするためのドメイン固有言語である%\index{Ltac}%Ltacです。本章の後半では、基本的なLtacの例をいくつか紹介します。本書全体では、もっとたくさんのLtacの例を紹介していきます。
 
-最後に、[Inductive] や [Definition] のようなコマンドは %\index{Vernacularコマンド}%Vernacular の一部です。Vernacular は Coq システムに対するあらゆる種類の有用な要求や命令を含みます。すべての Coq のソースファイルは Vernacular コマンドの列であり、たくさんのコマンドは Gallina や Ltac プログラムを引数に取ります(実際は、Coq のソースファイルはネストされたスコープ構造の影響で、列ではなく木に近い形をしています)。
+最後は、[Inductive]や[Definition]のようなコマンドを含む%\index{Vernacularコマンド}%Vernacularです。Vernacularには、Coqシステムに対するあらゆる種類の有用な要求や命令が含まれます。Coqのソースファイルは、いずれもVernacularコマンドの列であり、それらのコマンドの多くは引数としてGallinaやLtacのプログラムを取ります（ネストされたスコープを持つさまざまな構造の影響で、Coqのソースファイルは実際には列ではなく_[木]_に近い形をしています）。
 
 %\medskip%
 
-式の意味の簡単な定義を与えましょう：%\index{Vernacular commands!Fixpoint}% *)
+式の意味の簡単な定義を与えましょう。%\index{Vernacular commands!Fixpoint}% *)
 
 Fixpoint expDenote (e : exp) : nat :=
   match e with
@@ -163,7 +163,7 @@ Fixpoint expDenote (e : exp) : nat :=
 (** We declare explicitly that this is a recursive definition, using the keyword [Fixpoint].  The rest should be old hat for functional programmers. *)
 *)
 (**
-[Fixpoint] キーワードを使って、これは再帰的定義をしていることを明示的に宣言しています。残りの部分は関数型プログラマにとっては目新しいものではないでしょう。 *)
+これが再帰的な定義であることを、[Fixpoint]キーワードを使って明示的に宣言しています。それ以外の部分は、関数型プログラマにとっては目新しいものではないでしょう。 *)
 
 (**
 (** It is convenient to be able to test definitions before starting to prove things about them.  We can verify that our semantics is sensible by evaluating some sample uses, using the command %\index{Vernacular commands!Eval}%[Eval].  This command takes an argument expressing a%\index{reduction strategy}% _reduction strategy_, or an "order of evaluation."  Unlike with ML, which hardcodes an _eager_ reduction strategy, or Haskell, which hardcodes a _lazy_ strategy, in Coq we are free to choose between these and many other orders of evaluation, because all Coq programs terminate.  In fact, Coq silently checked %\index{termination checking}%termination of our [Fixpoint] definition above, using a simple heuristic based on monotonically decreasing size of arguments across recursive calls.  Specifically, recursive calls must be made on arguments that were pulled out of the original recursive argument with [match] expressions.  (In Chapter 7, we will see some ways of getting around this restriction, though simply removing the restriction would leave Coq useless as a theorem proving tool, for reasons we will start to learn about in the next chapter.)
@@ -171,10 +171,9 @@ Fixpoint expDenote (e : exp) : nat :=
 To return to our test evaluations, we run the [Eval] command using the [simpl] evaluation strategy, whose definition is best postponed until we have learned more about Coq's foundations, but which usually gets the job done. *)
 *)
 (**
-これらの定義の性質の証明をする前に、テストができれば好都合です。コマンド %\index{Vernacular commands!Eval}%[Eval] を使っていくつかの例を評価し、私たちのセマンティクスがもっともらしいことを確かめてみましょう。このコマンドは%\index{簡約戦略}%「簡約戦略」(reduction strategy)、別の言葉で「評価順序」(order of evaluation)を表す引数を取ります。ML の先行評価や、Haskell の遅延評価とは違い、Coq ではこれらや他の様々な評価順序を選べます。これが可能なのはすべての Coq プログラムが停止するからです。実は、Coq は内部で上の [Fixpoint] で定義した関数の%\index{termination checking}%停止性をチェックしています。Coq は再帰呼び出しごとに引数のサイズが単調減少していることを見て、停止性を判断しています。さらに言うと、再帰呼び出しは [match] 式によって分割された元々の引数によって作られていないといけません。
-(この制限を単順に削除するのはCoqを役に立たない定理証明ツールに変えてしまいます。この理由は次の章で学びます。第7章では、[Fixpoint]の制限に対処するためのいくつかの方法を見ます。)
+これらの定義について何かしら証明を始める前に、定義をテストできると好都合です。これまでに定義したセマンティクスがもっともらしいことを、コマンド%\index{Vernacular commands!Eval}%[Eval]で用例をいくつか評価することにより確かめてみましょう。[Eval]コマンドは、%\index{簡約戦略}%_[簡約戦略]_（reduction strategy）もしくは_[評価順序]_（order of evaluation）と呼ばれるものを表す引数を取ります。_[先行評価]_が前提のMLや、_[遅延評価]_が前提のHaskellとは違い、Coqではさまざまな評価順序を選べます。これが可能なのは、すべてのCoqプログラムが停止するからです。実を言うと、Coqの内部では、上記の[Fixpoint]で定義した関数の%\index{termination checking}%停止性が確認されています。この確認では、再帰が呼び出されるたびに引数のサイズが単調に減少することに基づいた単純なヒューリスティクスにより、停止性を判断しています。この場合には、[match]式によって分割された元の再帰的な引数に対して再帰呼び出しが作られていなければなりません。（この制限を単純に削除すると、Coqは定理証明のための道具として役に立たないものになってしまうでしょう。その理由は次章から学びます。第7章では、[Fixpoint]の制限に対処するためのいくつかの方法を見ます。）
 
-評価のテストをするために、評価戦略 [simpl] を使って [Eval] コマンドを実行しましょう。[simpl] の定義は Coq の基礎をもっと学むまで後回しにしますが、[simpl] は通常テストを終わらせてくれます。 *)
+評価を試してみる前に、[simpl]という評価戦略を使って[Eval]コマンドを実行しましょう。[simpl]の定義はCoqの基礎をもっと学んでから示しますが、通常は[simpl]を使えばいいでしょう。 *)
 
 Eval simpl in expDenote (Const 42).
 (** [= 42 : nat] *)
@@ -189,7 +188,7 @@ Eval simpl in expDenote (Binop Times (Binop Plus (Const 2) (Const 2)) (Const 7))
 (** %\smallskip{}%Nothing too surprising goes on here, so we are ready to move on to the target language of our compiler. *)
 *)
 (**
-%\smallskip{}%どれも自然な結果でしょう。これで、私たちのコンパイラのターゲット言語の定義に移る準備ができました。 *)
+%\smallskip{}%どれも自然な結果です。今度はコンパイラのターゲット言語を定義することにしましょう。 *)
 
 
 (** ** ターゲット言語 *)
@@ -198,7 +197,7 @@ Eval simpl in expDenote (Binop Times (Binop Plus (Const 2) (Const 2)) (Const 7))
 (** We will compile our source programs onto a simple stack machine, whose syntax is: *)
 *)
 (**
-今まで定義してきたソースプログラムを簡単なスタックマシン上へコンパイルします。ターゲット言語のシンタックスは以下で与えます： *)
+前項で定義したソース言語によるプログラムを、単純なスタックマシンへとコンパイルします。コンパイラのターゲット言語は次のようなシンタックスで与えます。 *)
 
 Inductive instr : Set :=
 | iConst : nat -> instr
@@ -213,9 +212,9 @@ Definition stack := list nat.
 We can give instructions meanings as functions from stacks to optional stacks, where running an instruction results in [None] in case of a stack underflow and results in [Some s'] when the result of execution is the new stack [s'].  %\index{Gallina operators!::}%The infix operator [::] is "list cons" from the Coq standard library.%\index{Gallina terms!option}% *)
 *)
 (**
-命令 [instr] はスタックの先頭に定数をプッシュする [iConst] か、引数二つをポップし二項演算子に適用した後スタックに結果をプッシュする [iBinon] から成ります。ここでのプログラム [prog] は命令 [instr] のリストで、スタック [stack] は自然数のリストです。
+[instr]は命令で、スタックの先頭に定数をプッシュする[iConst]か、引数を二つポップして二項演算子に適用したあとで結果をスタックにプッシュする[iBinon]のいずれかです。プログラム（[prog]）は命令（[instr]）のリストであり、スタック（[stack]）は自然数のリストです。
 
-命令の意味をスタックからスタックのオプション型への関数として与えましょう。命令を実行してスタックアンダーフローに陥った場合は [None]、結果として新たなスタック [s'] を得た場合は [Some s'] を返します。%\index{Gallina operators!::}%中置演算子 [::] はリストの cons で、Coq の標準ライブラリで定義されています。%\index{Gallina terms!option}% *)
+命令には、スタックからスタックのオプション型への関数として意味を与えましょう。命令を実行した結果がスタックアンダーフローに陥る場合は[None]、結果として新たなスタック[s']を得る場合は[Some s']を返すものとします。%\index{Gallina operators!::}%中置演算子「[::]」はリストのconsです。Coqの標準ライブラリで定義されています。%\index{Gallina terms!option}% *)
 
 Definition instrDenote (i : instr) (s : stack) : option stack :=
   match i with
@@ -231,7 +230,7 @@ Definition instrDenote (i : instr) (s : stack) : option stack :=
 (** With [instrDenote] defined, it is easy to define a function [progDenote], which iterates application of [instrDenote] through a whole program. *)
 *)
 (**
-[instrDenote] が定義されれば、関数 [progDenote] も簡単に定義できます。プログラム全体に対して [instrDenote] を繰り返し適用させます： *)
+[instrDenote]が定義できたので、プログラム全体を通して[instrDenote]を繰り返し適用する関数[progDenote]も簡単に定義できます。 *)
 
 Fixpoint progDenote (p : prog) (s : stack) : option stack :=
   match p with
@@ -247,7 +246,7 @@ Fixpoint progDenote (p : prog) (s : stack) : option stack :=
 (** With the two programming languages defined, we can turn to the compiler definition. *)
 *)
 (**
-こうして二つのプログラミング言語が定義されたので、コンパイラの定義に移りましょう。 *)
+二つのプログラミング言語が定義できたところで、コンパイラの定義に移りましょう。 *)
 
 (** ** 変換 *)
 
@@ -255,7 +254,7 @@ Fixpoint progDenote (p : prog) (s : stack) : option stack :=
 (** Our compiler itself is now unsurprising.  The list concatenation operator %\index{Gallina operators!++}\coqdocnotation{%#<tt>#++#</tt>#%}% comes from the Coq standard library. *)
 *)
 (**
-私たちのコンパイラは自然に定義されます。リストの結合 %\index{Gallina operators!++}\coqdocnotation{%#<tt>#++#</tt>#%}% は Coq の標準ライブラリにあります。 *)
+コンパイラは自然に定義できます。リストの結合には、Coqの標準ライブラリにある%\index{Gallina operators!++}\coqdocnotation{%#<tt>#++#</tt>#%}%を使います。 *)
 
 Fixpoint compile (e : exp) : prog :=
   match e with
@@ -265,7 +264,7 @@ Fixpoint compile (e : exp) : prog :=
 
 
 (** (* Before we set about proving that this compiler is correct, we can try a few test runs, using our sample programs from earlier. *)
-このコンパイラが正しいことを証明する前に、先ほどのサンプルプログラムを使っていくつかテストを走らせてみましょう。 *)
+このコンパイラが正しいことを証明する前に、先ほど実行したサンプルプログラムを試しに走らせてみましょう。 *)
 
 Eval simpl in compile (Const 42).
 (** [= iConst 42 :: nil : prog] *)
@@ -277,7 +276,7 @@ Eval simpl in compile (Binop Times (Binop Plus (Const 2) (Const 2)) (Const 7)).
 (** [= iConst 7 :: iConst 2 :: iConst 2 :: iBinop Plus :: iBinop Times :: nil : prog] *)
 
 (** (* %\smallskip{}%We can also run our compiled programs and check that they give the right results. *)
-%\smallskip{}%コンパイルされたプログラムも実行し、それらが正しい結果を返すこともチェックしましょう。 *)
+%\smallskip{}%コンパイルされたプログラムを実行して正しい結果を返すことも確かめてみます。 *)
 
 Eval simpl in progDenote (compile (Const 42)) nil.
 (** [= Some (42 :: nil) : option stack] *)
@@ -290,7 +289,7 @@ Eval simpl in progDenote (compile (Binop Times (Binop Plus (Const 2) (Const 2))
 (** [= Some (28 :: nil) : option stack] *)
 
 (** (* %\smallskip{}%So far so good, but how can we be sure the compiler operates correctly for _all_ input programs? *)
-%\smallskip{}%今のところ良いですが、どうすれば[すべての]入力プログラムに対してコンパイラが正しく動作することを確かめればよいでしょうか？ *)
+%\smallskip{}%今のところうまくいっています。でも、どうすれば_[すべて]_の入力プログラムに対してコンパイラが正しく動作することを確かめられるでしょうか。 *)
 
 (** ** 変換の正しさ *)
 
@@ -298,7 +297,7 @@ Eval simpl in progDenote (compile (Binop Times (Binop Plus (Const 2) (Const 2))
 (** We are ready to prove that our compiler is implemented correctly.  We can use a new vernacular command [Theorem] to start a correctness proof, in terms of the semantics we defined earlier:%\index{Vernacular commands!Theorem}% *)
 *)
 (**
-コンパイラが正しく実装されたことを証明しましょう。証明を始めるためには新たな Vernacular コマンド [Theorem] を使います。先ほど定義したセマンティクスを用いて変換の正しさを証明しましょう。%\index{Vernacular commands!Theorem}% *)
+コンパイラが正しく実装されたことを証明しましょう。先ほど定義したセマンティクスの観点から証明を始めるために、[Theorem]という新たなVernacularコマンドを使います。%\index{Vernacular commands!Theorem}% *)
 
 Theorem compile_correct : forall e, progDenote (compile e) nil = Some (expDenote e :: nil).
 (* begin thide *)
@@ -307,7 +306,7 @@ Theorem compile_correct : forall e, progDenote (compile e) nil = Some (expDenote
 (** Though a pencil-and-paper proof might clock out at this point, writing "by a routine induction on [e]," it turns out not to make sense to attack this proof directly.  We need to use the standard trick of%\index{strengthening the induction hypothesis}% _strengthening the induction hypothesis_.  We do that by proving an auxiliary lemma, using the command [Lemma] that is a synonym for [Theorem], conventionally used for less important theorems that appear in the proofs of primary theorems.%\index{Vernacular commands!Lemma}% *)
 *)
 (**
-紙と鉛筆の証明なら「[e] に関する帰納法より」と書いて終わらせるかもしれませんが、この証明は直接取り組むのは懸命ではありません。ここでは基本的な手法である%\index{帰納法の仮定の強化}%[帰納法の仮定の強化]をする必要があります。そのために、[Lemma] コマンドを使って補題を示しましょう。[Lemma] コマンドは [Theorem] のシノニムで、慣習的に主定理の証明に必要となる補助的な定理に対して使います。%\index{Vernacular commands!Lemma}% *)
+紙と鉛筆による証明なら、ここで「[e]に関する帰納法より」と書いて終了できるかもしれませんが、この証明に直接取り組むのは実は懸命ではありません。ここでは、基本的な手法である%\index{帰納法の仮定の強化}%_[帰納法の仮定の強化]_が必要になります。そのために[Lemma]コマンドを使って補題を示しましょう。[Lemma]コマンドは[Theorem]のシノニムで、慣習的に主定理の証明に必要となる補助的な定理に対して使います。%\index{Vernacular commands!Lemma}% *)
 
 Abort.
 
@@ -334,7 +333,7 @@ We manipulate the proof state by running commands called%\index{tactics}% _tacti
 *)
 *)
 (**
-[Lemma] コマンドを読み込むと、%\index{対話的証明モード}%[対話的証明モード](interactive proof-editing mode)に入ります。スクリーンに何やら新しいテキストが表示されるのが見えるでしょう：
+[Lemma]コマンドのピリオドを読み込むと、%\index{対話的証明モード}%_[対話的証明モード]_（interactive proof-editing mode）に入ります。スクリーンに何やら新しいテキストが表示されるのが見えるでしょう。
 
 [[
 1 subgoal
@@ -345,11 +344,11 @@ We manipulate the proof state by running commands called%\index{tactics}% _tacti
 
 ]]
 
-Coq は補題の証明を始めようとしています。ここに見えているテキストは、私たちが証明のどこにいるのかを部分的に表しています。今、私たちには証明のゴールが一つあることを伝えられています。一般に、証明の途中で、複数の未証明の部分的なゴールが与えられることがあります。こういったゴールのことを %\index{サブゴール}%サブゴールと呼び、それらは論理的な命題です。複数のサブゴールはどんな順番で証明してもよいですが、通常は Coq の与えた順番で証明するのが良いでしょう。
+Coqが補題を再掲してくれたように見えます。これは、私たちが証明のどこにいるのかを示す一般的なやり方で、今はその特別な場合です。一行めの表示は、サブゴールが一つある、と読めます。一般に、証明の途中には証明すべき論理命題がいくつも出てきます。それら未証明の部分的な論理命題が、%\index{サブゴール}%サブゴールです。複数のサブゴールはどんな順番で証明してもかまいませんが、通常はCoqが提示してくれた順番で証明するのがよいでしょう。
 
-出力には私たちの一つのサブゴールが完全な詳細とともに書かれています。二重線の上には自由変数や%\index{仮定}%仮定が(もしあれば)示されます。二重線の下は一般的に、仮定を使って証明されるべき%\index{結論}%結論が書かれています。
+上記の出力では、その下に一つのサブゴールの詳細が完全に示されています。二重線の上側には、自由変数や%\index{仮定}%仮定が（もしあれば）示されます。二重線の下側は%\index{結論}%結論で、一般には仮定を使って証明されるべきものが示されます。
 
-証明の状態は%\index{タクティク}%[タクティク]と呼ばれるコマンドを実行することで操作できます。もっとも重要なタクティクの一つである %\index{tactics!induction}%[induction] から始めましょう。
+証明の状態は、%\index{タクティク}%_[タクティク]_と呼ばれるコマンドを実行することで操作します。もっとも重要なタクティクの一つである%\index{tactics!induction}%[induction]から始めましょう。
 *)
 
   induction e.
@@ -380,7 +379,7 @@ We begin the first case with another very common tactic.%\index{tactics!intros}%
 *)
 *)
 (**
-今、式 [e] の構造の帰納法によってこの証明を始めることが宣言されました。始めのサブゴールは、帰納法による証明のための二つの新しいサブゴールに変わりました：
+この証明を式[e]の構造に対する帰納法によって進める、と宣言しています。これにより、元のサブゴールが、帰納法による証明の場合分けに対応する二つの新しいサブゴールに変わります。
 
 [[
 2 subgoals
@@ -399,9 +398,9 @@ subgoal 2 is
 
 ]]
 
-一つ目のサブゴールには二重線と、その上に自由変数や仮定も表示されますが、それ以降のサブゴールは結論だけが表示されます。今%\index{自由変数}%自由変数の例が一つ目のサブゴールに見えますね。[nat] 型の自由変数 [n] です。結論は、元の定理内の [e] が [Const n] に置き換えられています。同様に、二つ目のサブゴールの [e] はコンストラクタ [Binop] の一般的な形に置き換えられています。この両方のサブゴールを証明することは、%\index{構造的帰納法}%構造的帰納法による標準的な証明に対応します。
+一つめのサブゴール（現在のサブゴールでもあります）には、二重線とその上の自由変数や仮定が表示されますが、それ以降のサブゴールには結論だけが表示されます。一つめのサブゴールには%\index{自由変数}%自由変数がありますね。[nat]型の自由変数[n]です。このサブゴールの結論は、元の定理の主張で[e]が[Const n]に置き換えられてものです。同様に、二つめのサブゴールの[e]は、コンストラクタ[Binop]の一般的な形に置き換えられています。場合分けの両方のサブゴールの証明が、%\index{構造的帰納法}%構造的帰納法による標準的な証明に対応していることがわかります。
 
-一つ目のサブゴールの証明を新しいタクティクから始めましょう。次のタクティクは非常によく使われます%\index{tactics!intros}%。 *)
+前に使った[induction]とはまた別の、やはりよく利用する[intros]というタクティクを使って、一つめのサブゴールを証明するところから始めましょう。%\index{tactics!intros}% *)
 
   intros.
 
@@ -424,7 +423,7 @@ To progress further, we need to use the definitions of some of the functions app
 *)
 *)
 (**
-サブゴールは次のように変わります：
+サブゴールは次のように変わります。
 [[
 
  n : nat
@@ -436,9 +435,9 @@ To progress further, we need to use the definitions of some of the functions app
 
 ]]
 
-[intros] は、ゴールの先頭にあった [forall] によって束縛された変数を自由変数に変えました。
+[intros]により、先頭にあった[forall]で束縛された変数が自由変数に変わりました。
 
-さらに証明を進めるためには、ゴール内のいくつかの関数の定義を使う必要があります。[unfold] タクティクは識別子をその定義に置き換えます。%\index{tactics!unfold}%
+さらに証明を進めるためには、ゴール内にあるいくつかの関数の定義を使う必要があります。[unfold]タクティクを使うと、識別子がその定義に置き換わります。%\index{tactics!unfold}%
 *)
 
   unfold compile.
@@ -476,7 +475,7 @@ We only need to unfold the first occurrence of [progDenote] to prove the goal.  
 
 ]]
 
-ゴールを証明するには一つ目の [progDenote] を展開(unfold)する必要があります。[at] 節は [unfold] と共に使われ、識別子を特定の箇所のみを展開したい場合にその場所を指定します。場所は左から右に数えます。%\index{tactics!unfold}% *)
+ゴールを証明するのに展開が必要なのは、一つめの[progDenote]だけです。[unfold]と一緒に[at]節を使うことで、展開したい特定の識別子の出現場所を指定できます。出現場所は左から右に数えます。%\index{tactics!unfold}% *)
 
   unfold progDenote at 1.
 (**
@@ -524,9 +523,9 @@ Fortunately, in this case, we can eliminate the complications of anonymous recur
 
 ]]
 
-今回の [unfold] は [progDenote] を無名の再帰関数に変えました(一般に [fun] や "lambda" が再帰しない無名関数を与えるのと同様に)。これは、再帰的定義を展開するときに一般に起こります。ここで、Coq は引数 [p], [s] を [p0], [s0] へ自動的に変えたことに注意してください。局所的な自由変数と名前の衝突を避けるためです。また、他にも [None (A:=stack)] という部分項が見えますね。この項は自身が [option stack] 型を持つということを指示する注釈を含んでいます。このことを [option] の定義内の型変数 [A] の明示的具体化と呼びます。
+この[unfold]により、[progDenote]が無名の再帰関数に変わります（一般に[fun]や「lambda」で再帰しない無名関数が得られるのに似ています）。再帰的な定義を展開すると、通常はこのようなことが起こります。ここで、Coqが引数[p]と[s]を、それぞれ[p0]および[s0]へと自動的に変えたことに注意してください。これは、局所的な自由変数と名前の衝突を避けるためです。[None (A:=stack)]という部分項もありますね。この項には、この項が[option stack]型を持つということを指示する注釈が含まれています。このことを、「名前付きの型変数[A]を[option]の定義から明示的に具体化する」と表現します。
 
-幸いなことに、今のケースではこの複雑な無名再帰関数をすぐに除くことができます。これは、引数である [(iConst n :: nil) ++ p] の構造が、[simpl] タクティクを使って内部のパターンマッチを簡約することで明らかになるからです。[simpl] タクティクは先ほど [Eval] と共に使ったものと同じ簡約戦略を適用します(詳細はまだ触れません)。%\index{tactics!simpl}%
+幸いなことに、今の例ではこの複雑な無名の再帰関数をすぐに取り除けます。これは、引数である[(iConst n :: nil) ++ p]の構造が、[simpl]タクティクを使って内部のパターンマッチを簡約することで明らかになるからです。[simpl]タクティクは、先ほど[Eval]で使ったのと同じ簡約戦略を適用します（詳細については今はまだ触れません）。%\index{tactics!simpl}%
 *)
 
   simpl.
@@ -571,7 +570,7 @@ Now we can unexpand the definition of [progDenote]:%\index{tactics!fold}%
 
 ]]
 
-これで [progDenote] の定義を折り畳むことができます：%\index{tactics!fold}%
+これで[progDenote]の定義を折り畳むことができます。%\index{tactics!fold}%
 *)
 
   fold progDenote.
@@ -598,7 +597,7 @@ progDenote p (n :: s) = progDenote p (n :: s)
 
 ]]
 
-自明な等式になったので、このケースの証明はこれで終わりのように見えます。実際、次のタクティクを使えば証明は終わります：%\index{tactics!reflexivity}%
+自明な等式になったので、このケースの証明はこれで終わりのように見えます。実際、次のタクティクを使えば証明は終わりです。%\index{tactics!reflexivity}%
 *)
 
   reflexivity.
@@ -626,7 +625,7 @@ We see our first example of %\index{hypotheses}%hypotheses above the double-dash
 We start out the same way as before, introducing new free variables and unfolding and folding the appropriate definitions.  The seemingly frivolous [unfold]/[fold] pairs are actually accomplishing useful work, because [unfold] will sometimes perform easy simplifications. %\index{tactics!intros}\index{tactics!unfold}\index{tactics!fold}% *)
 *)
 (**
-二つ目のサブゴールに入ります：
+二つめのサブゴールに入ります。
 
 [[
   b : binop
@@ -643,9 +642,9 @@ We start out the same way as before, introducing new free variables and unfoldin
 
 ]]
 
-初めての%\index{仮定}%「仮定」の例が二重線の上に見えますね。部分項 [e1], [e2] に対応する帰納法の仮定 [IHe1], [IHe2] です。
+二重線の上に%\index{仮定}%「仮定」が登場する最初の例です。部分項[e1]および[e2]に対応する帰納法の仮定は、それぞれ[IHe1]および[IHe2]です。
 
-前回と同じように、自由変数を導入([intro]duce)し、適切な定義を展開([unfold])し折り畳み([fold])ます。[unfold]/[fold] は一見つまらないことをやっているように見えますが、実は [unfold] は時折簡単な簡約を行うので、実に有益に働きます。 %\index{tactics!intros}\index{tactics!unfold}\index{tactics!fold}% *)
+前回と同じように、自由変数を導入（[intro]duce）し、適切な定義を展開（[unfold]）して、折り畳み（[fold]）ます。一見すると、[unfold]して[fold]するのは無駄に見えるかもしれませんが、[unfold]が簡単な簡約を実施する場合があるので、実際には有益な仕事が成し遂げられています。%\index{tactics!intros}\index{tactics!unfold}\index{tactics!fold}% *)
 
   intros.
   unfold compile.
@@ -675,7 +674,7 @@ We start out the same way as before, introducing new free variables and unfoldin
 What we need is the associative law of list concatenation, which is available as a theorem [app_assoc_reverse] in the standard library.%\index{Vernacular commands!Check}%  (Here and elsewhere, it is possible to tell the difference between inputs and outputs to Coq by periods at the ends of the inputs.) *)
 *)
 (**
-今、私たちはこれまで見てきたタクティクでは不十分な地点に着きました。もう定義の展開は不要なので、他のことを試す必要があります。
+これは、これまでに使ったタクティクだけでは不十分な状況です。定義の展開をこれ以上しても何も得られないので、何か別のことを試す必要があります。
 
 [[
   b : binop
@@ -693,7 +692,7 @@ What we need is the associative law of list concatenation, which is available as
 
 ]]
 
-今必要なのは、リストの結合に関する結合律(associative law)です。これは標準ライブラリで定理 [app_assoc_reverse] として利用できます。%\index{Vernacular commands!Check}% (Coqの入力か出力かは、最後にピリオドがあるかどうかで見分けられます。)
+必要なのは、リストの結合に関する結合律（associative law）です。これは標準ライブラリにある[app_assoc_reverse]という定理として利用できます。%\index{Vernacular commands!Check}%（ここに限らず、説明に出てくる記述がCoqに対する入力なのか、それとも出力結果なのかは、末尾にピリオドがあるかどうかで見分けられます。）
 *)
 
 Check app_assoc_reverse.
@@ -713,7 +712,7 @@ app_assoc_reverse
 
 ]]
 
-もし使いたい定理の名前を知らなければ、%\index{Vernacular commands!SearchRewrite}%[SearchRewrite] コマンドを使って検索できます。[SearchRewrite] は以下のように書き換えたいパターンを入力して使います： *)
+もし使いたい定理の名前がわからなければ、%\index{Vernacular commands!SearchRewrite}%[SearchRewrite]コマンドを使って検索できます。[SearchRewrite]には、以下のように、書き換えたいパターンを指定します。 *)
 
 SearchRewrite ((_ ++ _) ++ _).
 (**
@@ -740,7 +739,7 @@ app_assoc: forall (A : Type) (l m n : list A), l ++ m ++ n = (l ++ m) ++ n
 
 ]]
 
-[app_assoc_reverse] で書き換えを行いましょう： %\index{tactics!rewrite}% *)
+書き換えに[app_assoc_reverse]を使いましょう。 %\index{tactics!rewrite}% *)
 
   rewrite app_assoc_reverse.
 
@@ -753,7 +752,7 @@ app_assoc: forall (A : Type) (l m n : list A), l ++ m ++ n = (l ++ m) ++ n
 ]]
 
 Now we can notice that the lefthand side of the equality matches the lefthand side of the second inductive hypothesis, so we can rewrite with that hypothesis, too.%\index{tactics!rewrite}% *)
-%\noindent{}%結論は以下のように変わります：
+%\noindent{}%結論は以下のように変わります。
 
 [[
    progDenote (compile e2 ++ (compile e1 ++ iBinop b :: nil) ++ p) s =
@@ -761,7 +760,7 @@ Now we can notice that the lefthand side of the equality matches the lefthand si
 
 ]]
 
-今、等式の左辺は二つ目の帰納法の仮定内の等式の左辺に一致していることが分かります。よってその仮定も書き換えに使えます。%\index{tactics!rewrite}% *)
+この等式の左辺は、二つめの帰納法の仮定に出てくる等式の左辺に一致しています。よって、その仮定も書き換えに使えます。%\index{tactics!rewrite}% *)
 
   rewrite IHe2.
 (**
@@ -780,8 +779,7 @@ The same process lets us apply the remaining hypothesis.%\index{tactics!rewrite}
 
 ]]
 
-同様のプロセスで残りの仮定も適用できます。%\index{tactics!rewrite}% *)
-
+同様にして残りの仮定も適用できます。%\index{tactics!rewrite}% *)
 
   rewrite app_assoc_reverse.
   rewrite IHe1.
@@ -802,7 +800,7 @@ Now we can apply a similar sequence of tactics to the one that ended the proof o
 
 ]]
 
-これで、先ほど終わらせた一つ目の証明と同様のタクティクを適用していくことができます。%\index{tactics!unfold}\index{tactics!simpl}\index{tactics!fold}\index{tactics!reflexivity}%
+これで、先ほど終わらせた一つめの証明と同様のタクティクを適用していくことができます。%\index{tactics!unfold}\index{tactics!simpl}\index{tactics!fold}\index{tactics!reflexivity}%
 *)
 
   unfold progDenote at 1.
@@ -811,7 +809,7 @@ Now we can apply a similar sequence of tactics to the one that ended the proof o
   reflexivity.
 
 (** (* And the proof is completed, as indicated by the message: *)
-これで、以下のメッセージと共に証明が完了しました： *)
+次のようなメッセージが出て、証明完了です。 *)
 
 (**
 <<
@@ -824,7 +822,7 @@ Now we can apply a similar sequence of tactics to the one that ended the proof o
 *)
 *)
 (**
-私たちの最初の証明ができました。既に、このような単純な定理に対しても、証明のスクリプトは構造化されておらず、あまり読者に教育的ではありません。もしこのアプローチをもっと本格的な定理に拡張しようとすれば、証明のスクリプトは可読性が低く、タクティク・ベースの証明に反対する人々には都合のいい批判の的となるでしょう。幸いなことに、Coq はスクリプトによる高機能な自動化をサポートしており、この補題に対して短い証明を与えることができます(自動化のタクティクは別の場所で定義しています)。これまで書いてきた証明の試みを中止し、新しく初めましょう。%\index{Vernacular commands!Abort}%
+これが本書の最初の証明です。このような単純な定理ですら、最終的に得られる証明のスクリプトは構造化されておらず、読み手にとってあまり教育的ではありません。もっと本格的な定理を同じ方針で証明すれば、タクティクを使った証明を批判するのに好都合な、可読性が低い証明のスクリプトになってしまいます。幸いなことに、Coqはスクリプトによる高機能な自動化に対応しています。別の場所でスクリプトとして定義した自動化のタクティクを利用することで、この補題に対する短い証明を与えることが可能です。これまでの証明を[Abort]で中止し、はじめからやり直してみましょう。%\index{Vernacular commands!Abort}%
 *)
 
 Abort.
@@ -846,13 +844,13 @@ The %\index{Vernacular commands!Qed}%[Qed] command checks that the proof is fini
 The proof of our main theorem is now easy.  We prove it with four period-terminated tactics, though separating them with semicolons would work as well; the version here is easier to step through.%\index{tactics!intros}% *)
 *)
 (**
-必要なのは帰納法による証明の決まり文句を書いて、残りの長々しい推論を自動化するタクティクを呼ぶことだけです。今回の証明ではタクティクの終わりでピリオドの変わりに%\index{tactics!semicolon}%セミコロンが使われています。セミコロンは二つのタクティクの間に使い、証明を構造化し合成します。タクティク [t1; t2] は [t1] を適用し、その後残される各サブゴールに [t2] を適用します。セミコロンは効果的な証明の自動化のための基本的な構成要素の一つです。ピリオドは証明途中の確認すべき状態がどこにあるのかを予め調べるには便利です。しかし複雑な証明は最終的には、セミコロンなどを使って一つのタクティクに合成し、ピリオドが一つだけになるようにすべきです。
+必要なのは、まず帰納法による証明における決まり文句を書き、中間の長々しい推論を自動化するタクティクを呼ぶことだけです。前回の証明ではタクティクの末尾にピリオドを置きましたが、今回の証明ではピリオドの代わりに%\index{tactics!semicolon}%セミコロンを使います。セミコロンは二つのタクティクを切り離し、証明を構造化して組み合わせられるようにしてくれます。タクティク[t1; t2]には、[t1]を適用してから残りの各サブゴールに対して[t2]を適用する、という効果があります。セミコロンは、証明を効果的に自動化するための基本的な構成要素の一つです。ピリオドは、途中の状態を確認しながら探索的に証明をしていくときは便利に使えます。しかし、それなりに複雑な証明は、最終的にすべて、セミコロンを使って合成した一つのタクティクの末尾にピリオドが一つだけある状態にすべきです。
 
-[crush] タクティクは本書に付随したライブラリにあり、Coq の標準ライブラリ内のものではありません。本書のライブラリは証明の高度な自動化にとても役立つタクティクを他にもいくつか含んでいます。
+[crush]は、本書に付随するライブラリで用意しているタクティクであり、Coqの標準ライブラリにはありません。ほかにも本書のライブラリには証明の高度な自動化にとても役立つタクティクがいくつも含まれています。
 
-%\index{Vernacular commands!Qed}%[Qed] コマンドは証明が実際に完了していることを確かめ、そうであればその証明を保存します。これまで書いてきたタクティクたちは[証明スクリプト]、別の言葉で言えば Ltac プログラムの列で、これは正しく型付けされた Gallina の項です。定理が正しいことは、証明スクリプト自体ではなく、証明項が正しいことの(比較的単純な)検査器のみで信用できます。本書の第1部では証明を Gallina の項として表現することの原理について紹介します。
+%\index{Vernacular commands!Qed}%[Qed]コマンドは、証明が実際に完了していることを確認し、そうであればその証明を保存します。これまで書いてきたタクティクたちは_[証明スクリプト]_、別の言い方をするとLtacプログラムの列であり、正しく型付けされたGallinaの項です。証明スクリプトそのものは、定理が正しいことを信じる根拠にはなりません。定理が正しいことを信じるのに必要なのは、証明項の（比較的単純な）検査器が正しいことを信頼することだけです。本書の第1部では、あらゆる証明をGallinaの項として表現することの背景にある原理について説明します。
 
-主定理は今、容易に証明できます。うまくセミコロンを使い、ピリオド四つで証明をします。この証明はより簡単に進みます。%\index{tactics!intros}% *)
+今、主定理は容易に証明できます。ここではピリオドで終端した四つのタクティクにより証明します。セミコロン区切りにしても同じことですが、証明を順番に進めるには、このやり方のほうが簡単だからです。%\index{tactics!intros}% *)
 
 Theorem compile_correct : forall e, progDenote (compile e) nil = Some (expDenote e :: nil).
   intros.
@@ -874,7 +872,7 @@ At this point, we want to massage the lefthand side to match the statement of [c
 
 ]]
 
-ここで、左辺を [compile_correct'] の主張に合うように書き換えましょう。標準ライブラリの以下の定理が有効です： *)
+ここで、左辺を[compile_correct']の主張に合うように書き換えましょう。標準ライブラリの以下の定理が使えます。 *)
 
 Check app_nil_end.
 (** [[
@@ -898,7 +896,7 @@ app_nil_end
 Now we can apply the lemma.%\index{tactics!rewrite}% *)
 *)
 (**
-結論にはリストが複数個現れているので、定理内の変数 [l] の値を明示しました。どれを書き換えたいかを明示しなければ、[rewrite] タクティクは別の場所を選んで書き換えてしまうことがあります。
+今度は結論に複数のリストが現れているので、定理内の変数[l]の値を明示しています。[rewrite]タクティクは、書き換えたいものを明示しないと、別の場所を選んで書き換えてしまうことがあります。
 
 [[
   e : exp
@@ -928,7 +926,7 @@ We are almost done.  The lefthand and righthand sides can be seen to match by si
 
 ]]
 
-ほとんどが終わりました。左辺と右辺はシンプルな記号的評価によって一致するように見えます。Coq は記号的評価によって同じ結果に正規化されるものはいつでも同じ項として見なします。[progDenote] の定義よりここでのケースも同様です。詳細は気にせずとも、%\index{tactics!reflexivity}%[reflexivity] タクティクはこの正規化をし左辺と右辺が構文的に等しいことを確かめます。%\index{tactics!reflexivity}% *)
+これでもうほとんど終わりです。左辺と右辺は単純な記号的評価によって一致しそうに見えます。ありがたいことに、記号的評価によって同じ結果に正規化されるものは、Coqによって同じ項とみなされます。この場合に左辺と右辺が同じ項に評価されるのは[progDenote]の定義によるわけですが、そのような詳細を気にする必要はありません。%\index{tactics!reflexivity}%[reflexivity]タクティクを呼び出すだけで、正規化および左辺と右辺の構文的な等しさの確認を実施してくれます。%\index{tactics!reflexivity}% *)
 
   reflexivity.
 Qed.
@@ -938,7 +936,7 @@ Qed.
 (** This proof can be shortened and automated, but we leave that task as an exercise for the reader. *)
 *)
 (**
-この証明はより短くでき自動化されますが、これは読者への演習問題としましょう。 *)
+この証明は、もっと短く、さらに自動化できますが、これは読者への演習問題としましょう。 *)
 
 
 (** * 型付き式 *)
@@ -947,7 +945,7 @@ Qed.
 (** In this section, we will build on the initial example by adding additional expression forms that depend on static typing of terms for safety. *)
 *)
 (**
-この節では、安全のため項の静的片付けを持つような式の構造を追加した最初の例を作ります。 *)
+この節では、項が静的型付けを持つような安全な式の構造を付け足すことで、最初の例を拡充していきます。 *)
 
 (** ** ソース言語 *)
 
@@ -955,7 +953,7 @@ Qed.
 (** We define a trivial language of types to classify our expressions: *)
 *)
 (**
-式を区別するための型の自明な言語を定義します： *)
+式を区別するために、自明な型の言語を定義します。 *)
 
 Inductive type : Set := Nat | Bool.
 
@@ -965,9 +963,9 @@ Inductive type : Set := Nat | Bool.
    Now we define an expanded set of binary operators. *)
 *)
 (**
-ほとんどのプログラミング言語と同様に、Coq は変数名の大文字と小文字を区別します。よって今定義された型 [type] は先ほど多相的な定理の主張の中で見た [Type] キーワード(詳細は後で述べます)とは異なります。 また、コンストラクタの [Nat], [Bool] も標準ライブラリ内の型 [nat], [bool] とは異なります。
+多くのプログラミング言語と同様に、Coqでは変数名の大文字と小文字に区別があるので、ここで定義した型[type]は、先ほど多相的な定理の主張の中に登場した[Type]キーワード（詳細は後で説明します）とは区別されます。コンストラクタである[Nat]と[Bool]も、標準ライブラリ内にある型[nat]および[bool]とは異なります。
 
-  拡張された二項演算子のセットを定義しましょう。 *)
+二項演算子についても拡張したものを定義しましょう。 *)
 
 Inductive tbinop : type -> type -> type -> Set :=
 | TPlus : tbinop Nat Nat Nat
@@ -988,25 +986,25 @@ The second restriction is not lifted by GADTs.  In ML and Haskell, indices of ty
 *)
 *)
 (**
-[tbinop] の定義は [binop] と重要な意味で異なります。[binop] は [Set] 型を持つと宣言されましたが、[tbinop] は [type -> type -> type -> Set] 型と宣言しました。[tbinop] は _indexed type family_ として定義します。Indexed inductive types は Coq の表現力の核で、私たちの興味のあるほとんどのものはこれで定義されます。
+[tbinop]の定義には、[binop]の定義とは大きく異なる点があります。[binop]は[Set]型であると宣言しましたが、[tbinop]は[type -> type -> type -> Set]型であると宣言しています。これは、_[添字付けされた型の族]_（indexed type family）として[tbinop]を定義しているということです。添字付けされた型の族は、Coqの表現力の根幹です。実際、それ以外の興味深いものは、ほとんどすべて添字付けされた型の族によって定義されます。
 
-[tbinop] の直感的な説明は、[tbinop t1 t2 t] は型 [t1], [t2] のオペランドを取り、型 [t] の結果を返す二項演算子です。たとえば、コンストラクタ [TLt] (自然数の順序 ≦)は型 [tbinop Nat Nat Bool] を持ち、引数が自然数、結果がブール値であることを意味します。[TEq] の型は多相性によって少し複雑になっています。[TEq] は同じ型を持つ値を任意に取れるようにしているのです。
+[tbinop]の直観的な説明は、「[tbinop t1 t2 t]は、型[t1]と[t2]のオペランドを取って型[t]の結果を返す二項演算子である」というものです。たとえばコンストラクタ[TLt]（自然数の順序$\leq$#≦#）は、引数が自然数、結果がブール値であることを意味する型[tbinop Nat Nat Bool]を持ちます。[TEq]の型は、多相性によって少し複雑になっています。具体的には、等値の比較である[TEq]では、_[同じ]_型を持つ値を任意に取れるようにしてあります。
 
-ML や Haskell は添字付けされた代数的データ型を持ちます。たとえば、ML や Haskell のリスト型はリストの要素の型によって添字付けられています。しかしながら、ML や Haskelll 98 は Coq に比べるとデータ型の定義に関して二つの大きな制限があります。
+MLやHaskellには添字付けされた代数的データ型があります。たとえば、MLやHaskellのリスト型は、リストの要素の型によって添字付けられています。ただし、MLやHaskelll 98は、Coqに比べるとデータ型の定義に関して二つの大きな制限があります。
 
-まず、各データコンストラクタの添字はそのデータ型の定義のトップレベルで束縛された型変数でなければいけません。
-たとえば、[TPlus]は添字がすべて[Nat]に固定された[tbinop]を構成するコンストラクタですが、ML や Haskell ではそのようなことができません。
-%\index{generalized algebraic datatypes}\index{GADTs|see{generalized algebraic datatypes}}% _Generalized algebraic datatypes_ (GADTs)%~\cite{GADT}% はこの制限をなくす、広く普及した機能で、%\index{GHC Haskell}%GHC Haskell、OCaml 4や、その他の言語で使用されます。
+まず、各データコンストラクタの添字が、そのデータ型の定義のトップレベルで束縛された型変数でなければいけません。
+たとえば、[TPlus]はすべての添字が[Nat]に固定された[tbinop]を構成するコンストラクタですが、MLやHaskellではそのような定義をする手段はありません。
+%\index{generalized algebraic datatypes}\index{GADTs|see{generalized algebraic datatypes}}%_一般化代数データ型_（Generalized algebraic datatypes、GADTs）%~\cite{GADT}%は、%\index{GHC Haskell}%GHC Haskell、OCaml 4など、この制限が取り除かれている言語で広く採用されている機能です。
 
-二つ目の制限は GADTs でも制限されたままです。ML や Haskell では、型の添字は必ず型であって、[式]であってはいけません。Coq では、型は任意の Gallina 項により添字付けできます。型添字はプログラムと同じ領域に住むことができ、それらは通常のプログラムと同様に計算できます。
-Haskellは%\index{Haskell}multi-parameter type classesに基いた型添字の計算を制限付きでサポートしており、type functionのような近年の拡張はHaskellプログラミングを「現実の」型付き関数型プログラミングに近づけさえしましたが、依存型なしでは、型を使ってプログラミングすることと普通にプログラミングすることに常に必ずギャップが生まれます。
+二つめの制限はGADTsでは対処できません。MLやHaskellでは、型の添字は必ず型であり、[式]であってはいけません。Coqでは、型は任意のGallina項により添字付けできます。型の添字はプログラムと同じ領域に属することができ、それらは通常のプログラムと同様に計算できます。
+Haskellは、%\index{Haskell}multi-parameter type classに基いた型の添字計算に制限付きで対応しています。また、型関数（type function）のような近年の拡張により、Haskellプログラミングは「本物」の型付き関数型プログラミングにだいぶ近づきました。しかし、依存型なしでは、型を使ってプログラミングすることと、普通にプログラミングすることとの間に、必ずギャップが生じます。
 *)
 
 (**
 (** We can define a similar type family for typed expressions, where a term of type [texp t] can be assigned object language type [t].  (It is conventional in the world of interactive theorem proving to call the language of the proof assistant the%\index{meta language}% _meta language_ and a language being formalized the%\index{object language}% _object language_.) *)
 *)
 (**
-同様にして、片付き式に対して型族を定義できます。型 [texp t] を持つ項は対象言語の型 [t] を割り当てられます。(対話的定理証明の世界では慣習的に、証明支援器の言語を%\index{メタ言語}%[メタ言語]と呼び、形式化されている言語を%\index{対象言語}%[対象言語]と呼びます。)*)
+型付きの式に対しても、同じように型族を定義できます。型[texp t]を持つ項には、対象言語の型[t]が割り当てられます。（対話的定理証明の分野では、慣習的に、証明支援器の言語を%\index{メタ言語}%[メタ言語]と呼び、形式化の対象になっている言語を%\index{対象言語}%[対象言語]と呼びます。）*)
 
 Inductive texp : type -> Set :=
 | TNConst : nat -> texp Nat
@@ -1014,7 +1012,7 @@ Inductive texp : type -> Set :=
 | TBinop : forall t1 t2 t, tbinop t1 t2 t -> texp t1 -> texp t2 -> texp t.
 
 (** (* Thanks to our use of dependent types, every well-typed [texp] represents a well-typed source expression, by construction.  This turns out to be very convenient for many things we might want to do with expressions.  For instance, it is easy to adapt our interpreter approach to defining semantics.  We start by defining a function mapping the types of our object language into Coq types: *)
-依存型のおかげで、構成から、すべての well-typed な [texp] は well-typed なソース言語の式を表します。これは私たちがこれから式についてしたい様々なことに対してとても便利であることが分かります。たとえば、今までのようなセマンティクスを定義するインタプリタのアプローチに適合させるのが簡単です。まず、オブジェクト言語の型を Coq の型に移す写像を定義します： *)
+依存型を利用することで、すべてのwell-typedな[texp]は、その構成によりwell-typedなソース言語の式を表すことになります。式を使って何かをしたい場合、これがとても便利なことが多いのです。たとえば、インタプリタのときの手法をセマンティクスの定義にも簡単に適用できます。対象言語の型をCoqの型に移す写像の定義から始めましょう。 *)
 
 Definition typeDenote (t : type) : Set :=
   match t with
@@ -1026,7 +1024,7 @@ Definition typeDenote (t : type) : Set :=
 (** It can take a few moments to come to terms with the fact that [Set], the type of types of programs, is itself a first-class type, and that we can write functions that return [Set]s.  Past that wrinkle, the definition of [typeDenote] is trivial, relying on the [nat] and [bool] types from the Coq standard library.  We can interpret binary operators by relying on standard-library equality test functions [eqb] and [beq_nat] for Booleans and naturals, respectively, along with a less-than test [leb]: *)
 *)
 (**
-ここで、いくつかの事実について触れておきましょう。「プログラムの型」の型である [Set] はそれ自身がファーストクラスの型で、私たちは [Set] を返す関数を書くことができます。[typeDenote] の定義は明白で、Coq 標準ライブラリの型 [nat], [bool] を使っています。私たちの二項演算子は、標準ライブラリ内の比較関数 [eqb], [beq_nat] や [leb] を使って定義できます。それぞれ、ブール値間、自然数値間のイコール、自然数の≦を表します。*)
+「プログラムの型」の型である[Set]は、それ自身がファーストクラスの型なので、[Set]を返す関数が書けます。この事実を受け入れるには少し時間がかかるかもしれませんね。それさえ納得できれば、[typeDenote]の定義ではCoqの標準ライブラリの型である[nat]と[bool]をそのまま使っているだけです。二項演算子の定義では、標準ライブラリの比較関数である[eqb]（ブール値間の等値性）、[beq_nat]（自然数値間の等値性）、[leb]（自然数の$\leq$#≦#）をそのまま使います。*)
 
 Definition tbinopDenote arg1 arg2 res (b : tbinop arg1 arg2 res)
   : typeDenote arg1 -> typeDenote arg2 -> typeDenote res :=
@@ -1044,12 +1042,12 @@ Definition tbinopDenote arg1 arg2 res (b : tbinop arg1 arg2 res)
 The same tricks suffice to define an expression denotation function in an unsurprising way.  Note that the [type] arguments to the [TBinop] constructor must be included explicitly in pattern-matching, but here we write underscores because we do not need to refer to those arguments directly. *)
 *)
 (**
-この関数は先ほど定義した表示関数と比べていくつか違いがあります。まず、[tbinop] は添字付けされた型なので、その添字は [tbinopDenote] の追加の引数になります。
-次に、それぞれの場合分けでの[型]がマッチされる[値]に依存する場合には正銘の%\index{依存パターンマッチ}%[依存パターンマッチ]が必要です。
-ここでは依存パターンマッチを支援するGallinaのたくさんのうまい側面について詳細は述べませんが、このテーマは本書の第2部の中心となります。
+この関数は、前に定義した[binopDenote]関数とそれほど大きく違うわけではありません。まず、[tbinop]は添字付けされた型なので、その添字が[tbinopDenote]の追加の引数になります。
+次に、場合分けの本体における_[型]_がマッチした_[値]_に依存する場合には、正真正銘の%\index{依存パターンマッチ}%_[依存パターンマッチ]_が必要です。
+Gallinaには、依存パターンマッチを支援する面がたくさんありますが、ここでは詳細には踏み込みません。これは本書の第2部の中心テーマです。
 
-同じ仕組みにより、式の表示関数を自然な方法で定義できます。
-コンストラクタ[TBinop]の[type]型の引数はパターンマッチの中で明示的に含まなければいけませんが、ここではそれらの引数を直接参照する必要はないのでアンダースコアを書きます。
+同じ仕組みにより、式に対する[texpDenote]関数も自然に定義できます。
+コンストラクタ[TBinop]に対する[type]型の引数を明示的にパターンマッチに含めなければなりませんが、これらの引数を直接参照する必要はないので、ここではアンダースコアを書いています。
 *)
 
 Fixpoint texpDenote t (e : texp t) : typeDenote t :=
@@ -1063,7 +1061,7 @@ Fixpoint texpDenote t (e : texp t) : typeDenote t :=
 (** We can evaluate a few example programs to convince ourselves that this semantics is correct. *)
 *)
 (**
-このセマンティクスが正しいことを確かめるためにいくつかのプログラムの例を評価します。*)
+このセマンティクスが正しいことを確かめるために、プログラムをいくつか試しに評価してみましょう。*)
 
 Eval simpl in texpDenote (TNConst 42).
 (** [= 42 : typeDenote Nat] *)
@@ -1090,7 +1088,7 @@ Eval simpl in texpDenote (TBinop TLt (TBinop TPlus (TNConst 2) (TNConst 2))
 (** %\smallskip{}%Now we are ready to define a suitable stack machine target for compilation. *)
 *)
 (**
-%\smallskip{}%今、コンパイルのための適切なスタックマシンを定義する準備ができました。*)
+%\smallskip{}%これでコンパイルに適したスタックマシンのターゲットを定義する準備ができました。*)
 
 
 (** ** ターゲット言語 *)
@@ -1103,12 +1101,12 @@ For our new languages, besides underflow, we also have the problem of stack slot
 We start by defining stack types, which classify sets of possible stacks. *)
 *)
 (**
-型無しの言語の例では、スタックマシーンプログラムはスタックアンダーフローを起こし動かなくなるかもしれません。私たちのコンパイラはアンダーフローするプログラムを生み出さないことを証明したにも関わらず、そのような複雑な状況を扱うのは好ましくありません。
-すべてのスタックマシーンプログラムにアンダーフローがないように強制するために依存型を使えたかもしれません。
+言語に型がなかったときは、スタックマシーンのプログラムがスタックアンダーフローを起こして動かなくなる可能性がありました。アンダーフローするプログラムをコンパイラは生成しない、と証明したのに、そのような事態への対処が必要になるというのでは、残念すぎます。
+依存型を使えば、すべてのスタックマシーンのプログラムがアンダーフローを起こさないことが強制できたでしょう。
 
-私たちの言語では、アンダーフローに加えて、ブール値ではなく自然数がスタックに入ったり、その逆が起きたりする問題があります。
+新しい言語には、アンダーフロー以外にも、ブール値ではなく自然数がスタックに入ったり、その逆の状況が起きたりするという問題があります。ここでは、起こりうる障害を推論しなくて済むように、添字付けられた型の族を使うことにします。
 
-可能なスタックの集合を区別する、スタック型を定義することから始めます。
+まずはスタック型を定義し、起こりうるスタックの状態を分類できるようにしましょう。
 *)
 
 Definition tstack := list type.
@@ -1119,8 +1117,9 @@ Definition tstack := list type.
 We can define instructions in terms of stack types, where every instruction's type tells us what initial stack type it expects and what final stack type it will produce. *)
 *)
 (**
-[tstack]で区別されるスタックは同じ数だけ要素を持ち、各スタックの要素はそのスタック型における同じ位置にある型を持たなければいけません。
+ある[tstack]によって分類されるスタックは、いずれも要素の数が同じでなければなりません。また、各スタックの要素の型は、スタック型における同じ位置の型でなければなりません。
 
+スタック型を利用して命令を定義しましょう。いずれの命令も、命令が最初に期待しているスタック型と命令によって生成される最終的なスタック型とがわかるような型を持ちます。
 
 *)
 
@@ -1133,7 +1132,8 @@ Inductive tinstr : tstack -> tstack -> Set :=
 
 (** (** Stack machine programs must be a similar inductive family, since, if we again used the [list] type family, we would not be able to guarantee that intermediate stack types match within a program. *)*)
 (**
-もしここでも[list]型族を使ったら、中間的なスタック型がプログラムに合うことが保証されないので、スタックマシーンプログラムは必ず同様な帰納的なデータでなればいません。
+スタックマシーンのプログラムも、同様な帰納的な族にしなければなりません。
+もしここで前のように[list]型の族を使ったら、プログラム内部で中間的なスタック型がマッチするかどうかを保証する手立てがなくなってしまうからです。
 *)
 
 Inductive tprog : tstack -> tstack -> Set :=
@@ -1147,8 +1147,7 @@ Inductive tprog : tstack -> tstack -> Set :=
 (** Now, to define the semantics of our new target language, we need a representation for stacks at runtime.  We will again take advantage of type information to define types of value stacks that, by construction, contain the right number and types of elements. *)
 *)
 (**
-新しいターゲット言語のセマンティクスを定義するために、ランタイムでのスタックの表現が必要です。正しい数と型を持つ要素を含む値のスタックの型を定義します。ここでも型の情報が役立ちます。
-この構成の仕方から、スタックは正しい数と型を持つ要素を含むようにスタック型が定義されます。
+次は、新しいターゲット言語のセマンティクスを定義するために、実行時のスタックの表現を決める必要があります。構成の仕方から要素の個数と型が正しい値について、スタックの型を定義するのにも、型の情報が役立ちます。
 *)
 
 Fixpoint vstack (ts : tstack) : Set :=
@@ -1163,19 +1162,19 @@ Fixpoint vstack (ts : tstack) : Set :=
 This idea of programming with types can take a while to internalize, but it enables a very simple definition of instruction denotation.  Our definition is like what you might expect from a Lisp-like version of ML that ignored type information.  Nonetheless, the fact that [tinstrDenote] passes the type-checker guarantees that our stack machine programs can never go wrong.  We use a special form of [let] to destructure a multi-level tuple. *)
 *)
 (**
-新しい[Set]値関数です。
-今回は再帰関数です。[Set]はどの関数が書かれるかを決めるのに特別に扱われないため、完全に妥当です。
-この関数は、空のスタック型のスタック値は[unit]型の任意の値であると言っています。
-[unit]はただ一つの値[tt]を持つ型です。
-空でないスタック型はペアの値スタックを導きます。ペアの一つ目の要素は適切な型を持ち、二つ目の要素は残りのスタック型の表現に従います。
-[%]%\index{notation scopes}\coqdocvar{%#<tt>#type#</tt>#%}%と書いてCoqの拡張可能なパーサへある命令をしています。
-特に、この命令は[match]式全体にかかっていて、演算子[*]が乗算ではなくデカルト積として解釈されるようにその[match]式を型であるかのようにパースされるようにしています。
-(ここでの%\coqdocvar{%#<tt>#type#</tt>#%}%は先ほど定義した帰納的データ型[type]とはつながりはありません。)
+[Set]値の関数がまた出てきました。
+今回は再帰関数です。書かれる可能性がある関数を決める際に[Set]が特別扱いされることはないので、再帰関数でも完全に妥当です。
+この関数は、空のスタック型の値を表すスタックは[unit]型の任意の値である、と言っています。
+[unit]は、唯一の値[tt]を持つ型です。
+空でないスタック型は、ペアの値を表すスタックになります。そのペアは、一つめの要素が適切な型で、二つめの要素が残りのスタック型の表現に従うようなものです。
+[%]%\index{notation scopes}\coqdocvar{%#<tt>#type#</tt>#%}%は、Coqの拡張可能なパーサへの、ある指示になります。
+この場合は[match]式全体に適用される指示で、その[match]式が型としてパースされるようにし、演算子[*]が乗算ではなく直積として解釈されるようにします。
+（この場合の%\coqdocvar{%#<tt>#type#</tt>#%}%は、先ほど定義した帰納的データ型[type]には関係ありません。)
 
-この、型を使ったプログラミングのアイデアは身につけるのにしばらくかかりますが、instruction denotationのとてもシンプルな定義を可能にします。
-私たちの定義は型情報を無視するLisp的なMLに期待するかもしれないものになっています。
-それにもかかわらず、[tinstrDenote]が型検査を通るという事実は、私たちのスタックマシーンプログラムは絶対にうまくいかなくなることがないということを保証します。
-multi-level tupleを分解するために、[let]の特殊な形を使います。
+型を使ったプログラミングの概念を習得するには時間がかかるかもしれませんが、おかげで命令の表示的意味論がとてもシンプルに定義できます。
+ここで得られた定義は、型情報が無視されたLispふうのMLによる定義にも似ています。
+にもかかわらず、[tinstrDenote]が型検査を通るという事実により、このスタックマシーンのプログラムで障害が発生することがありえないと保証されるのです。
+多重タプルを分解するには特殊な形式の[let]を使います。
 *)
 
 Definition tinstrDenote ts ts' (i : tinstr ts ts') : vstack ts -> vstack ts' :=
@@ -1211,7 +1210,7 @@ This and other mysteries of Coq dependent typing we postpone until Part II of th
 *)
 *)
 (**
-なぜ[match]の各ケースで無名関数を使って初期のスタックを束縛したのでしょうか？　代わりに次を考えましょう：
+[match]の場合分けで、初期スタックの束縛に無名関数を使ったのはなぜでしょうか。次のように書くと意図がはっきりしますが、これは正しくありません。
 [[
 Definition tinstrDenote ts ts' (i : tinstr ts ts') (s : vstack ts) : vstack ts' :=
   match i with
@@ -1223,21 +1222,21 @@ Definition tinstrDenote ts ts' (i : tinstr ts ts') (s : vstack ts) : vstack ts' 
   end.
 ]]
 
-Coqの型チェッカは以下のようなエラーを出力します：
+Coqの型検査器は以下のようなエラーを出力します。
 
 <<
 The term "(n, s)" has type "(nat * vstack ts)%type"
  while it is expected to have type "vstack ?119".
 >>
 
-このようなCoqの依存型の型付けの奥深い箇所については2部で述べます。ここでの要点は、関数の引数の型がマッチする値の型に依存するときは、[match]の分岐の中にそれらの引数を入れるとしばしば役立つということです。後に、この理由はGallinaの型付け規則をより完全に取り扱うことで説明されます。
+Coqの依存型における型付けの深淵な部分については第2部で述べます。関数の引数のうち、マッチさせる値の型に依存するような型を持つものは、[match]の分岐の中に押し込めるとうまくいく場合が多い、というのが上記の議論の要点です。それでうまくいく理由は、のちほどGallinaの型付け規則についてもっときちんと扱うときに説明します。
 *)
 
 (**
 (** We finish the semantics with a straightforward definition of program denotation. *)
 *)
 (**
-プログラムの表示の直接的な定義によってセマンティクスを終えます。
+最後に、プログラムの表示的意味論を直接定義します。
 *)
 
 Fixpoint tprogDenote ts ts' (p : tprog ts ts') : vstack ts -> vstack ts' :=
@@ -1250,7 +1249,7 @@ Fixpoint tprogDenote ts ts' (p : tprog ts ts') : vstack ts -> vstack ts' :=
 (** The same argument-postponing trick is crucial for this definition. *)
 *)
 (**
-この定義でも引数を[match]の中に入れるテクニックが重要となります。
+この定義でも引数を[match]の中に入れるテクニックが重要です。
 *)
 
 (** ** 翻訳 *)
@@ -1259,7 +1258,7 @@ Fixpoint tprogDenote ts ts' (p : tprog ts ts') : vstack ts -> vstack ts' :=
 (** To define our compilation, it is useful to have an auxiliary function for concatenating two stack machine programs. *)
 *)
 (**
-コンパイルを定義するために、二つのスタックマシーンプログラムを結合する補助関数が有用になります。
+コンパイルを定義するために、スタックマシーンの二つのプログラムを結合する補助関数を用意しましょう。
 *)
 
 Fixpoint tconcat ts ts' ts'' (p : tprog ts ts') : tprog ts' ts'' -> tprog ts ts'' :=
@@ -1272,7 +1271,7 @@ Fixpoint tconcat ts ts' ts'' (p : tprog ts ts') : tprog ts' ts'' -> tprog ts ts'
 (** With that function in place, the compilation is defined very similarly to how it was before, modulo the use of dependent typing. *)
 *)
 (**
-この関数によって、コンパイル関数は依存型を使う前とよく似た形で定義されます。
+スタックマシーンの結合処理をこの関数で置き換えれば、前とよく似た形でコンパイルの関数を定義できます（依存型を使っていることを除く）。
 *)
 
 Fixpoint tcompile t (e : texp t) (ts : tstack) : tprog ts (t :: ts) :=
@@ -1289,18 +1288,18 @@ Fixpoint tcompile t (e : texp t) (ts : tstack) : tprog ts (t :: ts) :=
 The underscores here are being filled in with stack types.  That is, the Coq type inferencer is, in a sense, inferring something about the flow of control in the translated programs.  We can take a look at exactly which values are filled in: *)
 *)
 (**
-この定義の中の一つの面白い特徴は、矢印[=>]の右に現れるアンダースコアです。
-HaskellやMLのプログラマーは多相的な値の型パラメータを推論するコンパイラに非常になじみがあるでしょう。
-Coqではさらに踏み込んで、特定の値の位置にアンダースコアを書くことで任意の項に対しそれを推論するようにシステムに尋ねることが可能です。
-これまでの定義で引数をすべては与えずに関数を呼び出していることに読者のみなさんは気付いているかもしれません。
-たとえば、[tcompile]の再帰呼び出しは引数[t]を省略しています。
-Coqの_implicit argument_のメカニズムは推論ができるかもしれない引数に対して自動でアンダースコアを挿入します。
-しかしそのような値の推論は完全からほど遠いです。
-一般に、HaskellやMLの多層型instantiationに似た場合でしか機能しません。
+この定義で面白いのは、矢印[=>]の右側にアンダースコアがあることです。
+型パラメータから多相的な値を推論するコンパイラは、HaskellやMLのプログラマにはお馴染みでしょう。
+Coqではさらに踏み込んで、特定の値の位置にアンダースコアを書くことで、任意の項に対する値の推論をシステムに任せることが可能です。
+これまでも引数をすべて与えずに関数を呼び出していたことに気付いている読者もいるかもしれません。
+たとえば、[tcompile]の再帰呼び出しでは引数[t]を省略しています。
+Coqには_[暗黙引数]_（implicit argument）という仕組みがあり、推論ができるかもしれない引数に対して自動でアンダースコアを挿入します。
+しかし、そのような値の推論を完全にするのは、到底無理な話です。
+一般には、HaskellやMLにおいて多相型の具体化ができるような場面でしか機能しません。
 
-ここでのアンダースコアはスタックの型が入ります。
-つまり、Coqの型推論器は翻訳されたプログラムの制御フローについてのものを推論していると言えます。
-以下のようにして、何の値が入っているか確認できます：
+この場合、アンダースコアにはスタック型が入ります。
+つまり、Coqの型推論器は、翻訳されたプログラムの制御フローについて何かしら推論していると言えます。
+何の値が入っているかは、以下のようにして確認できます。
 *)
 
 Print tcompile.
@@ -1323,7 +1322,7 @@ fix tcompile (t : type) (e : texp t) (ts : tstack) {struct e} :
 
 (**(** We can check that the compiler generates programs that behave appropriately on our sample programs from above: *)*)
 (**
-上から、適切に振舞うプログラムをコンパイラが生成することを確認できます：
+このコンパイラでも、前に利用したサンプルプログラムに対して適切に動作するプログラムが生成されることを確認しましょう。
 *)
 
 Eval simpl in tprogDenote (tcompile (TNConst 42) nil) tt.
@@ -1345,13 +1344,13 @@ Eval simpl in tprogDenote (tcompile (TBinop TLt (TBinop TPlus (TNConst 2) (TNCon
 (** [= (true, tt) : vstack (Bool :: nil)] *)
 
 (**(** %\smallskip{}%The compiler seems to be working, so let us turn to proving that it _always_ works. *)*)
-(** %\smallskip{}%コンパイラは動いているように見えるので、[常に]正しく動くことを証明しましょう。 *)
+(** %\smallskip{}%うまくコンパイラが動いているように見えるので、これが_[常に]_正しく動くことを証明しましょう。 *)
 
 
 (** ** 翻訳の正しさ *)
 
 (** (** We can state a correctness theorem similar to the last one. *)*)
-(** 前回と同様な正しさの定理を主張します。 *)
+(** 正しさについての定理を前回と同様に主張します。 *)
 
 Theorem tcompile_correct : forall t (e : texp t),
   tprogDenote (tcompile e nil) tt = (texpDenote e, tt).
@@ -1362,8 +1361,9 @@ Abort.
 
 (**(** Again, we need to strengthen the theorem statement so that the induction will go through.  This time, to provide an excuse to demonstrate different tactics, I will develop an alternative approach to this kind of proof, stating the key lemma as: *)*)
 (**
-帰納法がうまくいくように定理の主張を強くする必要がまたあります。
-今回は別のタクティクを見せるために、以下の補題を使って、このような種類の証明に対する代わりのアプローチを取ります。
+帰納法がうまくいくように、今回も定理の主張を強める必要があります。
+新しいタクティクを使って見せたいので、今回は前とは違う手法で証明を開発することにします。
+次の重要な補題を用意することから始めましょう。
 *)
 
 Lemma tcompile_correct' : forall t (e : texp t) ts (s : vstack ts),
@@ -1373,11 +1373,11 @@ Lemma tcompile_correct' : forall t (e : texp t) ts (s : vstack ts),
 
    Let us try to prove this theorem in the same way that we settled on in the last section. *)*)
 (**
-補題[compile_correct']は私たちが考えている式の「継続」%~\cite{continuations}%であるようなプログラム上に量化されていますが、ここではwe avoid drawing in any extra syntactic elements.
-ソース言語の式とその方に加えて、初めのスタック型とそれに適合するスタックを量化します。
-そのスタックから始まるプログラムのコンパイルをすると、その上にプログラムの表示的意味がプッシュされたスタックを得ます。
+[compile_correct']は、考慮している式への「継続」%~\cite{continuations}%であるようなプログラムについて量化された補題になっていますが、構文上の要素は増やさないようにしています。
+ソース言語の式とその型に加えて、最初のスタック型と、そのスタック型に適合するスタックについても量化されています。
+そのようなスタックからプログラムのコンパイルを始めると、その上にプログラムの表示的意味がプッシュされたスタックが得られる、という補題です。
 
-      前節と同じ方法でこの定理を証明しましょう。*)
+前節と同じ方法でこの補題を証明しましょう。*)
 
   induction e; crush.
 
@@ -1395,7 +1395,7 @@ tprogDenote
 We need an analogue to the [app_assoc_reverse] theorem that we used to rewrite the goal in the last section.  We can abort this proof and prove such a lemma about [tconcat].
 *)*)
 (**
-次の未証明の結論が残されました。
+次のような未証明の結論が残りました。
 
 [[
 tprogDenote
@@ -1406,8 +1406,8 @@ tprogDenote
 
 ]]
 
-前節でゴールを書き換えるのに使った定理[app_assoc_reverse]の類似物が必要です。
-証明を中止して[tconcat]についてのそのような補題を証明します。
+前節でゴールを書き換えるのに使った定理[app_assoc_reverse]に類似したものが必要です。
+この証明はここで中止し、[tconcat]に対するそのような補題を証明します。
 *)
 
 Abort.
@@ -1427,8 +1427,8 @@ Some code behind the scenes registers [app_assoc_reverse] for use by [crush].  W
 (**
 これは完全に自動で証明されます。
 
-裏であるコードは[app_assoc_reverse]を[crush]のために登録しています。
-同じ効果を得るために、同様に[tconcat_correct]を登録しなければいけません：%\index{Vernacular  commands!Hint Rewrite}%
+[app_assoc_reverse]が[crush]で利用されるのは、水面下のコードがそのように登録してくれるからです。
+[tconcat_correct]についても、同じ効果を得るための登録が必要です。%\index{Vernacular  commands!Hint Rewrite}%
 *)
 
 Hint Rewrite tconcat_correct.
@@ -1439,13 +1439,13 @@ Hint Rewrite tconcat_correct.
 Now we are ready to return to [tcompile_correct'], proving it automatically this time. *)
 *)
 (**
-ここで、[ヒント]という有用な概念を学びましょう。
-たくさんの証明は可能な証明ステップの組み合わせの徹底的な列挙によって発見されます。
-ヒントは考えるべきステップの集合を与えます。
-タクティク[crush]はそのようなしらみつぶし探索を暗黙で適用し、ヒントに与えた以上の可能性を考えます。
-この[Hint Rewrite tconcat_correct]は補題[tconcat_correct]を左から右への書換に使うようにヒントとして与えています。
+ここで、_[ヒント]_という便利な概念を説明しましょう。
+証明ステップの組み合わせを徹底的に列挙してしまうと、証明がたくさん見つかる可能性があります。
+そこで、考えるべきステップの集合を指定するためにヒントを与えます。
+タクティク[crush]は基本的にはしらみつぶしの探索を適用し、ヒントを与えるとその分だけ多くの可能性を考慮します。
+この[Hint Rewrite tconcat_correct.]により、補題[tconcat_correct]を左から右への書き換えに使うというヒントを与えています。
 
-これで、[tcompile_correct']に戻って自動で証明する準備ができました。
+それでは[tcompile_correct']に戻り、今度は自動で証明してみましょう。
 *)
 
 Lemma tcompile_correct' : forall t (e : texp t) ts (s : vstack ts),
@@ -1455,7 +1455,7 @@ Qed.
 
 (** (** We can register this main lemma as another hint, allowing us to prove the final theorem trivially. *)*)
 (**
-この主補題を新しいヒントとして登録し、最後の定理を自明に証明することができます。
+この主補題を新しいヒントとして登録すれば、最後の定理の証明が自明になります。
 *)
 
 Hint Rewrite tcompile_correct'.
@@ -1470,11 +1470,10 @@ Qed.
 (** It is probably worth emphasizing that we are doing more than building mathematical models.  Our compilers are functional programs that can be executed efficiently.  One strategy for doing so is based on%\index{program extraction}% _program extraction_, which generates OCaml code from Coq developments.  For instance, we run a command to output the OCaml version of [tcompile]:%\index{Vernacular commands!Extraction}% *)
 *)
 (**
-ここで、私たちは数学的モデルを構築する以上のことをしています。
-私たちのコンパイラは効率的に実行できる関数型プログラムです。
-
-そのようにする一つの戦略は、CoqコードからOCamlコードを生成する、[プログラム抽出]%\index{program extraction}%に基きます。
-たとえば、OCaml版の[tcompile]を出力するためのコマンドを実行しましょう：%\index{Vernacular commands!Extraction}%
+ここで強調しておきたいのは、いま私たちは数学的なモデルを構築しているだけではないということです。
+開発したコンパイラは、効率的に実行できる関数型のプログラムになります。
+そのための手段として、CoqコードからOCamlコードを生成する_[プログラム抽出]_%\index{program extraction}%があります。
+たとえば、OCaml版の[tcompile]を出力するには次のようにコマンドを実行します。%\index{Vernacular commands!Extraction}%
 *)
 
 Extraction tcompile.
@@ -1518,10 +1517,10 @@ let rec tcompile t e ts =
         b)), (TNil (Cons (t0, ts))))))
 >>
 
-このコードは普段使うOCamlのコンパイラでコンパイでき、そこそこ良いパフォーマンスの実行可能プログラムが得られます。
+このコードは通常のOCamlコンパイラでコンパイルが可能であり、そこそこ効率が良い実行可能プログラムが得られます。
 
-この章は筆者の提案するCoq開発のスタイルの二つの例を紹介するあわただしい案内でした。
-この本の第2部と第3部はこのスタイルの主要素、依存型とscripted proof automationにそれぞれ焦点を当てます。
-それらの前に、第1部ではより標準的な基礎的題材について触れます。
-第1部の早い段階から強い自動証明のスタイルを取るので、経験抱負なCoqハッカーにも第1部は興味深いかもしれません。
+本章では、筆者が提案するCoqの開発スタイルの例を二つ、駆け足で紹介してきました。
+本書の第2部と第3部では、この開発スタイルを支える依存型およびスクリプトによる証明の自動化にそれぞれ焦点を当てます。
+その前に、第1部では、より標準的な基礎となる題材について説明します。
+早い段階から強力に自動化するスタイルで証明していくので、経験抱負なCoqハッカーにとっても第1部の解説は興味深いものになるでしょう。
 *)
