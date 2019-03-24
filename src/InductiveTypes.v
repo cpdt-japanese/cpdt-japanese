@@ -267,7 +267,7 @@ It seems kind of odd to write a proof by induction with no inductive hypotheses.
 (*
 %\noindent%...which corresponds to "proof by case analysis" in classical math.  For non-recursive inductive types, the two tactics will always have identical behavior.  Often case analysis is sufficient, even in proofs about recursive types, and it is nice to avoid introducing unneeded induction hypotheses.
 *)
-%\noindent%上記のように証明を始めても、同じ結果になったでしょう。
+%\noindent %上記のように証明を始めても、同じ結果になったでしょう。
 [induction]と[destruct]の二つのタクティクは、再帰のない帰納型に対しては常にまったく同じ振る舞いをします。
 再帰的な型に関する証明であっても、場合分けによる証明で十分なことが少なくありません。
 また、場合分けによる証明により、不必要な帰納法の仮説を増やさないで済むこともあります。
@@ -1335,7 +1335,7 @@ Error: Non strictly positive occurrence of "term" in "(term -> term) -> term"
 (*
 We have run afoul of the%\index{strict positivity requirement}\index{positivity requirement}% _strict positivity requirement_ for inductive definitions, which says that the type being defined may not occur to the left of an arrow in the type of a constructor argument.  It is important that the type of a constructor is viewed in terms of a series of arguments and a result, since obviously we need recursive occurrences to the lefts of the outermost arrows if we are to have recursive occurrences at all.  Our candidate definition above violates the positivity requirement because it involves an argument of type [term -> term], where the type [term] that we are defining appears to the left of an arrow.  The candidate type of [App] is fine, however, since every occurrence of [term] is either a constructor argument or the final result type.
 *)
-ここで抵触したのは、帰納的定義に対する_[厳密陽性要件]（strict positivity requirement）_という制限です%\index{げんみつようせいようけん@厳密陽性要件}\index{ようせいようけん@陽性要件}。
+ここで抵触したのは、帰納的定義に対する_[厳密陽性要件]_（strict positivity requirement）という制限です%\index{げんみつようせいようけん@厳密陽性要件}\index{ようせいようけん@陽性要件}。
 厳密陽性要件では、定義しようとしている型が、構成子の引数の型において矢印の左側に出現してはいけないことになっています。
 もし再帰的な出現があれば、一番外側の矢印の左側に再帰的な出現が明らかに必要なので、構成子の型は引数と結果の列として見ればよい、というのがポイントです。
 上記の定義では、[term -> term]型という形で、いま定義しようとしている[term]型が矢印の左側に出現する引数が関与しており、これが陽性要件に違反します。
