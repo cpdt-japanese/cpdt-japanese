@@ -57,8 +57,9 @@ The last chapter took a deep dive into some of the more advanced Coq features, t
 (*
 Mainstream presentations of mathematics treat proofs as objects that exist outside of the universe of mathematical objects.  However, for a variety of reasoning tasks, it is convenient to encode proofs, traditional mathematical objects, and programs within a single formal language.  Validity checks on mathematical objects are useful in any setting, to catch typos and other uninteresting errors.  The benefits of static typing for programs are widely recognized, and Coq brings those benefits to both mathematical objects and programs via a uniform mechanism.  In fact, from this point on, we will not bother to distinguish between programs and mathematical objects.  Many mathematical formalisms are most easily encoded in terms of programs.
 *)
-数学では、数学の世界の外側にあるものとして証明を扱うのが主流です。
-しかし、証明、伝統的な数学の対象、そしてプログラムを単一の形式的言語により符号化すれば、さまざまな論証の作業にとって都合がよくなります。
+数学では、数学的対象の世界の外側にあるものとして証明を扱うのが主流です。
+(* 池渕：「証明は数学の世界の外側にある」と言われると違和感があった。多分mathematical objectは普通の数学で言う集合を指していて、集合と証明は区別される、ということを言いたいんだと思う。*)
+しかし、証明、伝統的な数学的対象、そしてプログラムを単一の形式的言語により符号化すれば、さまざまな論証の作業にとって都合がよくなります。
 数学の対象に対する検証は、どのような形であれ、書き間違いやつまらないミスの発見に役立ちます。
 Coqでは、すでに広く認知されているプログラムへの静的型付けによる有益性を、数学の対象とプログラムに対して同じ仕組みで利用できます。
 そういうわけで、これ以降は、プログラムと数学の対象とをわざわざ区別することはやめにします。
@@ -70,7 +71,7 @@ Proofs are fundamentally different from programs, because any two proofs of a th
 証明は、本来はプログラムとは違います。
 ある定理に対する2つの証明は、工学的でなく形式的に見れば、等価なものであるとみなせるからです。
 とはいえ、証明の検査には、プログラムの検証に使うのと同じ型検査の技術が使えます。
-証明とプログラムは、_[Curry-Howard対応]_%\index{Curry-Howard対応}%%\cite{Curry,Howard}%によって関連付けられるのです。
+証明とプログラムは、_[Curry-Howard対応]_に%\index{Curry-Howard対応}%%\cite{Curry,Howard}%よって関連付けられるのです。
 数学の定理を型として表現すると、その型を持つことを確認するプログラムそのものが、その定理の証明になります。
 
 (*
@@ -147,7 +148,7 @@ Check (fun x : False => x).
 (*
 %\smallskip{}%Every one of these example programs whose type looks like a logical formula is a%\index{proof term}% _proof term_.  We use that name for any Gallina term of a logical type, and we will elaborate shortly on what makes a type logical.
 *)
-%\smallskip{}%これらは、それぞれ型が論理式のように見えるプログラムの例になっており、いずれも%\index{しょうめいこう@証明項}%_[証明項]_と呼ばれます。
+%\smallskip{}%これらは、それぞれ型が論理式のように見えるプログラムの例になっており、いずれも%\index{しょうめいこう@証明項}% _[証明項]_と呼ばれます。
 この名称は、論理的な型を持つ任意のGallinaの項を表すのに使うことにします。
 どんな型が論理的であるかについては、すぐあとで詳細に述べます。
 
@@ -452,7 +453,8 @@ The first subgoal follows by Coq's rules of computation, so we can dispatch it e
 (* 
 Likewise for the second subgoal, so we can restart the proof and give a very compact justification.%\index{Vernacular commands}%
 *)
-2つめのサブゴールも同様なので、証明を再開して極めて簡潔な正当化を与えるだけです。%\index{Vernacularこまんど@Vernacularコマンド!Restart}%
+2つめのサブゴールも同様なので、証明を始めから再開して以下の簡潔な一行で証明を終わらせられます。%\index{Vernacularこまんど@Vernacularコマンド!Restart}%
+ (* いけぶち：「正当化」は日本語として不自然に感じた。うまい訳は思い付かなかったので意訳にしてみた。 *)
 *)
 
 Restart.
@@ -699,8 +701,9 @@ There is also a very useful tactic called %\index{tactics!congruence}%[congruenc
 *)
 この定理を一発で証明できる%\index{たくてぃくす@タクティクス!congruence}%[congruence]という便利なタクティクもあります。
 [congruence]タクティクは、[discriminate]および[injection]を一般化し、さらに「関数は等しい引数について等しい結果を返す」といった同等性についての一般的な性質に対する論証を追加してくれます。
-すなわち、[congruence]は、%\index{みかいしゃくかんすうのどうとうせいりろん@未解釈関数の同等性理論}%_[未解釈関数の同等性理論に対する完全な決定的手続き]_に帰納型に関するさまざまな機能を追加したタクティクだといえます。
+すなわち、[congruence]は%\index{みかいしゃくかんすうとどういつせいのりろん@未解釈関数と同一性の理論}%、_[未解釈関数と同一性の理論に対する完全な決定手続き]_に帰納型に関するさまざまな機能を追加したタクティクだといえます。
 (* the theory of equality and uninterpreted functions は何のことか？-nobsun *)
+(* いけぶち：the theory of equality and uninterpreted functions は論理記号が = のみで、項が(symbolicな)関数(や定数)から成るような公理の集合のことだと思います。 *)
 
 %\medskip%
 
@@ -831,8 +834,9 @@ We have the usual two cases, one for each constructor of [nat_btree].
 (*
 * Parameterized Types
 *)
-* パラメタライズド型
+* パラメータ付き型
 (* parameterized type の定訳は？-nobsun *)
+(* いけぶち：とりあえずよく使われる「-付き」にしてみた *)
 *)
 
 (**
@@ -1311,7 +1315,7 @@ Up to this point, we have seen how to encode in Coq more and more of what is pos
 Given our last example of an inductive type, many readers are probably eager to try encoding the syntax of %\index{lambda calculus}%lambda calculus.  Indeed, the function-based representation technique that we just used, called%\index{higher-order abstract syntax}\index{HOAS|see{higher-order abstract syntax}}% _higher-order abstract syntax_ (HOAS)%~\cite{HOAS}%, is the representation of choice for lambda calculi in %\index{Twelf}%Twelf and in many applications implemented in Haskell and ML.  Let us try to import that choice to Coq:
 *)
 読者のなかには、さきほどの帰納型の例を見て、%\index{らむだけいさん@λ計算}%λ計算の構文をエンコードしようとする人も多いでしょう。
-さきほどの例で見たような、関数による表現技法は、%\index{こうかいちゅうしょうこうぶん@高階抽象構文}\index{HOAS|see{高階抽象構文}}%_[高階抽象構文]_（HOAS、higher-order abstract syntax）と呼ばれています%~\cite{HOAS}%。HOASは、%\index{Twelf}%Twelfをはじめ、HaskellやMLで実装されたアプリケーションにおけるλ計算の表現として採用されています。
+さきほどの例で見たような、関数による表現技法は、_[高階抽象構文]_（HOAS、higher-order abstract syntax）%\index{こうかいちゅうしょうこうぶん@高階抽象構文}\index{HOAS|see{高階抽象構文}}%と呼ばれています%~\cite{HOAS}%。HOASは、%\index{Twelf}%Twelfをはじめ、HaskellやMLで実装されたアプリケーションにおけるλ計算の表現として採用されています。
 この技法をCoqでも使ってみましょう。
 *)
 
@@ -1335,7 +1339,7 @@ Error: Non strictly positive occurrence of "term" in "(term -> term) -> term"
 (*
 We have run afoul of the%\index{strict positivity requirement}\index{positivity requirement}% _strict positivity requirement_ for inductive definitions, which says that the type being defined may not occur to the left of an arrow in the type of a constructor argument.  It is important that the type of a constructor is viewed in terms of a series of arguments and a result, since obviously we need recursive occurrences to the lefts of the outermost arrows if we are to have recursive occurrences at all.  Our candidate definition above violates the positivity requirement because it involves an argument of type [term -> term], where the type [term] that we are defining appears to the left of an arrow.  The candidate type of [App] is fine, however, since every occurrence of [term] is either a constructor argument or the final result type.
 *)
-ここで抵触したのは、帰納的定義に対する_[厳密陽性要件]_（strict positivity requirement）という制限です%\index{げんみつようせいようけん@厳密陽性要件}\index{ようせいようけん@陽性要件}。
+ここで抵触したのは、帰納的定義に対する_[厳密陽性要件]_（strict positivity requirement）という制限です%\index{げんみつようせいようけん@厳密陽性要件}\index{ようせいようけん@陽性要件}%。
 厳密陽性要件では、定義しようとしている型が、構成子の引数の型において矢印の左側に出現してはいけないことになっています。
 もし再帰的な出現があれば、一番外側の矢印の左側に再帰的な出現が明らかに必要なので、構成子の型は引数と結果の列として見ればよい、というのがポイントです。
 上記の定義では、[term -> term]型という形で、いま定義しようとしている[term]型が矢印の左側に出現する引数が関与しており、これが陽性要件に違反します。
@@ -1484,7 +1488,7 @@ fix F (n : nat) : P n :=
 The only new wrinkles here are, first, an anonymous recursive function definition, using the %\index{Gallina terms!fix}%[fix] keyword of Gallina (which is like [fun] with recursion supported); and, second, the annotations on the [match] expression.  This is a%\index{dependent pattern matching}% _dependently typed_ pattern match, because the _type_ of the expression depends on the _value_ being matched on.  We will meet more involved examples later, especially in Part II of the book.
 *)
 ここで新しく登場したのは、%\index{Gallinaこう@Gallina項!fix}%[fix]というGallinaのキーワードを使った無名再帰関数（[fix]は[fun]と同じく再帰に対応しています）と、[match]式に対する注釈です。
-このような[match]を%\index{dependent pattern matching}%_[依存型付きパターンマッチ]_と呼びます。
+このような[match]を_[依存型付きパターンマッチ]_と呼びます。%\index{dependent pattern matching}%
 なぜかというと、この式の_[型]_は、マッチする_[値]_に依存するからです。
 のちほど、特に第II部で、もっと複雑な例が登場します。
 
@@ -1501,7 +1505,7 @@ The only new wrinkles here are, first, an anonymous recursive function definitio
 (*
 To prove that [nat_rect] is nothing special, we can reimplement it manually.
 *)
-[nat-rect]が特別なものでないことは、手で再実装してみれば証明できます。
+[nat_rect]が特別なものでないことは、手で再実装してみれば証明できます。
 *)
 
 Fixpoint nat_rect' (P : nat -> Type) 
@@ -1707,9 +1711,10 @@ Inductive nat_tree : Set :=
 This is an example of a%\index{nested inductive type}% _nested_ inductive type definition, because we use the type we are defining as an argument to a parameterized type family.  Coq will not allow all such definitions; it effectively pretends that we are defining [nat_tree] mutually with a version of [list] specialized to [nat_tree], checking that the resulting expanded definition satisfies the usual rules.  For instance, if we replaced [list] with a type family that used its parameter as a function argument, then the definition would be rejected as violating the positivity restriction.
 *)
 この定義では、定義しようとする型を、パラメタ化された型族への引数として使っています。
-そのため、%\index{ねすとしたきのうがた@ネストした帰納型}%_[ネストした]_帰納型の定義の例になっています。
-このような定義は、すべてCoqが許してくれません。
-Coqはこの定義を、[nat_tree]で特定化した[list]を使って相互参照的に[nat_tree]を定義しているとみなし、定義が展開された結果が通常の規則を満すかどうかを確認します。
+そのため、_[ネストした]_帰納型%\index{ねすとしたきのうがた@ネストした帰納型}%の定義の例になっています。
+このような定義は、一般にはCoqは許してくれません。
+Coqはこの定義を、[nat_tree]を適用した[list]を使って相互参照的に[nat_tree]を定義しているとみなし、定義が展開された結果が通常の規則を満すかどうかを確認します。
+(*  いけぶち：型パラメータへの代入をspecializeと言うけど、「特定化」と言って通じるのかよく分からなかったので「適用」にしてみた *)
 たとえば、この定義の[list]を置き換えて、パラメータを関数引数として使うような型族にすれば、陽性要件に違反する定義であるとして拒絶されるでしょう。
 
 (*
