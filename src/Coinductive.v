@@ -561,16 +561,7 @@ Coqには余帰納的証明を直接支援するタクティックが提供さ�
 *)
 
   cofix ones_eq.
-  (** [[
-  ones_eq : stream_eq ones ones'
-  ============================
-   stream_eq ones ones'
- 
-   ]]
-
-   It looks like this proof might be easier than we expected! *)
-*)
-  (** [[
+(** [[
   ones_eq : stream_eq ones ones'
   ============================
    stream_eq ones ones'
