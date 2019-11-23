@@ -1,5 +1,5 @@
 (* Copyright (c) 2011-2012, 2015, Adam Chlipala
- * 
+ *
  * This work is licensed under a
  * Creative Commons Attribution-Noncommercial-No Derivative Works 3.0
  * Unported License.
@@ -18,6 +18,8 @@ Set Asymmetric Patterns.
 
 (** %\chapter{A Taste of Reasoning About Programming Language Syntax}% *)
 
+
+(**
 (** Reasoning about the syntax and semantics of programming languages is a popular application of proof assistants.  Before proving the first theorem of this kind, it is necessary to choose a formal encoding of the informal notions of syntax, dealing with such issues as %\index{variable binding}%variable binding conventions.  I believe the pragmatic questions in this domain are far from settled and remain as important open research problems.  However, in this chapter, I will demonstrate two underused encoding approaches.  Note that I am not recommending either approach as a silver bullet!  Mileage will vary across concrete problems, and I expect there to be significant future advances in our knowledge of encoding techniques.  For a broader introduction to programming language formalization, using more elementary techniques, see %\emph{%{{http://www.cis.upenn.edu/~bcpierce/sf/}Software Foundations}%}% by Pierce et al.
 
    This chapter is also meant as a case study, bringing together what we have learned in the previous chapters.  We will see a concrete example of the importance of representation choices; translating mathematics from paper to Coq is not a deterministic process, and different creative choices can have big impacts.  We will also see dependent types and scripted proof automation in action, applied to solve a particular problem as well as possible, rather than to demonstrate new Coq concepts.
@@ -25,6 +27,30 @@ Set Asymmetric Patterns.
    I apologize in advance to those readers not familiar with the theory of programming language semantics.  I will make a few remarks intended to relate the material here with common ideas in semantics, but these remarks should be safe for others to skip.
 
    We will define a small programming language and reason about its semantics, expressed as an interpreter into Coq terms, much as we have done in examples throughout the book.  It will be helpful to build a slight extension of [crush] that tries to apply %\index{functional extensionality}%functional extensionality, an axiom we met in Chapter 12, which says that two functions are equal if they map equal inputs to equal outputs.  We also use [f_equal] to simplify goals of a particular form that will come up with the term denotation function that we define shortly. *)
+*)
+(**
+プログラミング言語のシンタックスやセマンティクスについて推論することは証明支援器のよく用いられる応用です。
+Before proving the first theorem of this kind, it is necessary to choose a formal encoding of the informal notions of syntax, dealing with such issues as %\index{variable binding}%variable binding conventions.
+この種のことの最初の定理を証明する前に、シンタックスの非形式的な概念の形式的な表現を選ぶ必要があります。
+この分野での実践的な問いは解決にはほど遠く、研究として重要な未解決問題であると強く思います。
+しかし、この章では、二つの十分活用されていない表現手法を実演します。
+ただし、どちらの方法も問題解決への特効薬として勧めるわけではありません。
+有用性は具体的な問題ごとに大きく異なり、著者は未来の重大な発展がこれらの表現技法の知識にあると期待します。
+For a broader introduction to programming language formalization, using more elementary techniques, see %\emph{%{{http://www.cis.upenn.edu/~bcpierce/sf/}Software Foundations}%}% by Pierce et al.
+より初等的なテクニックを使った、プログラミング言語の形式化へのより広範囲な入門としては、Pierceらの %\emph{%{{http://www.cis.upenn.edu/~bcpierce/sf/}Software Foundations}%}% を参照してください。
+
+   この章はこれまでの章で学んだことを一度に使ったケーススタディとしての意味もあります。
+   数学を紙からCoqに翻訳することは一つに決まったプロセスではなく、異なる創造的な選択が大きな影響を持たらすかもしれないといった、表現の選択の重要性についての具体例を見ます。
+   また、新しいCoqの概念を説明するよりもむしろ、依存型とスクリプトによる証明の自動化が可能な限りうまく具体的な問題を解くことに応用されることも見ていきます。
+
+   プログラミング言語のセマンティクスの理論に詳しくない読者には予め謝らなければいけません。
+   本章をセマンティクスのありふれた概念に結びつけるためのいくつかの注意を起きますが、それらの注意は他の読者は飛ばしても構いません。
+
+   この本を通した例で行ったように、小さいプログラミング言語を定義し、Coqの項へのインタプリタとして表されたセマンティクスについて推論します。
+   [crush]を%\index{関数外延性}%関数外延性を適用するように少し拡張すると便利です。
+   関数外延性は、第12章で見た公理で、もし二つの関数が同じ入力を同じ出力に写像するならばその二つの関数は等しいという主張です。
+   また、この後すぐに定義する項の表示関数と共に現れる特別な形のゴールを簡約するために[f_equal]も使います。
+   *)
 
 Ltac ext := let x := fresh "x" in extensionality x.
 Ltac pl := crush; repeat (match goal with
@@ -34,7 +60,11 @@ Ltac pl := crush; repeat (match goal with
                             | [ |- hmap _ ?E = hmap _ ?E ] => f_equal
                           end; crush).
 
-(** At this point in the book source, some auxiliary proofs also appear. *)
+(** (** At this point in the book source, some auxiliary proofs also appear. *)
+*)
+(**
+本書のこの時点では、補助的な証明も現れます。
+ *)
 
 (* begin hide *)
 Section hmap.
@@ -71,7 +101,12 @@ Section Forall.
 End Forall.
 (* end hide *)
 
-(** Here is a definition of the type system we will use throughout the chapter.  It is for simply typed lambda calculus with natural numbers as the base type. *)
+(**
+(** Here is a definition of the type system we will use throughout the chapter.  It is for simply typed lambda calculus with natural numbers as the base type. *)*)
+(**
+以下にこの章を通して扱う型システムを定義します。
+これは基礎型として自然数を持った単順型付きラムダ計算です。
+*)
 
 Inductive type : Type :=
 | Nat : type
@@ -83,16 +118,32 @@ Fixpoint typeDenote (t : type) : Type :=
     | Func t1 t2 => typeDenote t1 -> typeDenote t2
   end.
 
-(** Now we have some choices as to how we represent the syntax of programs.  The two sections of the chapter explore two such choices, demonstrating the effect the choice has on proof complexity. *)
+(**
+(** Now we have some choices as to how we represent the syntax of programs.  The two sections of the chapter explore two such choices, demonstrating the effect the choice has on proof complexity. *)*)
+(**
+プログラムのシンタックスの表現の仕方は複数あります。
+この章の二つの節では、証明の複雑性についてどのような効果があるかを実証しながら二つの選択肢を見ていきます。
+*)
 
 
 (** * Dependent de Bruijn Indices *)
 
-(** The first encoding is one we met first in Chapter 9, the _dependent de Bruijn index_ encoding.  We represent program syntax terms in a type family parameterized by a list of types, representing the _typing context_, or information on which free variables are in scope and what their types are.  Variables are represented in a way isomorphic to the natural numbers, where number 0 represents the first element in the context, number 1 the second element, and so on.  Actually, instead of numbers, we use the [member] dependent type family from Chapter 9. *)
+(**
+(** The first encoding is one we met first in Chapter 9, the _dependent de Bruijn index_ encoding.  We represent program syntax terms in a type family parameterized by a list of types, representing the _typing context_, or information on which free variables are in scope and what their types are.  Variables are represented in a way isomorphic to the natural numbers, where number 0 represents the first element in the context, number 1 the second element, and so on.  Actually, instead of numbers, we use the [member] dependent type family from Chapter 9. *)*)
+(**
+最初の表現は第9章で最初に見た、_dependent de Bruijn index_表現です。
+We represent program syntax terms in a type family parameterized by a list of types, representing the _typing context_, or information on which free variables are in scope and what their types are.
+プログラムシンタックスの項は型のリストをパラメータに持つ型族で表現します。
+自然数0は文脈の最初の要素を、自然数1は二番目の要素を表現するというように、変数は自然数と同型になるような方法で表現されます。
+実際には、自然数の代わりに、第9章で扱った依存型族[member]を使います。
+*)
 
 Module FirstOrder.
 
-  (** Here is the definition of the [term] type, including variables, constants, addition, function abstraction and application, and let binding of local variables. *)
+(** (** Here is the definition of the [term] type, including variables, constants, addition, function abstraction and application, and let binding of local variables. *)*)
+  (**
+  変数、定数、加算、関数抽象・適用、局所変数のlet束縛を含む[term]型を定義します。
+  *)
 
   Inductive term : list type -> type -> Type :=
   | Var : forall G t, member t G -> term G t
@@ -107,7 +158,12 @@ Module FirstOrder.
 
   Arguments Const [G] _.
 
-  (** Here are two example term encodings, the first of addition packaged as a two-argument curried function, and the second of a sample application of addition to constants. *)
+  (** (** Here are two example term encodings, the first of addition packaged as a two-argument curried function, and the second of a sample application of addition to constants. *)*)
+  (**
+  Here are two example term encodings, the first of addition packaged as a two-argument curried function, and the second of a sample application of addition to constants.
+  項の表現の二つの例を挙げます。
+  一つ目はカリー化された二引数関数として作られた加算で、
+  *)
 
   Example add : term nil (Func Nat (Func Nat Nat)) :=
     Abs (Abs (Plus (Var (HNext HFirst)) (Var HFirst))).
@@ -472,7 +528,7 @@ Module HigherOrder.
             (App
                (Abs
                   (fun x : var Nat =>
-                   Abs (fun y : var Nat => Plus (Var x) (Var y)))) 
+                   Abs (fun y : var Nat => Plus (Var x) (Var y))))
                (Const 1)) (Const 2)) (Const 3)
      ]]
 
@@ -507,7 +563,7 @@ Module HigherOrder.
   (** Let us now revisit the three example program transformations from the last section.  Each is easy to implement with PHOAS, and the last is substantially easier than with first-order representations.
 
      First, we have the recursive identity function, following the same pattern as in the previous subsection, with a helper function, polymorphic in a tag choice; and a final function that instantiates the choice appropriately. *)
-  
+
   Fixpoint ident var t (e : term var t) : term var t :=
     match e with
       | Var _ x => Var x
@@ -600,7 +656,7 @@ Module HigherOrder.
          (App
             (Abs
                (fun x : var Nat =>
-                Abs (fun x0 : var Nat => Plus (Var x) (Var x0)))) 
+                Abs (fun x0 : var Nat => Plus (Var x) (Var x0))))
             (Const 1)) (Const 2)
      ]]
 
@@ -616,7 +672,7 @@ Module HigherOrder.
          (App
             (Abs
                (fun x : var Nat =>
-                Abs (fun x0 : var Nat => Plus (Var x) (Var x0)))) 
+                Abs (fun x0 : var Nat => Plus (Var x) (Var x0))))
             (Const 1)) (Const 2)
      ]]
 
@@ -701,7 +757,7 @@ Module HigherOrder.
 
      Have we really avoided first-order reasoning about the output terms of translations?  The answer depends on some subtle issues, which deserve a subsection of their own. *)
 
-  
+
   (** ** Establishing Term Well-Formedness *)
 
   (** Can there be values of type [Term t] that are not well-formed according to [Wf]?  We expect that Gallina satisfies key%\index{parametricity}% _parametricity_ %\cite{parametricity}% properties, which indicate how polymorphic types may only be inhabited by specific values.  We omit details of parametricity theorems here, but [forall t (E : Term t), Wf E] follows the flavor of such theorems.  One option would be to assert that fact as an axiom, "proving" that any output of any of our translations is well-formed.  We could even prove the soundness of the theorem on paper meta-theoretically, say by considering some particular model of CIC.

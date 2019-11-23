@@ -12,6 +12,14 @@
 <docs>http://blogs.law.harvard.edu/tech/rss</docs>
 
 <item>
+        <title>Book source updated for Coq 8.6</title>
+        <pubDate>Wed, 12 Jul 2017 14:56:07 EDT</pubDate>
+        <link>http://adam.chlipala.net/cpdt/</link>
+        <author>adamc@csail.mit.edu</author>
+        <description>The online versions of the book have been updated with code that builds with Coq 8.6, the latest version, as well as old versions 8.4 and 8.5.</description>
+</item>
+
+<item>
         <title>Book source updated for Coq 8.5</title>
         <pubDate>Wed, 5 Aug 2015 18:08:34 EDT</pubDate>
         <link>http://adam.chlipala.net/cpdt/</link>

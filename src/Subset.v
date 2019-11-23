@@ -46,8 +46,7 @@ We can use a new command, %\index{Vernacular commands!Extraction}\index{program 
 
 Extraction pred.
 
-(**
-<<
+(** <<
 (** val pred : nat -> nat **)
 
 let pred = function
@@ -125,7 +124,7 @@ Extraction pred_strong1.
 let pred_strong1 = function
   | O -> assert false (* absurd case *)
   | S n' -> n'
- >>
+>>
 *)
 
 (** The proof argument has disappeared!  We get exactly the OCaml code we would have written manually.  This is our first demonstration of the main technically interesting feature of Coq program extraction: proofs are erased systematically.
