@@ -848,8 +848,13 @@ Theorem tcompile_correct : forall t (e : texp t),
 Qed.
 (* end thide *)
 
-(** It is probably worth emphasizing that we are doing more than building mathematical models.  Our compilers are functional programs that can be executed efficiently.  One strategy for doing so is based on%\index{program extraction}% _program extraction_, which generates OCaml code from Coq developments.  For instance, we run a command to output the OCaml version of [tcompile]:%\index{Vernacular commands!Extraction}% *)
+(** It is probably worth emphasizing that we are doing more than building mathematical models.  Our compilers are functional programs that can be executed efficiently.  One strategy for doing so is based on%\index{program extraction}% _program extraction_, which generates OCaml code from Coq developments.
 
+  To set up the feature properly in recent versions of Coq, we must run the command [Require Extraction.].  However, this book %PDF%#HTML# is still built with a patched old version of Coq that neither requires nor allows that command, so it is commented out in this rendering!
+
+  Now we run a command to output the OCaml version of [tcompile]:%\index{Vernacular commands!Extraction}% *)
+
+Require Extraction.
 Extraction tcompile.
 
 (** <<

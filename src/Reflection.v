@@ -673,7 +673,7 @@ Ltac addToList x xs :=
   let b := inList x xs in
     match b with
       | true => xs
-      | false => constr:(x, xs)
+      | false => constr:((x, xs))
     end.
 
 (** Now we can write our recursive function to calculate the list of variable values we will want to use to represent a term. *)
@@ -718,8 +718,8 @@ Inductive formula' : Set :=
 
 Ltac reifyTerm xs e :=
   match e with
-    | True => constr:Truth'
-    | False => constr:Falsehood'
+    | True => Truth'
+    | False => Falsehood'
     | ?e1 /\ ?e2 =>
       let p1 := reifyTerm xs e1 in
       let p2 := reifyTerm xs e2 in

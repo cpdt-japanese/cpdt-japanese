@@ -117,8 +117,8 @@ Section ilist.
 (* end thide *)
 End ilist.
 
-Implicit Arguments Nil [A].
-Implicit Arguments First [n].
+Arguments Nil [A].
+Arguments First [n].
 
 (** A few examples show how to make use of these definitions. *)
 
@@ -242,11 +242,11 @@ Section hlist.
 End hlist.
 
 (* begin thide *)
-Implicit Arguments HNil [A B].
-Implicit Arguments HCons [A B x ls].
+Arguments HNil [A B].
+Arguments HCons [A B x ls] _ _.
 
-Implicit Arguments HFirst [A elm ls].
-Implicit Arguments HNext [A elm x ls].
+Arguments HFirst [A elm ls].
+Arguments HNext [A elm x ls] _.
 (* end thide *)
 
 (** By putting the parameters [A] and [B] in [Type], we enable fancier kinds of polymorphism than in mainstream functional languages.  For instance, one use of [hlist] is for the simple heterogeneous lists that we referred to earlier. *)
@@ -302,7 +302,7 @@ Inductive exp : list type -> type -> Set :=
 | Abs : forall ts dom ran, exp (dom :: ts) ran -> exp ts (Arrow dom ran).
 (* end thide *)
 
-Implicit Arguments Const [ts].
+Arguments Const [ts].
 
 (** We write a simple recursive function to translate [type]s into [Set]s. *)
 
@@ -481,7 +481,7 @@ In a proposition [x = y], we see that [x] is a parameter and [y] is a regular ar
 
 End fhlist.
 
-Implicit Arguments fhget [A B elm ls].
+Arguments fhget [A B elm ls] _ _.
 
 (** How does one choose between the two data structure encoding strategies we have presented so far?  Before answering that question in this chapter's final section, we introduce one further approach. *)
 
@@ -592,7 +592,7 @@ Error: Non strictly positive occurrence of "tree" in
 
 End tree.
 
-Implicit Arguments Node [A n].
+Arguments Node [A n] _.
 
 (** We can redefine [sum] and [inc] for our new [tree] type.  Again, it is useful to define a generic fold function first.  This time, it takes in a function whose domain is some [ffin] type, and it folds another function over the results of calling the first function at every possible [ffin] value. *)
 
@@ -608,7 +608,7 @@ Section rifoldr.
     end.
 End rifoldr.
 
-Implicit Arguments rifoldr [A B n].
+Arguments rifoldr [A B] f i [n] _.
 
 Fixpoint sum (t : tree nat) : nat :=
   match t with
@@ -708,7 +708,7 @@ Section cond.
     end.
 End cond.
 
-Implicit Arguments cond [A n].
+Arguments cond [A] default [n] _ _.
 (* end thide *)
 
 (** Now the expression interpreter is straightforward to write. *)
@@ -797,7 +797,7 @@ Section cfoldCond.
     end.
 End cfoldCond.
 
-Implicit Arguments cfoldCond [t n].
+Arguments cfoldCond [t] default [n] _ _.
 (* end thide *)
 
 (** Like for the interpreters, most of the action was in this helper function, and [cfold] itself is easy to write. *)

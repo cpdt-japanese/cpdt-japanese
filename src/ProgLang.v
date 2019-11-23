@@ -105,7 +105,7 @@ Module FirstOrder.
 
   | Let : forall G t1 t2, term G t1 -> term (t1 :: G) t2 -> term G t2.
 
-  Implicit Arguments Const [G].
+  Arguments Const [G] _.
 
   (** Here are two example term encodings, the first of addition packaged as a two-argument curried function, and the second of a sample application of addition to constants. *)
 
@@ -266,7 +266,7 @@ Module FirstOrder.
                 end
     end.
 
-  Implicit Arguments insertAtS [t G].
+  Arguments insertAtS [t] x [G] n _.
 
   (** Next we prove that [liftVar] is correct.  That is, a lifted variable retains its value with respect to a substitution when we perform an analogue to lifting by inserting a new mapping into the substitution. *)
 
@@ -355,9 +355,9 @@ Module HigherOrder.
     | Let : forall t1 t2, term t1 -> (var t1 -> term t2) -> term t2.
   End var.
 
-  Implicit Arguments Var [var t].
-  Implicit Arguments Const [var].
-  Implicit Arguments Abs [var dom ran].
+  Arguments Var [var t] _.
+  Arguments Const [var] _.
+  Arguments Abs [var dom ran] _.
 
   (** Coq accepts this definition because our embedded functions now merely take _variables_ as arguments, instead of arbitrary terms.  One might wonder whether there is an easy loophole to exploit here, instantiating the parameter [var] as [term] itself.  However, to do that, we would need to choose a variable representation for this nested mention of [term], and so on through an infinite descent into [term] arguments.
 

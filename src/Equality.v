@@ -214,7 +214,7 @@ Section fhlist.
     end.
 End fhlist.
 
-Implicit Arguments fhget [A B elm ls].
+Arguments fhget [A B elm ls] _ _.
 
 (* begin hide *)
 (* begin thide *)
@@ -235,7 +235,7 @@ Section fhlist_map.
       | _ :: _ => fun hls => (f (fst hls), fhmap _ (snd hls))
     end.
 
-  Implicit Arguments fhmap [ls].
+  Arguments fhmap [ls] _.
 
   (* begin hide *)
   (* begin thide *)
@@ -496,7 +496,7 @@ Section fhapp.
       | _ :: _ => fun hls1 hls2 => (fst hls1, fhapp _ _ (snd hls1) hls2)
     end.
 
-  Implicit Arguments fhapp [ls1 ls2].
+  Arguments fhapp [ls1 ls2] _ _.
 
   (* EX: Prove that fhapp is associative. *)
 (* begin thide *)
@@ -676,7 +676,7 @@ The term "pf" has type "a :: (ls1 ++ ls2) ++ ls3 = a :: ls1 ++ ls2 ++ ls3"
 (* end thide *)
 End fhapp.
 
-Implicit Arguments fhapp [A B ls1 ls2].
+Arguments fhapp [A B ls1 ls2] _ _.
 
 (** This proof strategy was cumbersome and unorthodox, from the perspective of mainstream mathematics.  The next section explores an alternative that leads to simpler developments in some cases. *)
 

@@ -12,6 +12,8 @@ Require Import List.
 
 Require Import DepList Cpdt.CpdtTactics.
 
+Require Extraction.
+
 Set Implicit Arguments.
 Set Asymmetric Patterns.
 (* end hide *)
@@ -1068,7 +1070,9 @@ Lemma proj1_again' : forall r, proof r
 
   The first goal looks reasonable.  Hypothesis [H0] is clearly contradictory, as [discriminate] can show. *)
 
-  discriminate.
+  try discriminate. (* Note: Coq 8.6 is now solving this subgoal automatically!
+                     * This line left here to keep everything working in
+                     * 8.4 and 8.5. *)
 (** %\vspace{-.15in}%[[
   H : proof p
   H1 : And p q = And p0 q0
@@ -1161,7 +1165,7 @@ Section withTypes.
     destruct n; simpl; unfold error; congruence.
   Defined.
 
-  Implicit Arguments nth_error_nil [A n x].
+  Arguments nth_error_nil [A n x] _.
 
   Lemma Some_inj : forall A (x y : A),
     Some x = Some y

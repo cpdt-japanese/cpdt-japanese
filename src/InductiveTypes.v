@@ -479,9 +479,9 @@ Section list.
 (* end thide *)
 End list.
 
-Implicit Arguments Nil [T].
+Arguments Nil [T].
 
-(** After we end the section, the [Variable]s we used are added as extra function parameters for each defined identifier, as needed.  With an [Implicit Arguments]%~\index{Vernacular commands!Implicit Arguments}% command, we ask that [T] be inferred when we use [Nil]; Coq's heuristics already decided to apply a similar policy to [Cons], because of the [Set Implicit Arguments]%~\index{Vernacular commands!Set Implicit Arguments}% command elided at the beginning of this chapter.  We verify that our definitions have been saved properly using the [Print] command, a cousin of [Check] which shows the definition of a symbol, rather than just its type. *)
+(** After we end the section, the [Variable]s we used are added as extra function parameters for each defined identifier, as needed.  With an [Arguments]%~\index{Vernacular commands!Arguments}% command, we ask that [T] be inferred when we use [Nil]; Coq's heuristics already decided to apply a similar policy to [Cons], because of the [Set Implicit Arguments]%~\index{Vernacular commands!Set Implicit Arguments}% command elided at the beginning of this chapter.  We verify that our definitions have been saved properly using the [Print] command, a cousin of [Check] which shows the definition of a symbol, rather than just its type. *)
 
 Print list.
 (** %\vspace{-.15in}% [[

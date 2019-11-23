@@ -12,6 +12,8 @@ Require Import Arith Bool List Omega.
 
 Require Import Cpdt.CpdtTactics Cpdt.MoreSpecif.
 
+Require Extraction.
+
 Set Implicit Arguments.
 Set Asymmetric Patterns.
 (* end hide *)
@@ -645,7 +647,7 @@ Section insert.
 
   (** We modify Coq's default choice of implicit arguments for [makeRbtree], so that we do not need to specify the [c] and [n] arguments explicitly in later calls. *)
 
-  Implicit Arguments makeRbtree [c n].
+  Arguments makeRbtree [c n] _.
 
   (** Finally, we define [insert] as a simple composition of [ins] and [makeRbtree]. *)
 
@@ -915,7 +917,7 @@ Section split.
   Defined.
 End split.
 
-Implicit Arguments split [P1 P2].
+Arguments split [P1 P2] P1_dec P2_dec s.
 
 (* begin hide *)
 Lemma app_empty_end : forall s, s ++ "" = s.

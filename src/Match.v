@@ -444,7 +444,7 @@ Ltac map T f :=
 Sometimes we need to employ the opposite direction of "nonterminal escape," when we want to pass a complicated tactic expression as an argument to another tactic, as we might want to do in invoking %\coqdocvar{%#<tt>#map#</tt>#%}%. *)
 
 Goal False.
-  let ls := map (nat * nat)%type ltac:(fun x => constr:(x, x)) (1 :: 2 :: 3 :: nil) in
+  let ls := map (nat * nat)%type ltac:(fun x => constr:((x, x))) (1 :: 2 :: 3 :: nil) in
     pose ls.
   (** [[
   l := (1, 1) :: (2, 2) :: (3, 3) :: nil : list (nat * nat)

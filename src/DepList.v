@@ -107,8 +107,8 @@ Section ilist.
   End fold.
 End ilist.
 
-Implicit Arguments INil [A].
-Implicit Arguments First [n].
+Arguments INil [A].
+Arguments First [n].
 
 Section imap.
   Variables A B : Type.
@@ -197,12 +197,12 @@ Section hlist.
   Qed.
 End hlist.
 
-Implicit Arguments HNil [A B].
-Implicit Arguments HCons [A B x ls].
-Implicit Arguments hmake [A B].
+Arguments HNil [A B].
+Arguments HCons [A B x ls] _ _.
+Arguments hmake [A B] f ls.
 
-Implicit Arguments HFirst [A elm ls].
-Implicit Arguments HNext [A elm x ls].
+Arguments HFirst [A elm ls].
+Arguments HNext [A elm x ls] _.
 
 Infix ":::" := HCons (right associativity, at level 60).
 Infix "+++" := happ (right associativity, at level 60).
@@ -233,4 +233,4 @@ Section hmap.
   Qed.
 End hmap.
 
-Implicit Arguments hmap [A B1 B2 ls].
+Arguments hmap [A B1 B2] f [ls] hl.

@@ -253,7 +253,7 @@ We can try restating the theorem with [stream_eq]. *)
 Theorem ones_eq : stream_eq ones ones'.
   (** Coq does not support tactical co-inductive proofs as well as it supports tactical inductive proofs.  The usual starting point is the [cofix] tactic, which asks to structure this proof as a co-fixpoint. *)
 
-  cofix.
+  cofix ones_eq.
   (** [[
   ones_eq : stream_eq ones ones'
   ============================
@@ -323,7 +323,7 @@ Qed.
 (** But, miraculously, this theorem turns out to be just what we needed. *)
 
 Theorem ones_eq : stream_eq ones ones'.
-  cofix.
+  cofix ones_eq.
 
   (** We can use the theorem to rewrite the two streams. *)
 
@@ -379,7 +379,7 @@ Qed.
    One common source of difficulty with co-inductive proofs is bad interaction with standard Coq automation machinery.  If we try to prove [ones_eq'] with automation, like we have in previous inductive proofs, we get an invalid proof. *)
 
 Theorem ones_eq' : stream_eq ones ones'.
-  cofix; crush.
+  cofix one_eq'; crush.
   (** %\vspace{-.25in}%[[
   Guarded.
   ]]
@@ -418,7 +418,7 @@ Section stream_eq_coind.
   (** Now it is straightforward to prove the principle, which says that any stream pair in [R] is equal.  The reader may wish to step through the proof script to see what is going on. *)
 
   Theorem stream_eq_coind : forall s1 s2, R s1 s2 -> stream_eq s1 s2.
-    cofix; destruct s1; destruct s2; intro.
+    cofix stream_eq_coind; destruct s1; destruct s2; intro.
     generalize (Cons_case_hd H); intro Heq; simpl in Heq; rewrite Heq.
     constructor.
     apply stream_eq_coind.
@@ -615,7 +615,7 @@ Section evalCmd_coind.
   (** The proof is routine.  We make use of a form of %\index{tactics!destruct}%[destruct] that takes an%\index{intro pattern}% _intro pattern_ in an [as] clause.  These patterns control how deeply we break apart the components of an inductive value, and we refer the reader to the Coq manual for more details. *)
 
   Theorem evalCmd_coind : forall vs1 c vs2, R vs1 c vs2 -> evalCmd vs1 c vs2.
-    cofix; intros; destruct c.
+    cofix evalCmd_coind; intros; destruct c.
     rewrite (AssignCase H); constructor.
     destruct (SeqCase H) as [? [? ?]]; econstructor; eauto.
     destruct (WhileCase H) as [[? ?] | [? [? [? ?]]]]; subst; econstructor; eauto.
