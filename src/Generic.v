@@ -201,19 +201,39 @@ Definition tree_den (A : Type) : datatypeDenote (tree A) (tree_dt A) :=
  *)
 
 
-(** * Recursive Definitions *)
+(**
+ (* * Recursive Definitions *)
+    * 再帰的定義
+  *)
 
 (* EX: Define a generic [size] function. *)
 
-(** We built these encodings of datatypes to help us write datatype-generic recursive functions.  To do so, we will want a reified representation of a%\index{recursion schemes}% _recursion scheme_ for each type, similar to the [T_rect] principle generated automatically for an inductive definition of [T].  A clever reuse of [datatypeDenote] yields a short definition. *)
+(**
+ (* We built these encodings of datatypes to help us write datatype-generic recursive functions.  To do so, we will want a reified representation of a%\index{recursion schemes}% _recursion scheme_ for each type, similar to the [T_rect] principle generated automatically for an inductive definition of [T].  A clever reuse of [datatypeDenote] yields a short definition.  *)
+
+ データ型について総称的な再帰関数を書くのに役立つようデータ型の符号化を構成しました。
+ そのためには、それぞれの型についての%\index{さいきすきーむ@再帰スキーム}%%\emph{再帰スキーム}%を具体化した表現があるのが望ましいでしょう。その表現は[T]の帰納的定義について自動的に生成された[T_rect]の原理と類似のものです。
+ [datatypeDenote]を巧妙に再利用することで短い定義を作りだします。
+ *)
 
 (* begin thide *)
 Definition fixDenote (T : Type) (dt : datatype) :=
   forall (R : Type), datatypeDenote R dt -> (T -> R).
 
-(** The idea of a recursion scheme is parameterized by a type and a reputed encoding of it.  The principle itself is polymorphic in a type [R], which is the return type of the recursive function that we mean to write.  The next argument is a heterogeneous list of one case of the recursive function definition for each datatype constructor.  The [datatypeDenote] function turns out to have just the right definition to express the type we need; a set of function cases is just like an alternate set of constructors where we replace the original type [T] with the function result type [R].  Given such a reified definition, a [fixDenote] invocation returns a function from [T] to [R], which is just what we wanted.
+(**
+ (* The idea of a recursion scheme is parameterized by a type and a reputed encoding of it.  The principle itself is polymorphic in a type [R], which is the return type of the recursive function that we mean to write.  The next argument is a heterogeneous list of one case of the recursive function definition for each datatype constructor.  The [datatypeDenote] function turns out to have just the right definition to express the type we need; a set of function cases is just like an alternate set of constructors where we replace the original type [T] with the function result type [R].  Given such a reified definition, a [fixDenote] invocation returns a function from [T] to [R], which is just what we wanted.
 
    We are ready to write some example functions now.  It will be useful to use one new function from the [DepList] library included in the book source. *)
+
+ 再帰スキームのアイデアは型と型のいわゆる符号化によってパラメータ化されています。
+ その原理自体は型[R](記述しようとしている再帰関数の返り値の型)が多相的であることです。
+ その次の論点は、各データ型のコンストラクタに対する再帰関数定義を一つのケースとしたものについての、ヘテロリストです。
+ [datatypeDenote]関数が、必要な型をあらわす寸分たがわぬ定義を持つような生成を行ないます; 関数(による)ケースひと揃いは、もとの型[T]を関数の結果の型[R]に置き換えるような、まさしく代わりのコンストラクタひと揃いのようなものです。
+ このような具体化された定義を考えると、[fixDenote]の実行は[T]から[R]への関数を返します。これが欲しかったものです。
+
+ 今や関数の例をいくつかを記述する準備ができました。
+ 本書のソースに含まれている[DepList]ライブラリの一つの新たな関数を利用するのが便利でしょう。
+ *)
 
 Check hmake.
 (** %\vspace{-.15in}% [[
@@ -222,14 +242,29 @@ Check hmake.
        (forall x : A, B x) -> forall ls : list A, hlist B ls
        ]]
 
-  The function [hmake] is a kind of [map] alternative that goes from a regular [list] to an [hlist].  We can use it to define a generic size function that counts the number of constructors used to build a value in a datatype. *)
+ (* The function [hmake] is a kind of [map] alternative that goes from a regular [list] to an [hlist].  We can use it to define a generic size function that counts the number of constructors used to build a value in a datatype. *)
+
+ 関数[hmake]は通常の[list]から[hlist]への、ある種の[map]の代わりのものです。
+ データ型の値を組み立てる際に使われるコンストラクタの数を数える総称的なsize関数を定義するのに利用できます。
+ *)
 
 Definition size T dt (fx : fixDenote T dt) : T -> nat :=
   fx nat (hmake (B := constructorDenote nat) (fun _ _ r => foldr plus 1 r) dt).
 
-(** Our definition is parameterized over a recursion scheme [fx].  We instantiate [fx] by passing it the function result type and a set of function cases, where we build the latter with [hmake].  The function argument to [hmake] takes three arguments: the representation of a constructor, its non-recursive arguments, and the results of recursive calls on all of its recursive arguments.  We only need the recursive call results here, so we call them [r] and bind the other two inputs with wildcards.  The actual case body is simple: we add together the recursive call results and increment the result by one (to account for the current constructor).  This [foldr] function is an [ilist]-specific version defined in the [DepList] module.
+(**
+ (* Our definition is parameterized over a recursion scheme [fx].  We instantiate [fx] by passing it the function result type and a set of function cases, where we build the latter with [hmake].  The function argument to [hmake] takes three arguments: the representation of a constructor, its non-recursive arguments, and the results of recursive calls on all of its recursive arguments.  We only need the recursive call results here, so we call them [r] and bind the other two inputs with wildcards.  The actual case body is simple: we add together the recursive call results and increment the result by one (to account for the current constructor).  This [foldr] function is an [ilist]-specific version defined in the [DepList] module.
 
    It is instructive to build [fixDenote] values for our example types and see what specialized [size] functions result from them. *)
+
+ 私たちの定義は再帰スキーム[fx]においてパラーメータ化されます。
+ 関数の結果の型と関数ケースひと揃いを渡すことで[fx]をインスタンス化します。後者は[hmake]で構成します。
+ [hmake]への関数引数は 3つです: コンストラクタの表現、再帰的でない引数、および再帰的な引数すべてにおける再帰呼び出しの結果です。
+ 再帰呼び出しの結果が必要なのはここだけなので、それらを[r]として他の2つの入力はワイルドカードに束縛します。
+ 実際のケースの本体は簡単です: 再帰呼び出しの結果を足しあわせてその結果を1増やします。(現在のコンストラクタを考慮します)
+ この[foldr]関数は[DepList]モジュールで定義している[ilist]に特化した版です。
+
+ 例示した型について[fixDenote]の値を構成するのと、その特殊化された[size]関数の結果を見るのは、ためになります。
+ *)
 
 Definition Empty_set_fix : fixDenote Empty_set Empty_set_dt :=
   fun R _ emp => match emp with end.
@@ -240,7 +275,10 @@ Eval compute in size Empty_set_fix.
      : Empty_set -> nat
 ]]
 
-Despite all the fanciness of the generic [size] function, CIC's standard computation rules suffice to normalize the generic function specialization to exactly what we would have written manually. *)
+ (* Despite all the fanciness of the generic [size] function, CIC's standard computation rules suffice to normalize the generic function specialization to exactly what we would have written manually. *)
+
+ 総称的な[size]関数が風変わりであるにもかかわらず、CICの標準的な計算規則は手書きで書いた総称的な関数の特殊化を正確に正規化するのには十分です。
+ *)
 
 Definition unit_fix : fixDenote unit unit_dt :=
   fun R cases _ => (hhd cases) tt INil.
@@ -250,7 +288,11 @@ Eval compute in size unit_fix.
      : unit -> nat
 ]]
 
-Again normalization gives us the natural function definition.  We see this pattern repeated for our other example types. *)
+ (* Again normalization gives us the natural function definition.  We see this pattern repeated for our other example types. *)
+
+ さらに正規化は自然な関数定義を与えてくれます。
+ このパターンは他の型の例でも繰り返しみることになるでしょう。
+ *)
 
 Definition bool_fix : fixDenote bool bool_dt :=
   fun R cases b => if b
@@ -270,7 +312,12 @@ Definition nat_fix : fixDenote nat nat_dt :=
       | S n' => (hhd (htl cases)) tt (ICons (F n') INil)
     end.
 
-(** To peek at the [size] function for [nat], it is useful to avoid full computation, so that the recursive definition of addition is not expanded inline.  We can accomplish this with proper flags for the [cbv] reduction strategy. *)
+(**
+ (* To peek at the [size] function for [nat], it is useful to avoid full computation, so that the recursive definition of addition is not expanded inline.  We can accomplish this with proper flags for the [cbv] reduction strategy. *)
+
+ [nat]に対する[size]関数を見てみると、全体が計算されてしまうのを避けるために、加算の再帰的定義がインラインに展開されないことが役立っています。
+ これは[cbv]簡約戦略に対する適切なフラグを利用することで得られます。
+ *)
 
 Eval cbv beta iota delta -[plus] in size nat_fix.
 (** %\vspace{-.15in}% [[
@@ -319,7 +366,11 @@ Eval cbv beta iota delta -[plus] in fun A => size (@tree_fix A).
 *)
 (* end thide *)
 
-(** As our examples show, even recursive datatypes are mapped to normal-looking size functions. *)
+(**
+ (* As our examples show, even recursive datatypes are mapped to normal-looking size functions. *)
+
+ 例で見てきたように、再帰的データ型であっても普通に見えるサイズ関数へと対応付けられます。
+ *)
 
 
 (** ** Pretty-Printing *)
