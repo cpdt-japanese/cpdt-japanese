@@ -546,9 +546,16 @@ Definition append' := append.
  *)
 
 
-(** ** Mapping *)
+(**
+ (* ** Mapping *)
+    ** マッピング
+ *)
 
-(** By this point, we have developed enough machinery that it is old hat to define a generic function similar to the list [map] function. *)
+(**
+ (* By this point, we have developed enough machinery that it is old hat to define a generic function similar to the list [map] function. *)
+
+ この時点で、リストの[map]関数と同じような総称的な関数を定義するのは時代遅れとするのに十分なからくりを用意できました。
+ *)
 
 Definition map T dt (dd : datatypeDenote T dt) (fx : fixDenote T dt) (f : T -> T)
   : T -> T :=
@@ -614,7 +621,12 @@ Eval compute in fun A => map (tree_den A) (@tree_fix A).
      ]]
      *)
 
-(** These [map] functions are just as easy to use as those we write by hand.  Can you figure out the input-output pattern that [map_nat S] displays in these examples? *)
+(**
+ (* These [map] functions are just as easy to use as those we write by hand.  Can you figure out the input-output pattern that [map_nat S] displays in these examples? *)
+
+ これらの[map]関数はまさしく手書きのものと同じように簡単に利用できます。
+ このあとの例の[map_nat S]が示す入出力パターンを指摘できるでしょうか?
+ *)
 
 Definition map_nat := map nat_den nat_fix.
 Eval simpl in map_nat S 0.
@@ -638,7 +650,11 @@ Eval simpl in map_nat S 2.
      ]]
      *)
 
-(** We get [map_nat S n] = [2 * n + 1], because the mapping process adds an extra [S] at every level of the inductive tree that defines a natural, including at the last level, the [O] constructor. *)
+(**
+ (* We get [map_nat S n] = [2 * n + 1], because the mapping process adds an extra [S] at every level of the inductive tree that defines a natural, including at the last level, the [O] constructor. *)
+
+ [map_nat S n] = [2 * n + 1]という結果を得ます。なぜならマッピングの過程で、自然数を定義している帰納的な木のどの段階でも余分な[S]が加わるからです。最後の段階、[O]コンストラクタも含めて(余分な[S]が)加わります。
+ *)
 
 
 (** * Proving Theorems about Recursive Definitions *)
