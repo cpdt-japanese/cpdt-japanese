@@ -373,28 +373,55 @@ Eval cbv beta iota delta -[plus] in fun A => size (@tree_fix A).
  *)
 
 
-(** ** Pretty-Printing *)
+(**
+ (* ** Pretty-Printing *)
+    ** プリティプリント
+ *)
 
-(** It is also useful to do generic pretty-printing of datatype values, rendering them as human-readable strings.  To do so, we will need a bit of metadata for each constructor.  Specifically, we need the name to print for the constructor and the function to use to render its non-recursive arguments.  Everything else can be done generically. *)
+(**
+ (* It is also useful to do generic pretty-printing of datatype values, rendering them as human-readable strings.  To do so, we will need a bit of metadata for each constructor.  Specifically, we need the name to print for the constructor and the function to use to render its non-recursive arguments.  Everything else can be done generically. *)
+
+ データ型の値の総称的なプリティプリントを行なうのも便利です。値を人が読み取れる文字列へと整形します。
+ そのためには、それぞれのコンストラクタに少しメタデータが必要です。
+ 具体的には、コンストラクタをプリントする名前と型の再帰的でない引数を整形するのに使用する関数が必要です。
+ その他諸々は総称的に行なうことができます。
+ *)
 
 Record print_constructor (c : constructor) : Type := PI {
   printName : string;
   printNonrec : nonrecursive c -> string
 }.
 
-(** It is useful to define a shorthand for applying the constructor [PI].  By applying it explicitly to an unknown application of the constructor [Con], we help type inference work. *)
+(**
+ (* It is useful to define a shorthand for applying the constructor [PI].  By applying it explicitly to an unknown application of the constructor [Con], we help type inference work. *)
+
+ コンストラクタ[PI]の適用の略記を定義すると便利です。
+ まだわからないコンストラクタ[Con]の適用に対して明示的にこれを適用することが、型推論がうまくいく助けになります。
+ *)
 
 Notation "^" := (PI (Con _ _)).
 
-(** As in earlier examples, we define the type of metadata for a datatype to be a heterogeneous list type collecting metadata for each constructor. *)
+(**
+ (* As in earlier examples, we define the type of metadata for a datatype to be a heterogeneous list type collecting metadata for each constructor. *)
+
+ 先の例のように、データ型のためにメタデータの型を定義します。そのデータ型は、それぞれのコンストラクタに対するメタデータを集めるヘテロリストの型となるものです。
+ *)
 
 Definition print_datatype := hlist print_constructor.
 
-(** We will be doing some string manipulation here, so we import the notations associated with strings. *)
+(**
+ (* We will be doing some string manipulation here, so we import the notations associated with strings. *)
+
+ ここでは文字列の操作をいくつか行なっていく予定なので、文字列に関連するノーテーションをインポートします。
+ *)
 
 Local Open Scope string_scope.
 
-(** Now it is easy to implement our generic printer, using another function from [DepList.] *)
+(**
+ (* Now it is easy to implement our generic printer, using another function from [DepList.] *)
+
+ 今となっては、[DepList]からのもう一つの関数を利用して、総称的なプリンタを実装するのは簡単です。
+ *)
 
 Check hmap.
 (** %\vspace{-.15in}% [[
@@ -410,7 +437,11 @@ Definition print T dt (pr : print_datatype dt) (fx : fixDenote T dt) : T -> stri
     (fun _ pc x r => printName pc ++ "(" ++ printNonrec pc x
       ++ foldr (fun s acc => ", " ++ s ++ acc) ")" r) pr).
 
-(** Some simple tests establish that [print] gets the job done. *)
+(**
+ (* Some simple tests establish that [print] gets the job done. *)
+
+ いくつかの簡潔なテストで、[print]で仕事が完了することを確認します。
+ *)
 
 Eval compute in print HNil Empty_set_fix.
 (** %\vspace{-.15in}% [[
@@ -508,7 +539,11 @@ Definition append' := append.
 (* end thide *)
 (* end hide *)
 
-(** Some of these simplified terms seem overly complex because we have turned off simplification of calls to [append], which is what uses of the [++] operator desugar to.  Selective [++] simplification would combine adjacent string literals, yielding more or less the code we would write manually to implement this printing scheme. *)
+(**
+ (* Some of these simplified terms seem overly complex because we have turned off simplification of calls to [append], which is what uses of the [++] operator desugar to.  Selective [++] simplification would combine adjacent string literals, yielding more or less the code we would write manually to implement this printing scheme. *)
+ いくつかの簡約された項はあまりに複雑に見えます。なぜなら[append]の呼び出しに対する簡約をオフにしているからです。[append]は[++]演算子の脱糖先に利用します。
+ 選択的に[++]を簡約するなら、隣接した文字列リテラルは結合されますが、この印字方法を実装するのに手書きするコードが増減していたでしょう。
+ *)
 
 
 (** ** Mapping *)
