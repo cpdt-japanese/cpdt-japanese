@@ -657,9 +657,17 @@ Eval simpl in map_nat S 2.
  *)
 
 
-(** * Proving Theorems about Recursive Definitions *)
+(**
+ (* * Proving Theorems about Recursive Definitions *)
+    * 再帰的定義についての定理証明
+ *)
 
-(** We would like to be able to prove theorems about our generic functions.  To do so, we need to establish additional well-formedness properties that must hold of pieces of evidence. *)
+(**
+ (* We would like to be able to prove theorems about our generic functions.  To do so, we need to establish additional well-formedness properties that must hold of pieces of evidence. *)
+
+ いよいよ総称的な関数についての定理を証明していきたいと思います。
+ そのためには、証拠の断片を保持する追加の正しい形式を示す特性を確立する必要があります。
+ *)
 
 Section ok.
   Variable T : Type.
@@ -668,7 +676,14 @@ Section ok.
   Variable dd : datatypeDenote T dt.
   Variable fx : fixDenote T dt.
 
-  (** First, we characterize when a piece of evidence about a datatype is acceptable.  The basic idea is that the type [T] should really be an inductive type with the definition given by [dd].  Semantically, inductive types are characterized by the ability to do induction on them.  Therefore, we require that the usual induction principle is true, with respect to the constructors given in the encoding [dd]. *)
+  (**
+   (* First, we characterize when a piece of evidence about a datatype is acceptable.  The basic idea is that the type [T] should really be an inductive type with the definition given by [dd].  Semantically, inductive types are characterized by the ability to do induction on them.  Therefore, we require that the usual induction principle is true, with respect to the constructors given in the encoding [dd]. *)
+
+   最初に、データ型についての証拠の断片を許容できる場合を特徴付けます。
+   基本的なアイデアは、型[T]が真に、[dd]で与えられる定義を持つ帰納型であるべきだということです。
+   意味論的には、帰納型は自身に対する帰納法を行なう能力によって特徴付けられます。
+   それゆえ、符号化[dd]内で与えられるコンストラクタについて、通常の帰納法の原理が真であることを要求します。
+   *)
 
   Definition datatypeDenoteOk :=
     forall P : T -> Prop,
@@ -677,9 +692,21 @@ Section ok.
         -> P ((hget dd m) x r))
       -> forall v, P v.
 
-  (** This definition can take a while to digest.  The quantifier over [m : member c dt] is considering each constructor in turn; like in normal induction principles, each constructor has an associated proof case.  The expression [hget dd m] then names the constructor we have selected.  After binding [m], we quantify over all possible arguments (encoded with [x] and [r]) to the constructor that [m] selects.  Within each specific case, we quantify further over [i : fin (recursive c)] to consider all of our induction hypotheses, one for each recursive argument of the current constructor.
+  (**
+   (* This definition can take a while to digest.  The quantifier over [m : member c dt] is considering each constructor in turn; like in normal induction principles, each constructor has an associated proof case.  The expression [hget dd m] then names the constructor we have selected.  After binding [m], we quantify over all possible arguments (encoded with [x] and [r]) to the constructor that [m] selects.  Within each specific case, we quantify further over [i : fin (recursive c)] to consider all of our induction hypotheses, one for each recursive argument of the current constructor.
 
      We have completed half the burden of defining side conditions.  The other half comes in characterizing when a recursion scheme [fx] is valid.  The natural condition is that [fx] behaves appropriately when applied to any constructor application. *)
+
+   この定義は消化するのに時間がかかります。
+   量化子[m : member c dt]は各コンストラクタを順番に考慮します; 通常の帰納法の原理のように、各コンストラクタは対応づく証明のケースを持ちます。
+   そして、式[hget dd m]は選択したコンストラクタに名前を付けます。
+   [m]を束縛したあと、[m]が選択したコンストラクタへのありうる([x]と[r]とともに符号化された)引数すべてを量化します。
+   それぞれの特定ケース内で、帰納法の仮定のすべてを考慮するためにさらに量化[i : fin (recursive c)]を行ないます。現在のコンストラクタの各再帰的引数に対する帰納法の仮定についてです。
+
+   副次的条件を定義する重荷の半分は完了しました。
+   もう半分は再帰スキーム[fx]が有効な場合の特徴付けです。
+   [fx]をどのコンストラクタの適用にあてはめても適切に振舞うというのが自然な条件です。
+   *)
 
   Definition fixDenoteOk :=
     forall (R : Type) (cases : datatypeDenote R dt)
@@ -688,11 +715,22 @@ Section ok.
       fx cases ((hget dd m) x r)
       = (hget cases m) x (imap (fx cases) r).
 
-  (** As for [datatypeDenoteOk], we consider all constructors and all possible arguments to them by quantifying over [m], [x], and [r].  The lefthand side of the equality that follows shows a call to the recursive function on the specific constructor application that we selected.  The righthand side shows an application of the function case associated with constructor [m], applied to the non-recursive arguments and to appropriate recursive calls on the recursive arguments. *)
+  (**
+   (* As for [datatypeDenoteOk], we consider all constructors and all possible arguments to them by quantifying over [m], [x], and [r].  The lefthand side of the equality that follows shows a call to the recursive function on the specific constructor application that we selected.  The righthand side shows an application of the function case associated with constructor [m], applied to the non-recursive arguments and to appropriate recursive calls on the recursive arguments. *)
+
+   [datatypeDenoteOk]に対してやったように、[m], [x], [r]を量化することで、すべてのコンストラクタとそれらのありうる引数すべてを考慮します。
+   その次の等式の左辺は、選択した特定のコンストラクタ適用における再帰関数の呼び出しを示しています。
+   右辺はコンストラクタ[m]に対応づいた関数ケースの適用を示しています。コンストラクタは、再帰していない引数と再帰的引数における適切な再帰呼び出しへ適用されます。
+   *)
 
 End ok.
 
-(** We are now ready to prove that the [size] function we defined earlier always returns positive results.  First, we establish a simple lemma. *)
+(**
+ (* We are now ready to prove that the [size] function we defined earlier always returns positive results.  First, we establish a simple lemma. *)
+
+ 今や先に定義した[size]関数が常に正の結果を返すことを証明する準備ができました。
+ 最初に、単純な補題を証明します。
+ *)
 
 (* begin thide *)
 Lemma foldr_plus : forall n (ils : ilist nat n),
@@ -716,7 +754,13 @@ Theorem size_positive : forall T dt
            (r : ilist nat (recursive x)) => foldr plus 1%nat r) dt) v > 0
     ]]
       
-    Our goal is an inequality over a particular call to [size], with its definition expanded.  How can we proceed here?  We cannot use [induction] directly, because there is no way for Coq to know that [T] is an inductive type.  Instead, we need to use the induction principle encoded in our hypothesis [dok] of type [datatypeDenoteOk dd].  Let us try applying it directly.
+    (* Our goal is an inequality over a particular call to [size], with its definition expanded.  How can we proceed here?  We cannot use [induction] directly, because there is no way for Coq to know that [T] is an inductive type.  Instead, we need to use the induction principle encoded in our hypothesis [dok] of type [datatypeDenoteOk dd].  Let us try applying it directly. *)
+
+    目的は、定義を展開した特定の[size]の呼び出しでの不等式を示すことです。
+    ここではどのように進めればよいでしょうか。
+    [induction]を直接利用することはできません。なぜなら、Coqには[T]が帰納型であることを知る術が無いからです。
+    代わりに、型[datatypeDenoteOk dd]の仮定[dok]内の符号化された帰納法の原理を使う必要があります。
+    直接適用してみましょう。
     [[
   apply dok.
     ]]
@@ -729,7 +773,11 @@ Error: Impossible to unify "datatypeDenoteOk dd" with
           (r : ilist nat (recursive x)) => foldr plus 1%nat r) dt) v > 0".
 >>
 
-    Matching the type of [dok] with the type of our conclusion requires more than simple first-order unification, so [apply] is not up to the challenge.  We can use the %\index{tactics!pattern}%[pattern] tactic to get our goal into a form that makes it apparent exactly what the induction hypothesis is. *)
+    (* Matching the type of [dok] with the type of our conclusion requires more than simple first-order unification, so [apply] is not up to the challenge.  We can use the %\index{tactics!pattern}%[pattern] tactic to get our goal into a form that makes it apparent exactly what the induction hypothesis is. *)
+
+    [dok]の型を結論の型と適合させるには単純な一階単一化以上のものが要求されます。よって[apply]では力不足です。
+    %\index{たくてぃく@タクティク!pattern}%[pattern]タクティクを使って、帰納法の仮定が何であるか正確に明らかにする形へとゴールを変形することができます。
+     *)
 
   pattern v.
   (** %\vspace{-.15in}%[[
@@ -763,7 +811,11 @@ Error: Impossible to unify "datatypeDenoteOk dd" with
                foldr plus 1%nat r0) dt)) r) > 0
     ]]
 
-    An induction hypothesis [H] is generated, but we turn out not to need it for this example.  We can simplify the goal using a library theorem about the composition of [hget] and [hmake]. *)
+    (* An induction hypothesis [H] is generated, but we turn out not to need it for this example.  We can simplify the goal using a library theorem about the composition of [hget] and [hmake]. *)
+
+    帰納法の仮定[H]が生成されましたが、この例では必要がないことがわかりました。
+    [hget]と[hmake]の合成についてのライブラリの定理を使ってゴールを単純化できます。
+     *)
 
   rewrite hget_hmake.
   (** %\vspace{-.15in}%[[
@@ -781,7 +833,11 @@ Error: Impossible to unify "datatypeDenoteOk dd" with
 
   apply foldr_plus.
 
-  (** Using hints, we can redo this proof in a nice automated form. *)
+  (**
+   (* Using hints, we can redo this proof in a nice automated form. *)
+
+   ヒントを利用すると、この証明をあざやかに自動的な形でやり直せます。
+   *)
 
   Restart.
 
@@ -792,9 +848,17 @@ Error: Impossible to unify "datatypeDenoteOk dd" with
 Qed.
 (* end thide *)
 
-(** It turned out that, in this example, we only needed to use induction degenerately as case analysis.  A more involved theorem may only be proved using induction hypotheses.  We will give its proof only in unautomated form and leave effective automation as an exercise for the motivated reader.
+(**
+ (* It turned out that, in this example, we only needed to use induction degenerately as case analysis.  A more involved theorem may only be proved using induction hypotheses.  We will give its proof only in unautomated form and leave effective automation as an exercise for the motivated reader.
 
    In particular, it ought to be the case that generic [map] applied to an identity function is itself an identity function. *)
+
+ この例では、場合分けに退化した帰納法の利用だけが必要だということがわかりました。
+ より複雑な定理は帰納法の仮定の利用でのみ証明できるかもしれません。
+ ここでは自動化されていない形の証明のみを与えます。有効な自動化は、意欲的な読者へ演習問題として残しておきます。
+
+ とくに、恒等関数へ適用された総称的な[map]はそれ自身、恒等関数でなければならない例を取り上げます。
+ *)
 
 Theorem map_id : forall T dt
   (dd : datatypeDenote T dt) (fx : fixDenote T dt)
@@ -802,7 +866,11 @@ Theorem map_id : forall T dt
   (v : T),
   map dd fx (fun x => x) v = v.
 (* begin thide *)
-  (** Let us begin as we did in the last theorem, after adding another useful library equality as a hint. *)
+  (**
+   (* Let us begin as we did in the last theorem, after adding another useful library equality as a hint. *)
+
+   役立つライブラリの等式をヒントとして加えた後で、さきほどの定理でやったように始めましょう。
+   *)
 
   Hint Rewrite hget_hmap.
 
@@ -824,7 +892,11 @@ Theorem map_id : forall T dt
                c0 x1 r0) dd)) r) = hget dd m x r
     ]]
 
-    Our goal is an equality whose two sides begin with the same function call and initial arguments.  We believe that the remaining arguments are in fact equal as well, and the [f_equal] tactic applies this reasoning step for us formally. *)
+    (* Our goal is an equality whose two sides begin with the same function call and initial arguments.  We believe that the remaining arguments are in fact equal as well, and the [f_equal] tactic applies this reasoning step for us formally. *)
+
+    ゴールは、両辺が同じ関数呼び出しと引数で始まるような等式です。
+    実は残りの引数も等しいと考えられるので、形式的には[f_equal]タクティクをこの推論の段階に適用します。
+     *)
 
   f_equal.
   (** %\vspace{-.15in}%[[
@@ -837,7 +909,12 @@ Theorem map_id : forall T dt
             c0 x1 r0) dd)) r = r
     ]]
 
-    At this point, it is helpful to proceed by an inner induction on the heterogeneous list [r] of recursive call results.  We could arrive at a cleaner proof by breaking this step out into an explicit lemma, but here we will do the induction inline to save space.*)
+    (* At this point, it is helpful to proceed by an inner induction on the heterogeneous list [r] of recursive call results.  We could arrive at a cleaner proof by breaking this step out into an explicit lemma, but here we will do the induction inline to save space.*)
+
+    この時点では、再帰的呼び出し結果のヘテロリスト[r]における内部的な帰納法によって進めるのが便利です。
+    この段階を明示的な補題へ分解することで、きれいな証明に到達できましたが、ここでは紙面を節約するために、
+    帰納法をインライン%\footnote{訳者注: \emph{crush}タクティクはインライン関数のように帰納法を利用した証明に展開されます。}%に行ないます。
+     *)
 
   induction r; crush.
 
@@ -847,7 +924,11 @@ Theorem map_id : forall T dt
   (* end thide *)
   (* end hide *)
 
-  (** The base case is discharged automatically, and the inductive case looks like this, where [H] is the outer IH (for induction over [T] values) and [IHr] is the inner IH (for induction over the recursive arguments).
+  (**
+   (* The base case is discharged automatically, and the inductive case looks like this, where [H] is the outer IH (for induction over [T] values) and [IHr] is the inner IH (for induction over the recursive arguments).
+
+   基本ケースは自動的に解決されます。帰納的なケースは次のような感じです。[H]は外側の帰納法の仮定([T]の値についての帰納法に対応)、[IHr]は内側の帰納法の仮定(再帰的引数についての帰納法に対応)、です。
+   *)
      [[
   H : forall i : fin (S n),
       fx T
@@ -890,7 +971,11 @@ Theorem map_id : forall T dt
                c0 x1 r0) dd)) r) = ICons a r
     ]]
 
-    We see another opportunity to apply [f_equal], this time to split our goal into two different equalities over corresponding arguments.  After that, the form of the first goal matches our outer induction hypothesis [H], when we give type inference some help by specifying the right quantifier instantiation. *)
+    (* We see another opportunity to apply [f_equal], this time to split our goal into two different equalities over corresponding arguments.  After that, the form of the first goal matches our outer induction hypothesis [H], when we give type inference some help by specifying the right quantifier instantiation. *)
+
+    [f_equal]を適用するもう一つ機会がめぐってきました。今回は、対象の引数についてゴールを2つの異なる等式に分割します。
+    そのあとでは、一つ目のゴールは外側の帰納法の仮定[H]に適合します。適切に量化のインスタンスを指定することで型推論を支援します。
+     *)
 
   f_equal.
   apply (H First).
@@ -904,7 +989,10 @@ Theorem map_id : forall T dt
             c0 x1 r0) dd)) r = r
     ]]
 
-    Now the goal matches the inner IH [IHr]. *)
+    (* Now the goal matches the inner IH [IHr]. *)
+
+    今やゴールは内側の帰納法の仮定[IHr]に適合します。
+     *)
 
   apply IHr; crush.
   (** %\vspace{-.15in}%[[
@@ -917,10 +1005,17 @@ Theorem map_id : forall T dt
          c0 x1 r0) dd) (get r i) = get r i
     ]]
 
-    We can finish the proof by applying the outer IH again, specialized to a different [fin] value. *)
+    (* We can finish the proof by applying the outer IH again, specialized to a different [fin] value. *)
+
+    外側の帰納法の仮定を異なる[fin]の値に特殊化しつつ再び適用することで、証明を終えることができます。
+     *)
 
   apply (H (Next i)).
 Qed.
 (* end thide *)
 
-(** The proof involves complex subgoals, but, still, few steps are required, and then we may reuse our work across a variety of datatypes. *)
+(**
+ (* The proof involves complex subgoals, but, still, few steps are required, and then we may reuse our work across a variety of datatypes. *)
+
+ この証明は複雑なサブゴールを含んでいますが、もはや必要なステップはほとんどありません。様々なデータ型にまたがってこれまでの結果を再利用できるでしょう。
+ *)
