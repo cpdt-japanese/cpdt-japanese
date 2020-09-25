@@ -3,7 +3,7 @@ jobs:
   type_check:
     working_directory: /tmp/cpdt
     docker:
-      - image: eldesh/coq:8.5pl3
+      - image: eldesh/coq:v8.9.1
     shell: /bin/bash --login -eo pipefail
     steps:
       - checkout
@@ -20,7 +20,7 @@ jobs:
   make_doc:
     working_directory: /tmp/cpdt
     docker:
-      - image: eldesh/coq:8.5pl3
+      - image: eldesh/coq:v8.9.1
     shell: /bin/bash --login -eo pipefail
     steps:
       - checkout
@@ -54,4 +54,3 @@ workflows:
       - make_doc:
           requires:
             - type_check
-
