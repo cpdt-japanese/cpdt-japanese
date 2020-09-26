@@ -10,7 +10,7 @@ jobs:
       - run:
           name: type check
           command: |
-            make
+            make -j2
       - persist_to_workspace:
           root: /tmp/cpdt
           paths:
